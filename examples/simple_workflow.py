@@ -131,9 +131,6 @@ with app.get_http_client(token) as client:
     health = app.get(client, "/health")
     print(f"API is healthy: {health}\n")
 
-    concepts = app.get(client, "/concepts")
-    print(f"List of concepts: {concepts}\n")
-
     accounts = app.get_account_ids(token)
     # Uncomment to print accounts IDs
     # print(f"Account IDs: {accounts}\n")
@@ -164,7 +161,9 @@ with app.get_http_client(token, design_instance_id) as client:
     created_wheel = app.post(client, "/configurations", data=WHEEL)
 
     # Read all aero configurations
-    configurations = app.get(client, "/configurations", params={"config_type": "aero"})
+    configurations = app.get(
+        client, f"/concepts/{design_instance_id}/configurations", params={"config_type": "aero"}
+    )
     # Uncomment to print configurations
     # print(f"List of configurations: {configurations}\n")
 

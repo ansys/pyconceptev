@@ -65,6 +65,7 @@ sphinx-autobuild = "^2024.4.16"
 sphinx-autodoc-typehints = "^2.1.1"
 sphinx-copybutton = "^0.5.1"
 sphinx-design = "^0.6.0"
+pypandoc-binary = "^1.13"
 
 # Optional testing dependencies
 [tool.poetry.group.tests]
