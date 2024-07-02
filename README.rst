@@ -18,12 +18,12 @@ PyConceptEV
 ..    :target: https://pypi.org/project/ansys-conceptev-core/
 ..    :alt: PyPI Downloads
 
-.. .. |codecov| image:: https://codecov.io/gh/ansys/pyconceptev-core/graph/badge.svg?token=UZIC7XT5WE
-..    :target: https://codecov.io/gh/ansys/pyconceptev-core
+.. .. |codecov| image:: https://codecov.io/gh/ansys/pyconceptev/graph/badge.svg?token=UZIC7XT5WE
+..    :target: https://codecov.io/gh/ansys/pyconceptev
 ..    :alt: Codecov
 
-.. .. |GH-CI| image:: https://github.com/ansys/pyconceptev-core/actions/workflows/ci_cd.yml/badge.svg
-..    :target: https://github.com/ansys/pyconceptev-core/actions/workflows/ci_cd.yml
+.. .. |GH-CI| image:: https://github.com/ansys/pyconceptev/actions/workflows/ci_cd.yml/badge.svg
+..    :target: https://github.com/ansys/pyconceptev/actions/workflows/ci_cd.yml
 ..    :alt: GH-CI
 
 .. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -34,8 +34,8 @@ PyConceptEV
 ..    :target: https://github.com/psf/black
 ..    :alt: Black
 
-.. .. |pre-commit| image:: https://results.pre-commit.ci/badge/github/ansys/pyconceptev-core/main.svg
-..    :target: https://results.pre-commit.ci/latest/github/ansys/pyconceptev-core/main
+.. .. |pre-commit| image:: https://results.pre-commit.ci/badge/github/ansys/pyconceptev/main.svg
+..    :target: https://results.pre-commit.ci/latest/github/ansys/pyconceptev/main
 ..    :alt: pre-commit.ci
 
 
@@ -50,26 +50,28 @@ Documentation and issues
 ------------------------
 
 Documentation for the latest stable release of PyConceptEV is hosted
-at `PyConceptEV documentation <https://pyconceptev-core.docs.pyansys.com/version/stable/index.html>`_.
+at `PyConceptEV documentation <https://conceptev.docs.pyansys.com/>`_.
 
 The documentation has these sections:
 
-- `Getting started <https://conceptev.core.docs.pyansys.com/version/stable/getting_started/index.html>`_: Learn
+- `Getting started <https://conceptev.docs.pyansys.com/version/stable/getting_started/index.html>`_: Learn
   how to install PyConceptEV in user mode and quickly begin using it.
-- `User guide <https://conceptev.core.docs.pyansys.com/version/stable/user_guide/index.html>`_: Learn how to
+- `User guide <https://conceptev.docs.pyansys.com/version/stable/user_guide/index.html>`_: Learn how to
   configure a PyConceptEV session, get a token, and create a client.
-- `API reference <conceptev.core.docs.pyansys.com/version/stable/api/index.html>`_: Understand how the
-  `Ansys ConceptEV API documentation <https://conceptev.ansys.com/api/docs>`_: Provides for interacting
+- `API reference <conceptev.docs.pyansys.com/version/stable/api/index.html>`_: Understand how the
+  `Ansys ConceptEV API documentation <https://conceptev.ansys.com/api/docs>`_ provides for interacting
   programmatically with PyConcept EV.
-- `Contribute <conceptev.core.docs.pyansys.com/version/stable/contributing.html>`_: Learn how to
-  contribute to PyConceptEV codebase or documentation.
+- `Examples <https://conceptev.docs.pyansys.com/version/stable/examples/index.html>`_: Explore examples
+  that show how to use PyConceptEV.
+- `Contribute <conceptev.docs.pyansys.com/version/stable/contributing.html>`_: Learn how to
+  contribute to the PyConceptEV codebase or documentation.
 
 In the upper right corner of the documentation's title bar, there is an option
 for switching from viewing the documentation for the latest stable release
 to viewing the documentation for the development version or previously
 released versions.
 
-On the `PyConceptEV Issues <https://github.com/ansys/pyconceptev-core/issues>`_
+On the `PyConceptEV Issues <https://github.com/ansys/pyconceptev/issues>`_
 page, you can create issues to report bugs and request new features. On the
 `Discussions <https://discuss.ansys.com/>`_ page on the Ansys Developer portal,
 you can post questions, share ideas, and get community feedback.
@@ -82,8 +84,8 @@ as described in the previous paragraph.
 License
 -------
 
-PyConceptEV is licensed under the `MIT License <https://github.com/ansys/pyconceptev-core/blob/main/LICENSE>`_.
+PyConceptEV is licensed under the `MIT License <https://github.com/ansys/pyconceptev/blob/main/LICENSE>`_.
 
 PyConceptEV makes no commercial claim over Ansys whatsoever. This library adds a
-Python interface for the `Ansys ConceptEV <https://www.ansys.com/products/electronics/ansys-concept-ev>`_
+Python interface for `Ansys ConceptEV <https://www.ansys.com/products/electronics/ansys-concept-ev>`_
 without changing the core behavior or license of the original Ansys software.

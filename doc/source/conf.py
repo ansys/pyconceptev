@@ -21,23 +21,23 @@ project = "ansys-conceptev-core"
 copyright = f"(c) 2023-{datetime.today().year} ANSYS, Inc. and/or its affiliates."
 author = "ANSYS, Inc."
 release = version = __version__
-cname = os.getenv("DOCUMENTATION_CNAME", "conceptev.core.docs.pyansys.com")
+cname = os.getenv("DOCUMENTATION_CNAME", "conceptev.docs.pyansys.com")
 switcher_version = get_version_match(__version__)
 
 # Select desired logo, theme, and declare the html title
 html_logo = logo
 html_theme = "ansys_sphinx_theme"
-html_short_title = html_title = "pyconceptev-core"
+html_short_title = html_title = "pyconceptev"
 html_context = {
     "github_user": "ansys",
-    "github_repo": "pyconceptev-core",
+    "github_repo": "pyconceptev",
     "github_version": "main",
     "doc_path": "doc/source",
 }
 
 # specify the location of your github repo
 html_theme_options = {
-    "github_url": "https://github.com/ansys/pyconceptev-core",
+    "github_url": "https://github.com/ansys/pyconceptev",
     "use_edit_page_button": True,
     "show_prev_next": False,
     "show_breadcrumbs": True,
@@ -142,9 +142,7 @@ linkcheck_ignore = [
 # If we are on a release, we have to ignore the "release" URLs, since it is not
 # available until the release is published.
 if switcher_version != "dev":
-    linkcheck_ignore.append(
-        f"https://github.com/ansys/pyconceptev-core/releases/tag/v{__version__}"
-    )
+    linkcheck_ignore.append(f"https://github.com/ansys/pyconceptev/releases/tag/v{__version__}")
 
 # Sphinx event hooks
 
