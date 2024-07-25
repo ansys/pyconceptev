@@ -49,9 +49,9 @@ client_id = config["client_id"]
 authority = config["authority"]
 
 
-def create_msal_app():
+def create_msal_app(cache_filepath="token_cache.bin"):
     """Create MSAL App with a persistent cache."""
-    persistence = build_persistence("token_cache.bin")
+    persistence = build_persistence(cache_filepath)
     cache = token_cache.PersistedTokenCache(persistence)
     app = PublicClientApplication(client_id=client_id, authority=authority, token_cache=cache)
     return app

@@ -186,13 +186,13 @@ def create_new_project(
     user_details = httpx.post(osm_url + "/user/details", headers={"Authorization": token})
     if user_details.status_code not in (200, 204):
         raise Exception(f"Failed to get a user details on OCM {user_details}.")
-
+    design_instance_id = created_design.json()["designInstanceList"][0]["designInstanceId"]
     concept_data = {
         "capabilities_ids": [],
         "components_ids": [],
         "configurations_ids": [],
         "design_id": created_design.json()["designId"],
-        "design_instance_id": created_design.json()["designInstanceList"][0]["designInstanceId"],
+        "design_instance_id": design_instance_id,
         "drive_cycles_ids": [],
         "jobs_ids": [],
         "name": "Branch 1",
@@ -201,7 +201,9 @@ def create_new_project(
         "user_id": user_details.json()["userId"],
     }
 
-    created_concept = post(client, "/concepts", data=concept_data)
+    created_concept = post(
+        client, "/concepts", data=concept_data, params={"design_instance_id": design_instance_id}
+    )
     return created_concept
 
 
@@ -319,5 +321,3 @@ if __name__ == "__main__":
     with get_http_client(token) as client:  # Create a client to talk to the API
         health = get(client, "/health")  # Check that the API is healthy
         print(health)
-        concepts = get(client, "/concepts")  # Get a list of concepts
-        print(concepts)
