@@ -176,7 +176,7 @@ def test_create_new_project(httpx_mock: HTTPXMock, client: httpx.Client):
         "user_id": user_id,
     }
     httpx_mock.add_response(
-        url=f"{conceptev_url}/concepts",
+        url=f"{conceptev_url}/concepts?design_instance_id={design_instance_id}",
         method="post",
         match_json=concept_data,
         json=mocked_concept,
