@@ -37,9 +37,11 @@ python = ">=3.9,<4.0"
 importlib-metadata = {version = "^7.0", python = "<3.8"}
 python-dotenv = "^1.0.0"
 httpx = "^0.26.0"
+msal = "^1.29.0"
+msal-extensions = "^1.2.0"
+tomli = {version = "^2.0.1", python = "<3.11"}
 
-# Common packages for test and examples
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.group.dev.dependencies] # Common packages for test and examples
 plotly = "^5.18.0"
 tox = "^4.15.1"
 pytest-cov = "^5.0.0"

@@ -31,6 +31,8 @@ from typing import Literal
 import dotenv
 import httpx
 
+from ansys.conceptev.core import auth
+
 dotenv.load_dotenv()
 
 Router = Literal[
@@ -53,12 +55,14 @@ Router = Literal[
     "/utilities:data_format_version",
 ]
 
+app = auth.create_msal_app()
+
 
 def get_token() -> str:
     """Get token from OCM."""
     username = os.environ["CONCEPTEV_USERNAME"]
     password = os.environ["CONCEPTEV_PASSWORD"]
-    ocm_url = os.environ["OCM_URL"]
+    ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
         url=ocm_url + "/auth/login/", json={"emailAddress": username, "password": password}
     )
@@ -73,7 +77,7 @@ def get_http_client(token: str, design_instance_id: str | None = None) -> httpx.
     The HTTP client creates and maintains the connection, which is more performant than
     re-creating this connection for each call.
     """
-    base_url = os.environ["CONCEPTEV_URL"]
+    base_url = auth.config["CONCEPTEV_URL"]
     params = None
     if design_instance_id:
         params = {"design_instance_id": design_instance_id}
@@ -146,7 +150,7 @@ def create_new_project(
     project_goal: str = "Created from the CLI",
 ):
     """Create a project."""
-    osm_url = os.environ["OCM_URL"]
+    osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
     project_data = {
         "accountId": account_id,
@@ -182,13 +186,13 @@ def create_new_project(
     user_details = httpx.post(osm_url + "/user/details", headers={"Authorization": token})
     if user_details.status_code not in (200, 204):
         raise Exception(f"Failed to get a user details on OCM {user_details}.")
-
+    design_instance_id = created_design.json()["designInstanceList"][0]["designInstanceId"]
     concept_data = {
         "capabilities_ids": [],
         "components_ids": [],
         "configurations_ids": [],
         "design_id": created_design.json()["designId"],
-        "design_instance_id": created_design.json()["designInstanceList"][0]["designInstanceId"],
+        "design_instance_id": design_instance_id,
         "drive_cycles_ids": [],
         "jobs_ids": [],
         "name": "Branch 1",
@@ -197,7 +201,9 @@ def create_new_project(
         "user_id": user_details.json()["userId"],
     }
 
-    created_concept = post(client, "/concepts", data=concept_data)
+    created_concept = post(
+        client, "/concepts", data=concept_data, params={"design_instance_id": design_instance_id}
+    )
     return created_concept
 
 
@@ -209,7 +215,7 @@ def get_concept_ids(client: httpx.Client):
 
 def get_account_ids(token: str) -> dict:
     """Get account IDs."""
-    ocm_url = os.environ["OCM_URL"]
+    ocm_url = auth.config["OCM_URL"]
     response = httpx.post(url=ocm_url + "/account/list", headers={"authorization": token})
     if response.status_code != 200:
         raise Exception(f"Failed to get accounts {response}.")
@@ -222,7 +228,7 @@ def get_account_ids(token: str) -> dict:
 
 def get_default_hpc(token: str, account_id: str):
     """Get the default HPC ID."""
-    ocm_url = os.environ["OCM_URL"]
+    ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
         url=ocm_url + "/account/hpc/default",
         json={"accountId": account_id},
@@ -315,5 +321,3 @@ if __name__ == "__main__":
     with get_http_client(token) as client:  # Create a client to talk to the API
         health = get(client, "/health")  # Check that the API is healthy
         print(health)
-        concepts = get(client, "/concepts")  # Get a list of concepts
-        print(concepts)

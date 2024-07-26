@@ -1,0 +1,5 @@
+OCM_URL = "https://prod.portal.onscale.com/api"
+CONCEPTEV_URL = "https://conceptev.ansys.com/api"
+client_id =  'd8434bbf-552c-4672-ac1b-1cadbef28144'
+authority = 'https://ansysaccount.b2clogin.com/ansysaccount.onmicrosoft.com/B2C_1A_ANSYSID_SIGNUP_SIGNIN'
+scope ='https://ansysaccount.onmicrosoft.com/AnsysID/Authentication'
