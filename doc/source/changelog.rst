@@ -9,6 +9,41 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.1.5 <https://github.com/ansys/pyconceptev/releases/tag/v0.1.5>`_ - 2024-07-29
+================================================================================
+
+Added
+^^^^^
+
+- ansys id login `#78 <https://github.com/ansys/pyconceptev/pull/78>`_
+
+
+Changed
+^^^^^^^
+
+- chore: update CHANGELOG for v0.1.4 `#69 <https://github.com/ansys/pyconceptev/pull/69>`_
+
+
+Fixed
+^^^^^
+
+- slowed down pinging the results server `#80 <https://github.com/ansys/pyconceptev/pull/80>`_
+- Fix/documentation links `#88 <https://github.com/ansys/pyconceptev/pull/88>`_
+
+
+Dependencies
+^^^^^^^^^^^^
+
+- CHORE: Bump ansys-sphinx-theme from 0.16.5 to 0.16.6 `#70 <https://github.com/ansys/pyconceptev/pull/70>`_
+- CHORE: Bump twine from 5.1.0 to 5.1.1 `#76 <https://github.com/ansys/pyconceptev/pull/76>`_
+- CHORE: Bump importlib-metadata from 7.1.0 to 8.2.0 `#81 <https://github.com/ansys/pyconceptev/pull/81>`_
+- CHORE: Bump jupyterlab from 4.2.2 to 4.2.4 `#82 <https://github.com/ansys/pyconceptev/pull/82>`_
+- CHORE: Bump sphinx-autodoc-typehints from 2.1.1 to 2.2.3 `#83 <https://github.com/ansys/pyconceptev/pull/83>`_
+- CHORE: Bump tox from 4.15.1 to 4.16.0 `#84 <https://github.com/ansys/pyconceptev/pull/84>`_
+- CHORE: Bump sphinx from 7.3.7 to 7.4.7 `#85 <https://github.com/ansys/pyconceptev/pull/85>`_
+- CHORE: Bump plotly from 5.22.0 to 5.23.0 `#86 <https://github.com/ansys/pyconceptev/pull/86>`_
+- CHORE: Bump jupytext from 1.16.2 to 1.16.3 `#87 <https://github.com/ansys/pyconceptev/pull/87>`_
+
 `0.1.4 <https://github.com/ansys/pyconceptev/releases/tag/v0.1.4>`_ - 2024-06-13
 ================================================================================
 
