@@ -63,7 +63,7 @@ The documentation has these sections:
   programmatically with PyConcept EV.
 - `Examples <https://conceptev.docs.pyansys.com/version/stable/examples/index.html>`_: Explore examples
   that show how to use PyConceptEV.
-- `Contribute <conceptev.docs.pyansys.com/version/stable/contributing.html>`_: Learn how to
+- `Contribute <https://conceptev.docs.pyansys.com/version/stable/contributing.html>`_: Learn how to
   contribute to the PyConceptEV codebase or documentation.
 
 In the upper right corner of the documentation's title bar, there is an option
