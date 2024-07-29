@@ -22,4 +22,4 @@ Then, install PyConceptEV with this command:
 
 .. code:: bash
 
-   python -m pip pip install ansys-conceptev-core
+   python -m pip install ansys-conceptev-core
