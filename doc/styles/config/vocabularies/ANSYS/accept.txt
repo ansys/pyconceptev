@@ -6,3 +6,6 @@ Makefile
 isort
 pytest
 powertrains
+Cognito
+MSAL
+OnScale

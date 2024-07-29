@@ -28,38 +28,24 @@
 #
 # Perform required imports.
 
-# +
 import datetime
 import os
 from pathlib import Path
 
 import plotly.graph_objects as go
 
-from ansys.conceptev.core import app
-
-# -
+from ansys.conceptev.core import app, auth
 
 # ## Set up environment variables
+# Preferred method is to use AnsysID. So set to True.
+use_ansys_id = False  # True
 
-# Set up required environment variables.
-
-# +
-os.environ["CONCEPTEV_URL"] = "https://conceptev.ansys.com/api/"
-os.environ["OCM_URL"] = "https://prod.portal.onscale.com/api"
-
-# Set environment variables for ConceptEV username and password if they don't exist!
-if os.environ.get("CONCEPTEV_USERNAME") is None:
-    os.environ["CONCEPTEV_USERNAME"] = "joe.blogs@my_work.com"
-if os.environ.get("CONCEPTEV_PASSWORD") is None:
-    os.environ["CONCEPTEV_PASSWORD"] = "sup3r_s3cr3t_passw0rd"
-# -
-
-# +
-# Uncomment the following lines of code if you want to use a local ``.env`` file.
-#
-# import dotenv
-# dotenv.load_dotenv()
-# -
+if not (use_ansys_id):
+    # Set environment variables for ConceptEV username and password if they don't exist!
+    if os.environ.get("CONCEPTEV_USERNAME") is None:
+        os.environ["CONCEPTEV_USERNAME"] = "joe.blogs@my_work.com"
+    if os.environ.get("CONCEPTEV_PASSWORD") is None:
+        os.environ["CONCEPTEV_PASSWORD"] = "sup3r_s3cr3t_passw0rd"
 
 # ## Define example data
 #
@@ -117,32 +103,30 @@ BATTERY = {
 }
 
 motor_data = {"name": "e9", "component_type": "MotorLabID", "inverter_losses_included": False}
-# -
 
-# ## Use API client for the Ansys ConceptEV service
+if use_ansys_id:
+    # Get a token from Ansys ID (Preferred)
+    msal_app = auth.create_msal_app()
+    token = auth.get_ansyId_token(msal_app)
+else:
+    # Get a token from OCM (Deprecated)
+    token = app.get_token()
 
-# ### Get a token from OCM
 
-token = app.get_token()
-
-# ### Create a project
-
+# Use API client for the Ansys ConceptEV service
 with app.get_http_client(token) as client:
     health = app.get(client, "/health")
     print(f"API is healthy: {health}\n")
-
-    concepts = app.get(client, "/concepts")
-    print(f"List of concepts: {concepts}\n")
 
     accounts = app.get_account_ids(token)
     # Uncomment to print accounts IDs
     # print(f"Account IDs: {accounts}\n")
 
-    account_id = accounts[os.environ["CONCEPTEV_USERNAME"]]
+    account_id = accounts["conceptev_saas@ansys.com"]
     hpc_id = app.get_default_hpc(token, account_id)
     # Uncomment to print HPC ID
     # print(f"HPC ID: {hpc_id}\n")
-
+    # Create a project
     project = app.create_new_project(
         client, account_id, hpc_id, f"New Project +{datetime.datetime.now()}"
     )
@@ -164,7 +148,9 @@ with app.get_http_client(token, design_instance_id) as client:
     created_wheel = app.post(client, "/configurations", data=WHEEL)
 
     # Read all aero configurations
-    configurations = app.get(client, "/configurations", params={"config_type": "aero"})
+    configurations = app.get(
+        client, f"/concepts/{design_instance_id}/configurations", params={"config_type": "aero"}
+    )
     # Uncomment to print configurations
     # print(f"List of configurations: {configurations}\n")
 
@@ -238,7 +224,7 @@ with app.get_http_client(token, design_instance_id) as client:
     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
 
     # Read the results and show the result in your browser
-    results = app.read_results(client, job_info, calculate_units=False)
+    results = app.read_results(client, job_info, calculate_units=False, rate_limit=3)
     x = results[0]["capability_curve"]["speeds"]
     y = results[0]["capability_curve"]["torques"]
 
