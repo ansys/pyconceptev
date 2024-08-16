@@ -130,14 +130,21 @@ with app.get_http_client(token) as client:
     project = app.create_new_project(
         client, account_id, hpc_id, f"New Project +{datetime.datetime.now()}"
     )
-    print(f"ID of the created project: {project['id']}")
+    print(f"ID of the created project: {project['projectId']}")
+
+    # Create a concept with that project
+    concept = app.create_new_concept(
+        client, project["projectId"], f"New Concept +{datetime.datetime.now()}"
+    )
+    print(f"ID of the created concept: {concept['id']}")
+
 
 # ### Perform basic operations
 #
 # Perform basic operations on the design instance associated with the new project.
 
 # +
-design_instance_id = project["design_instance_id"]
+design_instance_id = concept["design_instance_id"]
 
 with app.get_http_client(token, design_instance_id) as client:
 
