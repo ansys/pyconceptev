@@ -148,7 +148,7 @@ def create_new_project(
     hpc_id: str,
     title: str,
     project_goal: str = "Created from the CLI",
-):
+) -> dict:
     """Create a project."""
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
@@ -171,7 +171,7 @@ def create_new_concept(
     client: httpx.Client,
     project_id: str,
     title: str = f"CLI concept {datetime.datetime.now()}",
-):
+) -> dict:
     """Create a concept within an existing project."""
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
@@ -221,7 +221,7 @@ def create_new_concept(
     return created_concept
 
 
-def get_concept_ids(client: httpx.Client):
+def get_concept_ids(client: httpx.Client) -> dict:
     """Get concept IDs."""
     concepts = get(client, "/concepts")
     return {concept["name"]: concept["id"] for concept in concepts}
@@ -240,7 +240,7 @@ def get_account_ids(token: str) -> dict:
     return accounts
 
 
-def get_default_hpc(token: str, account_id: str):
+def get_default_hpc(token: str, account_id: str) -> dict:
     """Get the default HPC ID."""
     ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
@@ -259,7 +259,7 @@ def create_submit_job(
     account_id: str,
     hpc_id: str,
     job_name: str = "cli_job: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
-):
+) -> dict:
     """Create and then submit a job."""
     job_input = {
         "job_name": job_name,
