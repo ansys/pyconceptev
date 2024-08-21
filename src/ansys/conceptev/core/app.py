@@ -148,7 +148,7 @@ def create_new_project(
     hpc_id: str,
     title: str,
     project_goal: str = "Created from the CLI",
-):
+) -> dict:
     """Create a project."""
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
@@ -164,6 +164,18 @@ def create_new_project(
     if created_project.status_code != 200 and created_project.status_code != 204:
         raise Exception(f"Failed to create a project {created_project}.")
 
+    return created_project.json()
+
+
+def create_new_concept(
+    client: httpx.Client,
+    project_id: str,
+    title: str = f"CLI concept {datetime.datetime.now()}",
+) -> dict:
+    """Create a concept within an existing project."""
+    osm_url = auth.config["OCM_URL"]
+    token = client.headers["Authorization"]
+
     product_ids = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
     product_id = [
         product["productId"]
@@ -172,9 +184,9 @@ def create_new_project(
     ][0]
 
     design_data = {
-        "projectId": created_project.json()["projectId"],
+        "projectId": project_id,
         "productId": product_id,
-        "designTitle": "Branch 1",
+        "designTitle": title,
     }
     created_design = httpx.post(
         osm_url + "/design/create", headers={"Authorization": token}, json=design_data
@@ -196,18 +208,20 @@ def create_new_project(
         "drive_cycles_ids": [],
         "jobs_ids": [],
         "name": "Branch 1",
-        "project_id": created_project.json()["projectId"],
+        "project_id": project_id,
         "requirements_ids": [],
         "user_id": user_details.json()["userId"],
     }
 
-    created_concept = post(
-        client, "/concepts", data=concept_data, params={"design_instance_id": design_instance_id}
-    )
+    query = {
+        "design_instance_id": created_design.json()["designInstanceList"][0]["designInstanceId"],
+    }
+
+    created_concept = post(client, "/concepts", data=concept_data, params=query)
     return created_concept
 
 
-def get_concept_ids(client: httpx.Client):
+def get_concept_ids(client: httpx.Client) -> dict:
     """Get concept IDs."""
     concepts = get(client, "/concepts")
     return {concept["name"]: concept["id"] for concept in concepts}
@@ -226,7 +240,7 @@ def get_account_ids(token: str) -> dict:
     return accounts
 
 
-def get_default_hpc(token: str, account_id: str):
+def get_default_hpc(token: str, account_id: str) -> dict:
     """Get the default HPC ID."""
     ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
@@ -245,7 +259,7 @@ def create_submit_job(
     account_id: str,
     hpc_id: str,
     job_name: str = "cli_job: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
-):
+) -> dict:
     """Create and then submit a job."""
     job_input = {
         "job_name": job_name,
