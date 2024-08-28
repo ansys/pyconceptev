@@ -167,6 +167,21 @@ def create_new_project(
     return created_project.json()
 
 
+def get_product_id(product_info, product_name):
+    """Get the product id for specific product name."""
+    product_id = None
+    for product in product_info:
+        if isinstance(product, dict):
+            if product["productName"] == product_name:
+                product_id = product["productId"]
+    if product_id is None:
+        raise Exception(
+            f"Failed to obtain product id of '{product_name}'. product_info={str(product_info)}"
+        )
+
+    return product_id
+
+
 def create_new_concept(
     client: httpx.Client,
     project_id: str,
@@ -176,12 +191,8 @@ def create_new_concept(
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
 
-    product_ids = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
-    product_id = [
-        product["productId"]
-        for product in product_ids.json()
-        if product["productName"] == "CONCEPTEV"
-    ][0]
+    product_info = httpx.get(osm_url + "/product/list", headers={"Authorization": token}).json()
+    product_id = get_product_id(product_info, "CONCEPTEV")
 
     design_data = {
         "projectId": project_id,
