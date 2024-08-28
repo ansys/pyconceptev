@@ -119,22 +119,11 @@ def test_delete(httpx_mock: HTTPXMock, client: httpx.Client):
 def test_create_new_project(httpx_mock: HTTPXMock, client: httpx.Client):
     client.params = []
     project_id = "project_id_123"
-    design_id = "design_id_123"
-    design_instance_id = "design_instance_123"
     account_id = "account_id_123"
     hpc_id = "hpc_id_123"
-    user_id = "user_id_123"
     title = "Testing Title"
-    product_id = "123"
-    mocked_concept = {"name": "new_mocked_concept"}
     mocked_project = {"projectId": project_id}
-    mocked_design = {
-        "designId": design_id,
-        "designInstanceList": [{"designInstanceId": design_instance_id}],
-        "projectId": project_id,
-        "productId": product_id,
-    }
-    mocked_user = {"userId": user_id}
+
     project_data = {
         "accountId": account_id,
         "hpcId": hpc_id,
@@ -146,21 +135,16 @@ def test_create_new_project(httpx_mock: HTTPXMock, client: httpx.Client):
         url=f"{ocm_url}/project/create", method="post", match_json=project_data, json=mocked_project
     )
 
-    httpx_mock.add_response(
-        url=f"{ocm_url}/product/list",
-        method="get",
-        json=[{"productId": product_id, "productName": "CONCEPTEV"}],
-    )
+    value = app.create_new_project(client, account_id, hpc_id, title)
+    assert value == mocked_project
 
-    design_data = {
-        "projectId": project_id,
-        "productId": product_id,
-        "designTitle": "Branch 1",
-    }
-    httpx_mock.add_response(
-        url=f"{ocm_url}/design/create", method="post", match_json=design_data, json=mocked_design
-    )
-    httpx_mock.add_response(url=f"{ocm_url}/user/details", method="post", json=mocked_user)
+
+def test_create_concept(httpx_mock: HTTPXMock, client: httpx.Client):
+    design_id = "design_id_123"
+    design_instance_id = "design_instance_123"
+    project_id = "project_id_123"
+    user_id = "user_id_123"
+    mocked_concept = {"name": "new_mocked_concept"}
 
     concept_data = {
         "capabilities_ids": [],
@@ -175,13 +159,38 @@ def test_create_new_project(httpx_mock: HTTPXMock, client: httpx.Client):
         "requirements_ids": [],
         "user_id": user_id,
     }
+    project_id = "project_id_123"
+    product_id = "123"
+    mocked_design = {
+        "designId": design_id,
+        "designInstanceList": [{"designInstanceId": design_instance_id}],
+        "projectId": project_id,
+        "productId": product_id,
+    }
+    mocked_user = {"userId": user_id}
+    httpx_mock.add_response(
+        url=f"{ocm_url}/product/list",
+        method="get",
+        json=[{"productId": product_id, "productName": "CONCEPTEV"}],
+    )
+    concept_title = "CLI concept"
+    design_data = {
+        "projectId": project_id,
+        "productId": product_id,
+        "designTitle": concept_title,
+    }
+    httpx_mock.add_response(
+        url=f"{ocm_url}/design/create", method="post", match_json=design_data, json=mocked_design
+    )
+    httpx_mock.add_response(url=f"{ocm_url}/user/details", method="post", json=mocked_user)
+
     httpx_mock.add_response(
         url=f"{conceptev_url}/concepts?design_instance_id={design_instance_id}",
         method="post",
         match_json=concept_data,
         json=mocked_concept,
     )
-    value = app.create_new_project(client, account_id, hpc_id, title)
+    value = app.create_new_concept(client, project_id, concept_title)
     assert value == mocked_concept
 
 
