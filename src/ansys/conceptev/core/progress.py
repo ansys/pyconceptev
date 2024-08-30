@@ -75,12 +75,7 @@ def check_status(status: str):
         return False
 
 
-def monitor_job_progress(job_id: str, user_id: str, token: str, already_async: bool = False):
+def monitor_job_progress(job_id: str, user_id: str, token: str):
     """Monitor job progress and return the status when complete."""
-    if already_async:
-        loop = asyncio.get_event_loop()
-        task = loop.create_task(monitor_job_messages(job_id, user_id, token))
-        result = loop.run_until_complete(task)
-    else:
-        result = asyncio.run(monitor_job_messages(job_id, user_id, token))
+    result = asyncio.run(monitor_job_messages(job_id, user_id, token))
     return result
