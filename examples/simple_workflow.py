@@ -38,7 +38,7 @@ from ansys.conceptev.core import app, auth
 
 # ## Set up environment variables
 # Preferred method is to use AnsysID. So set to True.
-use_ansys_id = True  # True
+use_ansys_id = False  # True
 
 if not (use_ansys_id):
     # Set environment variables for ConceptEV username and password if they don't exist!
