@@ -40,6 +40,7 @@ httpx = "^0.26.0"
 msal = "^1.29.0"
 msal-extensions = "^1.2.0"
 tomli = {version = "^2.0.1", python = "<3.11"}
+websockets = "^13.0.1"
 
 [tool.poetry.group.dev.dependencies] # Common packages for test and examples
 plotly = "^5.18.0"
@@ -80,6 +81,7 @@ pytest-httpx = "^0.29.0"
 pytest-mock = "^3.12.0"
 
 # Optional build requirements
+pytest-asyncio = "^0.24.0"
 [tool.poetry.group.build]
 optional = true
 

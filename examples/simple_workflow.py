@@ -38,7 +38,7 @@ from ansys.conceptev.core import app, auth
 
 # ## Set up environment variables
 # Preferred method is to use AnsysID. So set to True.
-use_ansys_id = False  # True
+use_ansys_id = True  # True
 
 if not (use_ansys_id):
     # Set environment variables for ConceptEV username and password if they don't exist!
@@ -231,7 +231,7 @@ with app.get_http_client(token, design_instance_id) as client:
     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
 
     # Read the results and show the result in your browser
-    results = app.read_results(client, job_info, calculate_units=False, rate_limit=3)
+    results = app.read_results(client, job_info, calculate_units=False)
     x = results[0]["capability_curve"]["speeds"]
     y = results[0]["capability_curve"]["torques"]
 
