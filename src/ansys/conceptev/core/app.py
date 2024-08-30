@@ -299,6 +299,7 @@ def read_results(
     client,
     job_info: dict,
     calculate_units: bool = True,
+    already_async: bool = False,
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]
