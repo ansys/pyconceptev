@@ -33,12 +33,12 @@ STATUS_COMPLETE = "complete"
 STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "failed"
 
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+ssl_context.load_verify_locations(certifi.where())
+
 
 def connect_to_ocm(user_id: str, token: str):
     """Connect to the OnScale Cloud Messaging service."""
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-    ssl_context.load_verify_locations(certifi.where())
-
     uri = (
         f"wss://sockets.prod.portal.onscale.com/socket/user?userId={user_id}&Authorization={token}"
     )

@@ -34,6 +34,7 @@ from ansys.conceptev.core.progress import (
     monitor_job_messages,
     monitor_job_progress,
     parse_message,
+    ssl_context,
 )
 
 
@@ -44,9 +45,10 @@ async def test_connect_to_ocm():
     expected_uri = (
         f"wss://sockets.prod.portal.onscale.com/socket/user?userId={user_id}&Authorization={token}"
     )
+
     with patch("ansys.conceptev.core.progress.connect") as mock_connect:
         connect_to_ocm(user_id, token)
-        mock_connect.assert_called_with(expected_uri)
+        mock_connect.assert_called_with(expected_uri, ssl=ssl_context)
 
 
 def test_parse_message():
