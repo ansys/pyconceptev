@@ -24,20 +24,25 @@
 
 import asyncio
 import json
+import ssl
 
+import certifi
 from websockets.asyncio.client import connect
 
 STATUS_COMPLETE = "complete"
 STATUS_FINISHED = "FINISHED"
-STATUS_ERROR = "FAILED"
+STATUS_ERROR = "failed"
 
 
 def connect_to_ocm(user_id: str, token: str):
     """Connect to the OnScale Cloud Messaging service."""
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    ssl_context.load_verify_locations(certifi.where())
+
     uri = (
         f"wss://sockets.prod.portal.onscale.com/socket/user?userId={user_id}&Authorization={token}"
     )
-    return connect(uri)
+    return connect(uri, ssl=ssl_context)
 
 
 def parse_message(message: str, job_id: str):
@@ -53,12 +58,17 @@ def parse_message(message: str, job_id: str):
         elif message_type == "progress":
             progress = message_data.get("progress", None)
             print(f"Progress:{progress}")
+        elif message_type == "error":
+            error = message_data.get("message", None)
+            print(f"Error:{error}")
 
 
 async def monitor_job_messages(job_id: str, user_id: str, token: str):
     """Monitor job messages and return the status when complete."""
     websocket_client = connect_to_ocm(user_id, token)
     async with websocket_client as websocket:
+
+        print("Connected to OCM Websockets.")
         async for message in websocket:
             status = parse_message(message, job_id)
             if check_status(status):
@@ -79,3 +89,14 @@ def monitor_job_progress(job_id: str, user_id: str, token: str):
     """Monitor job progress and return the status when complete."""
     result = asyncio.run(monitor_job_messages(job_id, user_id, token))
     return result
+
+
+if __name__ == "__main__":
+    from ansys.conceptev.core.app import get_user_id
+    from ansys.conceptev.core.auth import create_msal_app, get_ansyId_token
+
+    job_id = "ae3f3b4b-91d8-4cdd-8fa3-25eb202a561e"
+    msal_app = create_msal_app()
+    token = get_ansyId_token(msal_app)
+    user_id = get_user_id(token)
+    monitor_job_progress(job_id, user_id, token)

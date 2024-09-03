@@ -233,7 +233,8 @@ with app.get_http_client(token, design_instance_id) as client:
     concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
     # Read the results and show the result in your browser
-    time.sleep(120)  # wait for it to complete - not needed in real code
+    if not use_ansys_id:
+        time.sleep(120)  # wait for it to complete - not needed in real code
     results = app.read_results(client, job_info, calculate_units=False)
     x = results[0]["capability_curve"]["speeds"]
     y = results[0]["capability_curve"]["torques"]
