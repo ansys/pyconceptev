@@ -92,10 +92,11 @@ def monitor_job_progress(job_id: str, user_id: str, token: str):
 
 
 if __name__ == "__main__":
+    """Monitor a single job progress."""
     from ansys.conceptev.core.app import get_user_id
     from ansys.conceptev.core.auth import create_msal_app, get_ansyId_token
 
-    job_id = "ae3f3b4b-91d8-4cdd-8fa3-25eb202a561e"
+    job_id = "ae3f3b4b-91d8-4cdd-8fa3-25eb202a561e"  # Replace with your job ID
     msal_app = create_msal_app()
     token = get_ansyId_token(msal_app)
     user_id = get_user_id(token)
