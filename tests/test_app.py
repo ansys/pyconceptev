@@ -303,7 +303,7 @@ def test_read_file(mocker):
 
 
 def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
-    example_job_info = {"job": "mocked_job"}
+    example_job_info = {"job": "mocked_job", "job_id": "123"}
     example_results = {"results": "returned"}
     httpx_mock.add_response(
         url=f"{conceptev_url}/utilities:data_format_version?design_instance_id=123",
@@ -316,6 +316,12 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         method="post",
         match_json=example_job_info,
         json=example_results,
+    )
+    httpx_mock.add_response(
+        url=ocm_url + "/user/details", method="post", json={"userId": "user_123"}
+    )
+    httpx_mock.add_response(
+        url=ocm_url + "/job/load", method="post", json={"jobStatus": [{"jobStatus": "In Progress"}]}
     )
     results = app.read_results(client, example_job_info)
     assert example_results == results
