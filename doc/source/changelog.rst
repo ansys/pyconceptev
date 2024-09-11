@@ -9,6 +9,37 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.4 <https://github.com/ansys/pyconceptev/releases/tag/v0.4>`_ - 2024-09-04
+============================================================================
+
+Added
+^^^^^
+
+- Added progress monitor and tests `#105 <https://github.com/ansys/pyconceptev/pull/105>`_
+
+
+Changed
+^^^^^^^
+
+- chore: update CHANGELOG for v0.3.0 `#102 <https://github.com/ansys/pyconceptev/pull/102>`_
+- CHORE: Bump dev version into 0.4.dev0 `#103 <https://github.com/ansys/pyconceptev/pull/103>`_
+
+`0.3.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.3.0>`_ - 2024-08-22
+================================================================================
+
+Changed
+^^^^^^^
+
+- chore: update CHANGELOG for v0.2.0 `#93 <https://github.com/ansys/pyconceptev/pull/93>`_
+- CHORE: Bump dev version to 0.3.dev0 `#94 <https://github.com/ansys/pyconceptev/pull/94>`_
+- CHORE: Revert "chore: update CHANGELOG for v0.3.0 (#99)" `#100 <https://github.com/ansys/pyconceptev/pull/100>`_
+
+
+Miscellaneous
+^^^^^^^^^^^^^
+
+- Refactor concept creation process `#98 <https://github.com/ansys/pyconceptev/pull/98>`_
+
 `0.2.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.2.0>`_ - 2024-07-30
 ================================================================================
 
