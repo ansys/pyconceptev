@@ -34,12 +34,11 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-importlib-metadata = {version = ">=7,<9", python = "<3.8"}
-python-dotenv = "^1.0.0"
-httpx = "^0.26.0"
-msal = "^1.29.0"
-msal-extensions = "^1.2.0"
-tomli = {version = "^2.0.1", python = "<3.11"}
+python-dotenv = ">=1.0.0"
+httpx = ">=0.26.0"
+msal = ">=1.29.0"
+msal-extensions = ">=1.2.0"
+tomli = {version = ">=2.0.1", python = "<3.11"}
 
 [tool.poetry.group.dev.dependencies] # Common packages for test and examples
 plotly = "^5.18.0"
