@@ -175,13 +175,7 @@ def create_new_concept(
     """Create a concept within an existing project."""
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
-
-    product_ids = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
-    product_id = [
-        product["productId"]
-        for product in product_ids.json()
-        if product["productName"] == "CONCEPTEV"
-    ][0]
+    product_id = get_product_id(token)
 
     design_data = {
         "projectId": project_id,
@@ -218,6 +212,19 @@ def create_new_concept(
 
     created_concept = post(client, "/concepts", data=concept_data, params=query)
     return created_concept
+
+
+def get_product_id(token: str) -> str:
+    """Get the product ID."""
+    osm_url = auth.config["OCM_URL"]
+    products = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
+    if products.status_code != 200:
+        raise Exception(f"Failed to get product id.")
+
+    product_id = [
+        product["productId"] for product in products.json() if product["productName"] == "CONCEPTEV"
+    ][0]
+    return product_id
 
 
 def get_user_id(token):
