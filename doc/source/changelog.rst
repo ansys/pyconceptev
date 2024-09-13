@@ -9,6 +9,26 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.4.2 <https://github.com/ansys/pyconceptev/releases/tag/v0.4.2>`_ - 2024-09-13
+================================================================================
+
+Changed
+^^^^^^^
+
+- Testing, do not merge `#114 <https://github.com/ansys/pyconceptev/pull/114>`_
+
+
+Fixed
+^^^^^
+
+- added a product id getter `#111 <https://github.com/ansys/pyconceptev/pull/111>`_
+
+
+Miscellaneous
+^^^^^^^^^^^^^
+
+- CHORE: Revert changelog changes after release failure `#112 <https://github.com/ansys/pyconceptev/pull/112>`_
+
 `0.4.1 <https://github.com/ansys/pyconceptev/releases/tag/v0.4.1>`_ - 2024-09-12
 ================================================================================
 
