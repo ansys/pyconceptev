@@ -25,9 +25,15 @@
 import asyncio
 import json
 import ssl
+import sys
 
 import certifi
 from websockets.asyncio.client import connect
+
+if sys.version_info >= (3, 11):
+    import asyncio as async_timeout
+else:
+    import async_timeout
 
 STATUS_COMPLETE = "complete"
 STATUS_FINISHED = "FINISHED"
@@ -66,7 +72,7 @@ def parse_message(message: str, job_id: str):
 async def monitor_job_messages(job_id: str, user_id: str, token: str, timeout=3600):
     """Monitor job messages and return the status when complete."""
     try:
-        async with asyncio.timeout(timeout):
+        async with async_timeout.timeout(timeout):
             websocket_client = connect_to_ocm(user_id, token)
             async with websocket_client as websocket:
 
