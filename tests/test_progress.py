@@ -124,5 +124,5 @@ def test_monitor_job_progress():
     ) as mock_monitor:
         mock_monitor.return_value = STATUS_COMPLETE
         result = monitor_job_progress(job_id, user_id, token)
-        mock_monitor.assert_called_with(job_id, user_id, token)
+        mock_monitor.assert_called_with(job_id, user_id, token, 3600)
         assert result == STATUS_COMPLETE
