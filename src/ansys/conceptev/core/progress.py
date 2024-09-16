@@ -30,6 +30,8 @@ import sys
 import certifi
 from websockets.asyncio.client import connect
 
+from ansys.conceptev.core.auth import config
+
 if sys.version_info >= (3, 11):
     import asyncio as async_timeout
 else:
@@ -38,6 +40,7 @@ else:
 STATUS_COMPLETE = "complete"
 STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "failed"
+OCM_SOCKET_URL = config["OCM_SOCKET_URL"]
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.load_verify_locations(certifi.where())
@@ -45,9 +48,7 @@ ssl_context.load_verify_locations(certifi.where())
 
 def connect_to_ocm(user_id: str, token: str):
     """Connect to the OnScale Cloud Messaging service."""
-    uri = (
-        f"wss://sockets.prod.portal.onscale.com/socket/user?userId={user_id}&Authorization={token}"
-    )
+    uri = f"{OCM_SOCKET_URL}/user?userId={user_id}&Authorization={token}"
     return connect(uri, ssl=ssl_context)
 
 
