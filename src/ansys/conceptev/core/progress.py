@@ -63,16 +63,22 @@ def parse_message(message: str, job_id: str):
             print(f"Error:{error}")
 
 
-async def monitor_job_messages(job_id: str, user_id: str, token: str):
+async def monitor_job_messages(job_id: str, user_id: str, token: str, timeout=3600):
     """Monitor job messages and return the status when complete."""
-    websocket_client = connect_to_ocm(user_id, token)
-    async with websocket_client as websocket:
+    try:
+        async with asyncio.timeout(timeout):
+            websocket_client = connect_to_ocm(user_id, token)
+            async with websocket_client as websocket:
 
-        print("Connected to OCM Websockets.")
-        async for message in websocket:
-            status = parse_message(message, job_id)
-            if check_status(status):
-                return status
+                print("Connected to OCM Websockets.")
+                async for message in websocket:
+                    status = parse_message(message, job_id)
+                    if check_status(status):
+                        return status
+    except TimeoutError as err:
+        raise Exception(
+            f"Timeout Error: Job ({job_id}) is taking too long to complete (>{timeout} seconds)."
+        )
 
 
 def check_status(status: str):
@@ -85,9 +91,9 @@ def check_status(status: str):
         return False
 
 
-def monitor_job_progress(job_id: str, user_id: str, token: str):
+def monitor_job_progress(job_id: str, user_id: str, token: str, timeout=3600):
     """Monitor job progress and return the status when complete."""
-    result = asyncio.run(monitor_job_messages(job_id, user_id, token))
+    result = asyncio.run(monitor_job_messages(job_id, user_id, token, timeout))
     return result
 
 
@@ -100,4 +106,4 @@ if __name__ == "__main__":
     msal_app = create_msal_app()
     token = get_ansyId_token(msal_app)
     user_id = get_user_id(token)
-    monitor_job_progress(job_id, user_id, token)
+    monitor_job_progress(job_id, user_id, token, timeout=1)
