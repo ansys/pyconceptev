@@ -55,6 +55,7 @@ Router = Literal[
     "/utilities:data_format_version",
 ]
 
+JOB_TIMEOUT = auth.config["JOB_TIMEOUT"]
 app = auth.create_msal_app()
 
 
@@ -306,7 +307,7 @@ def read_results(
     client,
     job_info: dict,
     calculate_units: bool = True,
-    timeout: int = 3600,
+    timeout: int = JOB_TIMEOUT,
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]

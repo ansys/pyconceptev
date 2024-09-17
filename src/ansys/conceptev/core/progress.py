@@ -41,7 +41,7 @@ STATUS_COMPLETE = "complete"
 STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "failed"
 OCM_SOCKET_URL = config["OCM_SOCKET_URL"]
-
+JOB_TIMEOUT = config["JOB_TIMEOUT"]
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.load_verify_locations(certifi.where())
 
@@ -70,7 +70,7 @@ def parse_message(message: str, job_id: str):
             print(f"Error:{error}")
 
 
-async def monitor_job_messages(job_id: str, user_id: str, token: str, timeout=3600):
+async def monitor_job_messages(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
     """Monitor job messages and return the status when complete."""
     try:
         async with async_timeout.timeout(timeout):
@@ -98,7 +98,7 @@ def check_status(status: str):
         return False
 
 
-def monitor_job_progress(job_id: str, user_id: str, token: str, timeout=3600):
+def monitor_job_progress(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
     """Monitor job progress and return the status when complete."""
     result = asyncio.run(monitor_job_messages(job_id, user_id, token, timeout))
     return result
