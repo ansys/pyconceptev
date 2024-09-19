@@ -44,6 +44,13 @@ file_directory = pathlib.Path(__file__).parent.resolve()
 
 with open(file_directory.joinpath("resources", "config.toml"), "rb") as f:
     config = tomllib.load(f)
+try:
+    with open("config.toml", "rb") as f:
+        config2 = tomllib.load(f)
+        config.update(config2)
+except FileNotFoundError:
+    pass  # No local config file.
+
 scope = config["scope"]
 client_id = config["client_id"]
 authority = config["authority"]

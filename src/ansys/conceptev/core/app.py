@@ -55,6 +55,7 @@ Router = Literal[
     "/utilities:data_format_version",
 ]
 
+JOB_TIMEOUT = auth.config["JOB_TIMEOUT"]
 app = auth.create_msal_app()
 
 
@@ -306,6 +307,7 @@ def read_results(
     client,
     job_info: dict,
     calculate_units: bool = True,
+    timeout: int = JOB_TIMEOUT,
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]
@@ -315,7 +317,7 @@ def read_results(
     if check_status(initial_status):  # Job already completed
         return get_results(client, job_info, calculate_units)
     else:  # Job is still running
-        monitor_job_progress(job_id, user_id, token)  # Wait for completion
+        monitor_job_progress(job_id, user_id, token, timeout)  # Wait for completion
         return get_results(client, job_info, calculate_units)
 
 
