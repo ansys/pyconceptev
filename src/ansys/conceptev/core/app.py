@@ -25,13 +25,13 @@
 import datetime
 from json import JSONDecodeError
 import os
-import time
 from typing import Literal
 
 import dotenv
 import httpx
 
 from ansys.conceptev.core import auth
+from ansys.conceptev.core.progress import check_status, monitor_job_progress
 
 dotenv.load_dotenv()
 
@@ -175,13 +175,7 @@ def create_new_concept(
     """Create a concept within an existing project."""
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
-
-    product_ids = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
-    product_id = [
-        product["productId"]
-        for product in product_ids.json()
-        if product["productName"] == "CONCEPTEV"
-    ][0]
+    product_id = get_product_id(token)
 
     design_data = {
         "projectId": project_id,
@@ -195,9 +189,8 @@ def create_new_concept(
     if created_design.status_code not in (200, 204):
         raise Exception(f"Failed to create a design on OCM {created_design.content}.")
 
-    user_details = httpx.post(osm_url + "/user/details", headers={"Authorization": token})
-    if user_details.status_code not in (200, 204):
-        raise Exception(f"Failed to get a user details on OCM {user_details}.")
+    user_id = get_user_id(token)
+
     design_instance_id = created_design.json()["designInstanceList"][0]["designInstanceId"]
     concept_data = {
         "capabilities_ids": [],
@@ -210,7 +203,7 @@ def create_new_concept(
         "name": "Branch 1",
         "project_id": project_id,
         "requirements_ids": [],
-        "user_id": user_details.json()["userId"],
+        "user_id": user_id,
     }
 
     query = {
@@ -219,6 +212,29 @@ def create_new_concept(
 
     created_concept = post(client, "/concepts", data=concept_data, params=query)
     return created_concept
+
+
+def get_product_id(token: str) -> str:
+    """Get the product ID."""
+    osm_url = auth.config["OCM_URL"]
+    products = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
+    if products.status_code != 200:
+        raise Exception(f"Failed to get product id.")
+
+    product_id = [
+        product["productId"] for product in products.json() if product["productName"] == "CONCEPTEV"
+    ][0]
+    return product_id
+
+
+def get_user_id(token):
+    """Get the user ID."""
+    osm_url = auth.config["OCM_URL"]
+    user_details = httpx.post(osm_url + "/user/details", headers={"Authorization": token})
+    if user_details.status_code not in (200, 204):
+        raise Exception(f"Failed to get a user details on OCM {user_details}.")
+    user_id = user_details.json()["userId"]
+    return user_id
 
 
 def get_concept_ids(client: httpx.Client) -> dict:
@@ -290,29 +306,44 @@ def read_results(
     client,
     job_info: dict,
     calculate_units: bool = True,
-    no_of_tries: int = 200,
-    rate_limit: float = 0.3,
 ) -> dict:
-    """Read job results.
+    """Read job results."""
+    job_id = job_info["job_id"]
+    token = client.headers["Authorization"]
+    user_id = get_user_id(token)
+    initial_status = get_status(job_info, token)
+    if check_status(initial_status):  # Job already completed
+        return get_results(client, job_info, calculate_units)
+    else:  # Job is still running
+        monitor_job_progress(job_id, user_id, token)  # Wait for completion
+        return get_results(client, job_info, calculate_units)
 
-    Continuously request job results until a valid response is received or a limit of tries is
-    reached.
-    """
+
+def get_results(client, job_info: dict, calculate_units: bool = True):
+    """Get the results."""
     version_number = get(client, "/utilities:data_format_version")
-    for _ in range(0, no_of_tries):
-        response = client.post(
-            url="/jobs:result",
-            json=job_info,
-            params={
-                "results_file_name": f"output_file_v{version_number}.json",
-                "calculate_units": calculate_units,
-            },
-        )
-        time.sleep(rate_limit)
-        if response.status_code == 200:
-            return response.json()
+    response = client.post(
+        url="/jobs:result",
+        json=job_info,
+        params={
+            "results_file_name": f"output_file_v{version_number}.json",
+            "calculate_units": calculate_units,
+        },
+    )
+    return process_response(response)
 
-    raise Exception(f"There are too many requests: {response}.")
+
+def get_status(job_info: dict, token: str) -> str:
+    """Get the status of the job."""
+    ocm_url = auth.config["OCM_URL"]
+    response = httpx.post(
+        url=ocm_url + "/job/load",
+        json={"jobId": job_info["job_id"]},
+        headers={"Authorization": token},
+    )
+    processed_response = process_response(response)
+    initial_status = processed_response["jobStatus"][-1]["jobStatus"]
+    return initial_status
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:

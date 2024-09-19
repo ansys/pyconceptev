@@ -41,7 +41,6 @@ jobs:
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
-
   tests:
     name: Tests and coverage
     runs-on: ${{ matrix.os }}

@@ -47,7 +47,7 @@ class MockApp:
     def acquire_token_silent(self, scopes, account):
         return {"access_token": "mock_cached_token"}
 
-    def acquire_token_interactive(self, scopes, timeout):
+    def acquire_token_interactive(self, scopes):
         return {"access_token": "mock_token"}
 
 

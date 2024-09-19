@@ -87,7 +87,7 @@ def get_ansyId_token(app) -> str:
         # Now let's try to find a token in cache for this account
         result = app.acquire_token_silent(scopes=[scope], account=chosen)
     if not result:
-        result = app.acquire_token_interactive(scopes=[scope], timeout=10)
+        result = app.acquire_token_interactive(scopes=[scope])
     if "access_token" in result:
         return result["access_token"]
     error = result.get("error")
