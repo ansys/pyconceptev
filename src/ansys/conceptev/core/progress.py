@@ -25,27 +25,34 @@
 import asyncio
 import json
 import ssl
+import sys
 
 import certifi
 from websockets.asyncio.client import connect
 
+from ansys.conceptev.core.auth import config
+
+if sys.version_info >= (3, 11):
+    import asyncio as async_timeout
+else:
+    import async_timeout
+
 STATUS_COMPLETE = "complete"
 STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "failed"
-
+OCM_SOCKET_URL = config["OCM_SOCKET_URL"]
+JOB_TIMEOUT = config["JOB_TIMEOUT"]
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.load_verify_locations(certifi.where())
 
 
 def connect_to_ocm(user_id: str, token: str):
     """Connect to the OnScale Cloud Messaging service."""
-    uri = (
-        f"wss://sockets.prod.portal.onscale.com/socket/user?userId={user_id}&Authorization={token}"
-    )
+    uri = f"{OCM_SOCKET_URL}/user?userId={user_id}&Authorization={token}"
     return connect(uri, ssl=ssl_context)
 
 
-def parse_message(message: str, job_id: str):
+def get_status(message: str, job_id: str):
     """Parse the message and return the status or progress."""
     message_data = json.loads(message)
 
@@ -63,16 +70,47 @@ def parse_message(message: str, job_id: str):
             print(f"Error:{error}")
 
 
-async def monitor_job_messages(job_id: str, user_id: str, token: str):
-    """Monitor job messages and return the status when complete."""
-    websocket_client = connect_to_ocm(user_id, token)
-    async with websocket_client as websocket:
+def get_values(message: str, job_id: str) -> dict:
+    """Parse the message and return the calculated values."""
+    message_data = json.loads(message)
 
-        print("Connected to OCM Websockets.")
-        async for message in websocket:
-            status = parse_message(message, job_id)
-            if check_status(status):
-                return status
+    if message_data.get("jobId", "Unknown") == job_id:
+        message_type = message_data.get("messagetype", None)
+        if message_type == "progress" and message_data.get("progress", None) == 1:
+            calculated_values = message_data.get("calculated_values", None)
+            print(f"Calculated Values:{calculated_values}")
+            return calculated_values
+
+
+async def get_job_messages(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
+    """Get job messages and error on timeout."""
+    try:
+        async with async_timeout.timeout(timeout):
+            websocket_client = connect_to_ocm(user_id, token)
+            async with websocket_client as websocket:
+                print("Connected to OCM Websockets.")
+                async for message in websocket:
+                    yield message
+    except TimeoutError as err:
+        raise Exception(
+            f"Timeout Error: Job ({job_id}) is taking too long to complete (>{timeout} seconds)."
+        ) from err
+
+
+async def monitor_job_messages(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
+    """Monitor job messages and return the status when complete."""
+    async for message in get_job_messages(job_id, user_id, token, timeout):
+        status = get_status(message, job_id)
+        if check_status(status):
+            return status
+
+
+async def get_calculated_values(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
+    """Get Calculated Values."""
+    async for message in get_job_messages(job_id, user_id, token, timeout):
+        values = get_values(message, job_id)
+        if values is not None:
+            return values
 
 
 def check_status(status: str):
@@ -85,9 +123,9 @@ def check_status(status: str):
         return False
 
 
-def monitor_job_progress(job_id: str, user_id: str, token: str):
+def monitor_job_progress(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
     """Monitor job progress and return the status when complete."""
-    result = asyncio.run(monitor_job_messages(job_id, user_id, token))
+    result = asyncio.run(monitor_job_messages(job_id, user_id, token, timeout))
     return result
 
 
@@ -100,4 +138,4 @@ if __name__ == "__main__":
     msal_app = create_msal_app()
     token = get_ansyId_token(msal_app)
     user_id = get_user_id(token)
-    monitor_job_progress(job_id, user_id, token)
+    monitor_job_progress(job_id, user_id, token, timeout=1)
