@@ -9,6 +9,42 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.5 <https://github.com/ansys/pyconceptev/releases/tag/v0.5>`_ - 2024-09-20
+============================================================================
+
+Added
+^^^^^
+
+- added a timeout option `#118 <https://github.com/ansys/pyconceptev/pull/118>`_
+
+
+Changed
+^^^^^^^
+
+- chore: update CHANGELOG for v0.4.0 `#106 <https://github.com/ansys/pyconceptev/pull/106>`_
+- CHORE: Bump development version to 0.5.dev0 `#107 <https://github.com/ansys/pyconceptev/pull/107>`_
+- BUILD: Update dependencies range `#109 <https://github.com/ansys/pyconceptev/pull/109>`_
+- chore: update CHANGELOG for v0.4.2 `#115 <https://github.com/ansys/pyconceptev/pull/115>`_
+
+
+Dependencies
+^^^^^^^^^^^^
+
+- CHORE: Bump pre-commit from 3.7.1 to 3.8.0 `#92 <https://github.com/ansys/pyconceptev/pull/92>`_
+- CHORE: Bump jupytext from 1.16.3 to 1.16.4 `#95 <https://github.com/ansys/pyconceptev/pull/95>`_
+- CHORE: Bump sphinx-design from 0.6.0 to 0.6.1 `#96 <https://github.com/ansys/pyconceptev/pull/96>`_
+- CHORE: Bump plotly from 5.24.0 to 5.24.1 `#116 <https://github.com/ansys/pyconceptev/pull/116>`_
+- CHORE: Bump ansys-sphinx-theme from 0.16.6 to 1.0.8 `#117 <https://github.com/ansys/pyconceptev/pull/117>`_
+- CHORE: Bump ansys-sphinx-theme from 1.0.8 to 1.0.9 `#119 <https://github.com/ansys/pyconceptev/pull/119>`_
+- CHORE: Bump tox from 4.18.1 to 4.19.0 `#120 <https://github.com/ansys/pyconceptev/pull/120>`_
+- CHORE: Bump sphinx-autobuild from 2024.9.3 to 2024.9.17 `#121 <https://github.com/ansys/pyconceptev/pull/121>`_
+
+
+Maintenance
+^^^^^^^^^^^
+
+- CHORE: Bump ansys/actions from 6 to 7 `#97 <https://github.com/ansys/pyconceptev/pull/97>`_
+
 `0.4.2 <https://github.com/ansys/pyconceptev/releases/tag/v0.4.2>`_ - 2024-09-13
 ================================================================================
 
