@@ -31,9 +31,9 @@ from ansys.conceptev.core.progress import (
     STATUS_FINISHED,
     check_status,
     connect_to_ocm,
+    get_status,
     monitor_job_messages,
     monitor_job_progress,
-    parse_message,
     ssl_context,
 )
 
@@ -58,8 +58,8 @@ def test_parse_message():
     )
     progress_message = json.dumps({"jobId": job_id, "messagetype": "progress", "progress": 50})
 
-    assert parse_message(status_message, job_id) == STATUS_COMPLETE
-    assert parse_message(progress_message, job_id) is None
+    assert get_status(status_message, job_id) == STATUS_COMPLETE
+    assert get_status(progress_message, job_id) is None
 
 
 class AsyncContextManager:
@@ -124,5 +124,5 @@ def test_monitor_job_progress():
     ) as mock_monitor:
         mock_monitor.return_value = STATUS_COMPLETE
         result = monitor_job_progress(job_id, user_id, token)
-        mock_monitor.assert_called_with(job_id, user_id, token)
+        mock_monitor.assert_called_with(job_id, user_id, token, 3600)
         assert result == STATUS_COMPLETE
