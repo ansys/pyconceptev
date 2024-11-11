@@ -262,7 +262,9 @@ def test_create_submit_job(httpx_mock: HTTPXMock, client: httpx.Client):
     }
     mocked_job = ({"job": "data"}, {"stuff": "in file"})
     httpx_mock.add_response(
-        url=f"{conceptev_url}/jobs?design_instance_id=123", match_json=job_input, json=mocked_job
+        url=f"{conceptev_url}/jobs?design_instance_id=123&account_id={account_id}",
+        match_json=job_input,
+        json=mocked_job,
     )
     mocked_info = "job info"
     mocked_job_start = {
@@ -272,7 +274,7 @@ def test_create_submit_job(httpx_mock: HTTPXMock, client: httpx.Client):
         "hpc_id": hpc_id,
     }
     httpx_mock.add_response(
-        url=f"{conceptev_url}/jobs:start?design_instance_id=123",
+        url=f"{conceptev_url}/jobs:start?design_instance_id=123&account_id={account_id}",
         match_json=mocked_job_start,
         json=mocked_info,
     )
@@ -311,7 +313,7 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         json=3,
     )
     httpx_mock.add_response(
-        url=f"{conceptev_url}/jobs:result?design_instance_id=123&"
+        url=f"{conceptev_url}/jobs:result?design_instance_id=123"
         f"results_file_name=output_file_v3.json&calculate_units=true",
         method="post",
         match_json=example_job_info,
