@@ -302,6 +302,11 @@ def test_read_file(mocker):
     assert results == file_data
 
 
+@pytest.fixture
+def mock_job_results(mocker):
+    mocker.patch("ansys.conceptev.core.app.job_status")
+
+
 def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
     example_job_info = {"job": "mocked_job", "job_id": "123"}
     example_results = {"results": "returned"}
@@ -321,7 +326,7 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         url=ocm_url + "/user/details", method="post", json={"userId": "user_123"}
     )
     httpx_mock.add_response(
-        url=ocm_url + "/job/load", method="post", json={"jobStatus": [{"jobStatus": "In Progress"}]}
+        url=ocm_url + "/job/load", method="post", json={"jobStatus": [{"jobStatus": "complete"}]}
     )
     results = app.read_results(client, example_job_info)
     assert example_results == results
