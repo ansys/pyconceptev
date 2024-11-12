@@ -31,13 +31,13 @@ files = [
 
 [[package]]
 name = "ansys-sphinx-theme"
-version = "1.0.9"
+version = "1.0.11"
 description = "A theme devised by ANSYS, Inc. for Sphinx documentation."
 optional = false
 python-versions = "<4,>=3.9"
 files = [
-    {file = "ansys_sphinx_theme-1.0.9-py3-none-any.whl", hash = "sha256:583769355cf8a0d779ce7388bb66792a03f5f9f4ed0d8d8998469d2d2a563ada"},
-    {file = "ansys_sphinx_theme-1.0.9.tar.gz", hash = "sha256:e5190aba2cc5dec0163d7b86d352c9d87a39f6b3e23cd7cea58cf154e0565d3f"},
+    {file = "ansys_sphinx_theme-1.0.11-py3-none-any.whl", hash = "sha256:75c718e407a6b1e868ed5063ba3d1ac93c778195e129253dbaf2367bb87940f5"},
+    {file = "ansys_sphinx_theme-1.0.11.tar.gz", hash = "sha256:a9c3399f71fbdfee08dc97eb6821e660742b7f0c425a3a6f443254a356863ed4"},
 ]
 
 [package.dependencies]
