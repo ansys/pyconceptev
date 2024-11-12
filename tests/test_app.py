@@ -318,7 +318,7 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         json=3,
     )
     httpx_mock.add_response(
-        url=f"{conceptev_url}/jobs:result?design_instance_id=123"
+        url=f"{conceptev_url}/jobs:result?design_instance_id=123&"
         f"results_file_name=output_file_v3.json&calculate_units=true",
         method="post",
         match_json=example_job_info,
