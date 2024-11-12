@@ -362,6 +362,20 @@ def post_component_file(client: httpx.Client, filename: str, component_file_type
     return process_response(response)
 
 
+def get_concept(client: httpx.Client, design_instance_id: str) -> dict:
+    """Get the main parts of a concept."""
+    concept = get(
+        client, "/concepts", id=design_instance_id, params={"populated": False}
+    )  # populated True is unsupported at this time.
+    concept["configurations"] = get(client, f"/concepts/{design_instance_id}/configurations")
+    concept["components"] = get(client, f"/concepts/{design_instance_id}/components")
+
+    concept["requirements"] = get(client, f"/concepts/{design_instance_id}/requirements")
+
+    concept["architecture"] = get(client, f"/concepts/{design_instance_id}/architecture")
+    return concept
+
+
 if __name__ == "__main__":
     token = get_token()
 
