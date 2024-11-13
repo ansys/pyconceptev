@@ -262,7 +262,9 @@ def test_create_submit_job(httpx_mock: HTTPXMock, client: httpx.Client):
     }
     mocked_job = ({"job": "data"}, {"stuff": "in file"})
     httpx_mock.add_response(
-        url=f"{conceptev_url}/jobs?design_instance_id=123", match_json=job_input, json=mocked_job
+        url=f"{conceptev_url}/jobs?design_instance_id=123&account_id={account_id}",
+        match_json=job_input,
+        json=mocked_job,
     )
     mocked_info = "job info"
     mocked_job_start = {
@@ -272,7 +274,7 @@ def test_create_submit_job(httpx_mock: HTTPXMock, client: httpx.Client):
         "hpc_id": hpc_id,
     }
     httpx_mock.add_response(
-        url=f"{conceptev_url}/jobs:start?design_instance_id=123",
+        url=f"{conceptev_url}/jobs:start?design_instance_id=123&account_id={account_id}",
         match_json=mocked_job_start,
         json=mocked_info,
     )
@@ -302,6 +304,11 @@ def test_read_file(mocker):
     assert results == file_data
 
 
+@pytest.fixture
+def mock_job_results(mocker):
+    mocker.patch("ansys.conceptev.core.app.job_status")
+
+
 def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
     example_job_info = {"job": "mocked_job", "job_id": "123"}
     example_results = {"results": "returned"}
@@ -321,7 +328,7 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         url=ocm_url + "/user/details", method="post", json={"userId": "user_123"}
     )
     httpx_mock.add_response(
-        url=ocm_url + "/job/load", method="post", json={"jobStatus": [{"jobStatus": "In Progress"}]}
+        url=ocm_url + "/job/load", method="post", json={"jobStatus": [{"jobStatus": "complete"}]}
     )
     results = app.read_results(client, example_job_info)
     assert example_results == results

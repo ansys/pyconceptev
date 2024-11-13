@@ -38,7 +38,9 @@ dotenv.load_dotenv()
 Router = Literal[
     "/architectures",
     "/components",
-    "/components:from_file",
+    "/components:from_file",  # extra
+    "/components:upload",
+    "/components:upload_file",
     "/components:calculate_loss_map",
     "/configurations",
     "/configurations:calculate_forces",
@@ -51,8 +53,17 @@ Router = Literal[
     "/concepts",
     "/drive_cycles",
     "/drive_cycles:from_file",
+    "/drive_cycles:upload_file",
     "/health",
     "/utilities:data_format_version",
+]
+
+PRODUCT_ACCESS_ROUTES = [
+    "/components:upload_file",
+    "/components:from_file",  # extra
+    "/drive_cycles:upload_file",
+    "/jobs",
+    "/jobs:start",
 ]
 
 JOB_TIMEOUT = auth.config["JOB_TIMEOUT"]
@@ -113,22 +124,40 @@ def get(
     return process_response(response)
 
 
-def post(client: httpx.Client, router: Router, data: dict, params: dict = {}) -> dict:
+def post(
+    client: httpx.Client,
+    router: Router,
+    data: dict,
+    params: dict = {},
+    account_id: str | None = None,
+) -> dict:
     """Send a POST request to the base client.
 
     This HTTP verb performs the ``POST`` request and adds the route to the base client.
     """
+    params = check_product_access(router, account_id, params)
+
     response = client.post(url=router, json=data, params=params)
     return process_response(response)
 
 
-def delete(client: httpx.Client, router: Router, id: str) -> dict:
+def check_product_access(router: Router, account_id: str | None, params: dict) -> dict:
+    """Check account_id is there for product access."""
+    if router in PRODUCT_ACCESS_ROUTES:
+        if not account_id:
+            raise Exception(f"Account ID is required for {router}.")
+        params = params | {"account_id": account_id}
+    return params
+
+
+def delete(client: httpx.Client, router: Router, id: str, account_id: str | None = None) -> dict:
     """Send a DELETE request to the base client.
 
     This HTTP verb performs the ``DELETE`` request and adds the route to the base client.
     """
+    params = check_product_access(router, account_id, {})
     path = "/".join([router, id])
-    response = client.delete(url=path)
+    response = client.delete(url=path, params=params)
     if response.status_code != 204:
         raise Exception(f"Failed to delete from {router} with ID:{id}.")
 
@@ -285,14 +314,14 @@ def create_submit_job(
         "concept_id": concept["id"],
         "design_instance_id": concept["design_instance_id"],
     }
-    job, uploaded_file = post(client, "/jobs", data=job_input)
+    job, uploaded_file = post(client, "/jobs", data=job_input, account_id=account_id)
     job_start = {
         "job": job,
         "uploaded_file": uploaded_file,
         "account_id": account_id,
         "hpc_id": hpc_id,
     }
-    job_info = post(client, "/jobs:start", data=job_start)
+    job_info = post(client, "/jobs:start", data=job_start, account_id=account_id)
     return job_info
 
 
@@ -360,6 +389,20 @@ def post_component_file(client: httpx.Client, filename: str, component_file_type
         url=path, files={"file": file_contents}, params={"component_file_type": component_file_type}
     )
     return process_response(response)
+
+
+def get_concept(client: httpx.Client, design_instance_id: str) -> dict:
+    """Get the main parts of a concept."""
+    concept = get(
+        client, "/concepts", id=design_instance_id, params={"populated": False}
+    )  # populated True is unsupported at this time.
+    concept["configurations"] = get(client, f"/concepts/{design_instance_id}/configurations")
+    concept["components"] = get(client, f"/concepts/{design_instance_id}/components")
+
+    concept["requirements"] = get(client, f"/concepts/{design_instance_id}/requirements")
+
+    concept["architecture"] = get(client, f"/concepts/{design_instance_id}/architecture")
+    return concept
 
 
 if __name__ == "__main__":
