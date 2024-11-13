@@ -9,6 +9,36 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.6 <https://github.com/ansys/pyconceptev/releases/tag/v0.6>`_ - 2024-11-13
+============================================================================
+
+Added
+^^^^^
+
+- added a get_concept function `#131 <https://github.com/ansys/pyconceptev/pull/131>`_
+- improve test that was calling out to external endpoint `#136 <https://github.com/ansys/pyconceptev/pull/136>`_
+- feature/account_checking `#142 <https://github.com/ansys/pyconceptev/pull/142>`_
+
+
+Dependencies
+^^^^^^^^^^^^
+
+- CHORE: Bump ansys-sphinx-theme from 1.0.9 to 1.0.11 `#124 <https://github.com/ansys/pyconceptev/pull/124>`_
+- CHORE: Bump tomli from 2.0.1 to 2.0.2 `#129 <https://github.com/ansys/pyconceptev/pull/129>`_
+- CHORE: Bump websockets from 13.0.1 to 14.0 `#135 <https://github.com/ansys/pyconceptev/pull/135>`_
+- CHORE: Bump jupyterlab from 4.2.5 to 4.3.0 `#137 <https://github.com/ansys/pyconceptev/pull/137>`_
+- CHORE: Bump sphinx-autobuild from 2024.9.17 to 2024.10.3 `#139 <https://github.com/ansys/pyconceptev/pull/139>`_
+- CHORE: Bump tox from 4.19.0 to 4.23.2 `#140 <https://github.com/ansys/pyconceptev/pull/140>`_
+
+
+Maintenance
+^^^^^^^^^^^
+
+- chore: update CHANGELOG for v0.5.0 `#123 <https://github.com/ansys/pyconceptev/pull/123>`_
+- CHORE: Bump ansys/actions from 7 to 8 `#128 <https://github.com/ansys/pyconceptev/pull/128>`_
+- CI: Remove index jobs `#133 <https://github.com/ansys/pyconceptev/pull/133>`_
+- update to remove security issues `#141 <https://github.com/ansys/pyconceptev/pull/141>`_
+
 `0.5 <https://github.com/ansys/pyconceptev/releases/tag/v0.5>`_ - 2024-09-20
 ============================================================================
 
