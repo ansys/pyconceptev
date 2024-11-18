@@ -9,6 +9,27 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.7.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.7.0>`_ - 2024-11-18
+================================================================================
+
+Added
+^^^^^
+
+- gets filtered version and example for motor loss map upload `#149 <https://github.com/ansys/pyconceptev/pull/149>`_
+
+
+Fixed
+^^^^^
+
+- added additional auth check on get results `#148 <https://github.com/ansys/pyconceptev/pull/148>`_
+
+
+Maintenance
+^^^^^^^^^^^
+
+- chore: update CHANGELOG for v0.6 `#145 <https://github.com/ansys/pyconceptev/pull/145>`_
+- CHORE: Bump dev version into 0.7.dev0 `#147 <https://github.com/ansys/pyconceptev/pull/147>`_
+
 `0.6 <https://github.com/ansys/pyconceptev/releases/tag/v0.6>`_ - 2024-11-13
 ============================================================================
 
