@@ -230,7 +230,7 @@ with app.get_http_client(token, design_instance_id) as client:
 
     # Create and submit a job
     concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
-    job_info = app.create_submit_job(client, concept, account_id, hpc_id)
+    # job_info = app.create_submit_job(client, concept, account_id, hpc_id)
     # Following code is not working in the pipelne but should work in a local environment.
 
     # Read the results and show the result in your browser
