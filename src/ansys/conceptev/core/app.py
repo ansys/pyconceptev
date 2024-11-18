@@ -327,7 +327,7 @@ def create_submit_job(
 
 def read_file(filename: str) -> str:
     """Read a given file."""
-    with open(filename) as f:
+    with open(filename, "r+b") as f:
         content = f.read()
     return content
 
@@ -337,6 +337,7 @@ def read_results(
     job_info: dict,
     calculate_units: bool = True,
     timeout: int = JOB_TIMEOUT,
+    filtered: bool = False,
     msal_app: auth.PublicClientApplication | None = None,
 ) -> dict:
     """Read job results."""
@@ -345,24 +346,33 @@ def read_results(
     user_id = get_user_id(token)
     initial_status = get_status(job_info, token)
     if check_status(initial_status):  # Job already completed
-        return get_results(client, job_info, calculate_units)
+        return get_results(client, job_info, calculate_units, filtered)
     else:  # Job is still running
         monitor_job_progress(job_id, user_id, token, timeout)  # Wait for completion
         if msal_app is None:
             msal_app = auth.create_msal_app()
         token = auth.get_ansyId_token(msal_app)
         client.headers["Authorization"] = token  # Update the token
-        return get_results(client, job_info, calculate_units)
+        return get_results(client, job_info, calculate_units, filtered)
 
 
-def get_results(client, job_info: dict, calculate_units: bool = True):
+def get_results(
+    client,
+    job_info: dict,
+    calculate_units: bool = True,
+    filtered: bool = False,
+):
     """Get the results."""
     version_number = get(client, "/utilities:data_format_version")
+    if filtered:
+        filename = f"filtered_output_v{version_number}.json"
+    else:
+        filename = f"output_file_v{version_number}.json"
     response = client.post(
         url="/jobs:result",
         json=job_info,
         params={
-            "results_file_name": f"output_file_v{version_number}.json",
+            "results_file_name": filename,
             "calculate_units": calculate_units,
         },
     )

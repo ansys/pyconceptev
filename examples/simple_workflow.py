@@ -54,8 +54,8 @@ if not (use_ansys_id):
 # You can obtain example data from the schema sections of the API documentation.
 
 # +
-MOTOR_FILE_NAME = Path("resources") / "e9.lab"
-
+MOTOR_LAB_FILE = Path("resources") / "e9.lab"
+MOTOR_LOSS_MAP_FILE = Path("resources") / "e9.xlsx"
 AERO_1 = {
     "name": "New Aero Config",
     "drag_coefficient": 0.3,
@@ -171,11 +171,24 @@ with app.get_http_client(token, design_instance_id) as client:
     created_transmission = app.post(client, "/components", data=TRANSMISSION)
 
     # Create component from file
-    motor_loss_map = app.post_component_file(client, MOTOR_FILE_NAME, "motor_lab_file")
-    motor_data["data_id"] = motor_loss_map[0]
-    motor_data["max_speed"] = motor_loss_map[1]
+    motor_lab = app.post_component_file(client, MOTOR_LAB_FILE, "motor_lab_file")
+    motor_data["data_id"] = motor_lab[0]
+    motor_data["max_speed"] = motor_lab[1]
 
-    created_motor = app.post(client, "/components", data=motor_data)
+    created_motor_lab = app.post(client, "/components", data=motor_data)
+    print(f"Created motor: {created_motor_lab}\n")
+
+    # Create loss map motor component from file
+    client.timeout = 2000
+    motor_loss_map = app.post_component_file(client, MOTOR_LOSS_MAP_FILE, "motor_torque_grid_file")
+    loss_map_motor_data = {
+        "name": "e9_loss_map",
+        "component_type": "MotorLossMapID",
+        "poles": 8,
+        "data_id": motor_loss_map[0],
+    }
+
+    created_motor = app.post(client, "/components", data=loss_map_motor_data)
     print(f"Created motor: {created_motor}\n")
 
     # Extend client timeout to get loss map from the motor
@@ -184,7 +197,7 @@ with app.get_http_client(token, design_instance_id) as client:
         client,
         "/components:get_display_data",
         data={},
-        params={"component_id": created_motor["id"]},
+        params={"component_id": created_motor_lab["id"]},
     )
 
     # Show a figure of the loss map from the motor in you browser
@@ -198,11 +211,11 @@ with app.get_http_client(token, design_instance_id) as client:
 
     # Create an architecture
     architecture = {
-        "number_of_front_wheels": 1,
+        "number_of_front_wheels": 2,
         "number_of_front_motors": 1,
         "front_transmission_id": created_transmission["id"],
         "front_motor_id": created_motor["id"],
-        "number_of_rear_wheels": 0,
+        "number_of_rear_wheels": 2,
         "number_of_rear_motors": 0,
         "battery_id": created_battery["id"],
     }
@@ -224,19 +237,20 @@ with app.get_http_client(token, design_instance_id) as client:
     print(f"Created requirement: {created_requirement}")
 # -
 
+
+# Following code is not working in the pipelne but should work in a local environment.
+
 # Submit a job and show the result.
-
-with app.get_http_client(token, design_instance_id) as client:
-
-    # Create and submit a job
-    concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
-    # job_info = app.create_submit_job(client, concept, account_id, hpc_id)
-    # Following code is not working in the pipelne but should work in a local environment.
-
-    # Read the results and show the result in your browser
-    # results = app.read_results(client, job_info, calculate_units=False)
-    # x = results[0]["capability_curve"]["speeds"]
-    # y = results[0]["capability_curve"]["torques"]
-    #
-    # fig = go.Figure(data=go.Scatter(x=x, y=y))
-    # fig.show()
+# with app.get_http_client(token, design_instance_id) as client:
+#
+#     # Create and submit a job
+#     concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
+#     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
+#
+#     # Read the results and show the result in your browser
+#     results = app.read_results(client, job_info, calculate_units=False, filtered=True)
+#     x = results[0]["capability_curve"]["speeds"]
+#     y = results[0]["capability_curve"]["torques"]
+#
+#     fig = go.Figure(data=go.Scatter(x=x, y=y))
+#     fig.show()
