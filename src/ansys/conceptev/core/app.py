@@ -338,6 +338,7 @@ def read_results(
     calculate_units: bool = True,
     timeout: int = JOB_TIMEOUT,
     filtered: bool = False,
+    msal_app: auth.PublicClientApplication | None = None,
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]
@@ -348,6 +349,10 @@ def read_results(
         return get_results(client, job_info, calculate_units, filtered)
     else:  # Job is still running
         monitor_job_progress(job_id, user_id, token, timeout)  # Wait for completion
+        if msal_app is None:
+            msal_app = auth.create_msal_app()
+        token = auth.get_ansyId_token(msal_app)
+        client.headers["Authorization"] = token  # Update the token
         return get_results(client, job_info, calculate_units, filtered)
 
 
