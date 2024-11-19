@@ -40,10 +40,19 @@ filename = "resources/design_instance_ids.csv"
 short_results = True  # For results created after 15/11/2024 improved performance.
 
 get_results_off_server = False  # Turn to false to read from file. See script for details.
+# -------Limitations -------------------------#
+# If short results is true it gets in User Units
+# If short results not true and if you have large results file
+# it will probably timeout with a gateway error.
+# Assumes first job in list for each project is the result we want. Assumes no "re-calculation".
+# Assumes name of Drive Cycle Requirements "UDDS_50%" and "HWFET_50%"
+# Assumes a 2 motor architecture
+#
 
-# -------------------------------#
+
+# -----------TO DO --------------------#
 # Merge cells on headers
-# Units?
+# Units not outputted to excel
 # Non same component order
 # Front/rear clutch?
 # progress bar
@@ -177,7 +186,9 @@ if __name__ == "__main__":
         front_disconnect_clutch_name = (
             get_component_name(project_result, "front_clutch_id") + " (Front)"
         )
-        rear_inverter_name = get_component_name(project_result, "rear_inverter_id") + " (Rear)"
+        rear_transmission_name = (
+            get_component_name(project_result, "rear_transmission_id") + " (Rear)"
+        )
         rear_motor_name = get_component_name(project_result, "rear_motor_id") + " (Rear)"
         rear_inverter_name = get_component_name(project_result, "rear_inverter_id") + " (Rear)"
         rear_disconnect_clutch_name = (
@@ -210,14 +221,14 @@ if __name__ == "__main__":
                     front_disconnect_clutch_name, None
                 ),
                 ("UDDS Losses", "Front transmission"): UDDS_Component_Loss[front_tranmsission_name],
-                ("UDDS Losses", "Front inverter"): UDDS_Component_Loss[front_tranmsission_name],
-                ("UDDS Losses", "Front motor"): UDDS_Component_Loss[front_tranmsission_name],
+                ("UDDS Losses", "Front inverter"): UDDS_Component_Loss[front_inverter_name],
+                ("UDDS Losses", "Front motor"): UDDS_Component_Loss[front_motor_name],
                 ("UDDS Losses", "Rear disconnect clutch"): UDDS_Component_Loss.get(
                     rear_disconnect_clutch_name, None
                 ),
-                ("UDDS Losses", "Rear transmission"): UDDS_Component_Loss[front_tranmsission_name],
-                ("UDDS Losses", "Rear inverter"): UDDS_Component_Loss[front_tranmsission_name],
-                ("UDDS Losses", "Rear motor"): UDDS_Component_Loss[front_tranmsission_name],
+                ("UDDS Losses", "Rear transmission"): UDDS_Component_Loss[rear_transmission_name],
+                ("UDDS Losses", "Rear inverter"): UDDS_Component_Loss[rear_inverter_name],
+                ("UDDS Losses", "Rear motor"): UDDS_Component_Loss[rear_motor_name],
                 ("HWFET Losses", "Battery"): HWFET_50_Component_Loss[battery_name],
                 ("HWFET Losses", "Front disconnect clutch"): HWFET_50_Component_Loss.get(
                     front_disconnect_clutch_name, None
@@ -225,18 +236,16 @@ if __name__ == "__main__":
                 ("HWFET Losses", "Front transmission"): HWFET_50_Component_Loss[
                     front_tranmsission_name
                 ],
-                ("HWFET Losses", "Front inverter"): HWFET_50_Component_Loss[
-                    front_tranmsission_name
-                ],
-                ("HWFET Losses", "Front motor"): HWFET_50_Component_Loss[front_tranmsission_name],
+                ("HWFET Losses", "Front inverter"): HWFET_50_Component_Loss[front_inverter_name],
+                ("HWFET Losses", "Front motor"): HWFET_50_Component_Loss[front_motor_name],
                 ("HWFET Losses", "Rear disconnect clutch"): HWFET_50_Component_Loss.get(
                     rear_disconnect_clutch_name, None
                 ),
                 ("HWFET Losses", "Rear transmission"): HWFET_50_Component_Loss[
-                    front_tranmsission_name
+                    rear_transmission_name
                 ],
-                ("HWFET Losses", "Rear inverter"): HWFET_50_Component_Loss[front_tranmsission_name],
-                ("HWFET Losses", "Rear motor"): HWFET_50_Component_Loss[front_tranmsission_name],
+                ("HWFET Losses", "Rear inverter"): HWFET_50_Component_Loss[rear_inverter_name],
+                ("HWFET Losses", "Rear motor"): HWFET_50_Component_Loss[rear_motor_name],
             }
         )
     all_results = pd.DataFrame(output_results)
