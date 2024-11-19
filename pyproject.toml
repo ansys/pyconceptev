@@ -41,6 +41,7 @@ msal-extensions = ">=1.2.0"
 tomli = {version = ">=2.0.1", python = "<3.11"}
 websockets = ">=13.0.1"
 async-timeout = { version = ">=4", python = "<3.11" }
+pandas = {extras = ["excel"], version = "^2.2.3"}
 [tool.poetry.group.dev.dependencies] # Common packages for test and examples
 plotly = "^5.18.0"
 tox = "^4.15.1"
