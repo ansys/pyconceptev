@@ -29,7 +29,7 @@ from ansys.conceptev.core import app, auth
 
 # Inputs
 filename = "resources/combinations.csv"
-base_concept_id = "c076136f-b763-4a94-9adc-82ed6e5ed274"  # Replace with your base concept ID
+base_concept_id = "a05c7f7d-4c77-48d9-98d2-19b1244718d5"  # Replace with your base concept ID
 
 component_order = {
     "front_transmission_id": "Front Transmission",
@@ -39,6 +39,7 @@ component_order = {
     "rear_motor_id": "Rear Motor",
     "rear_inverter_id": "Rear Inverter",
     "battery_id": "Battery",
+    "clutch_id": "Clutch",
 }
 
 
@@ -48,10 +49,23 @@ def get_component_id_map(client, design_instance_id):
     return {component["name"]: component["id"] for component in components}
 
 
+def add_clutch(arch, combo):
+    if "IPM" in combo["Front Motor"]:
+        arch["front_clutch_id"] = arch.pop("clutch_id")
+    elif "IPM" in combo["Rear Motor"]:
+        arch["rear_clutch_id"] = arch.pop("clutch_id")
+    elif not ("IPM" in combo["Front Motor"]) and not ("IPM" in combo["Rear Motor"]):
+        arch.pop("clutch_id")
+        pass
+    else:
+        raise Exception("Don't know how to add clutch.")
+    return arch
+
+
 def update_architecture(components, combo):
     # Update Architecture
     arch = {key: components[combo[value]] for key, value in component_order.items()}
-
+    arch = add_clutch(arch, combo)
     arch["number_of_front_wheels"] = 2
     arch["number_of_front_motors"] = 1
     arch["number_of_rear_wheels"] = 2
@@ -59,18 +73,15 @@ def update_architecture(components, combo):
     return arch
 
 
-def create_design_instance(client, account_id, hpc_id, combo):
+def create_design_instance(project_id, title):
     osm_url = auth.config["OCM_URL"]
-    project = app.create_new_project(
-        client, account_id, hpc_id, f"{combo} +{datetime.datetime.now()}"
-    )
-    project_id = project["projectId"]
+
     product_id = app.get_product_id(token)
 
     design_data = {
         "projectId": project_id,
         "productId": product_id,
-        "designTitle": f"{combo} +{datetime.datetime.now()}",
+        "designTitle": title,
     }
     created_design = httpx.post(
         osm_url + "/design/create", headers={"Authorization": token}, json=design_data
@@ -81,6 +92,19 @@ def create_design_instance(client, account_id, hpc_id, combo):
 
     design_instance_id = created_design.json()["designInstanceList"][0]["designInstanceId"]
     return design_instance_id
+
+
+def copy_concept(base_concept_id, design_instance_id):
+    copy = {
+        "old_design_instance_id": base_concept_id,
+        "new_design_instance_id": design_instance_id,
+        "copy_jobs": False,
+    }
+    # Clone the base concept
+    params = {"design_instance_id": design_instance_id, "populated": False}
+    client.params = params
+    concept = app.post(client, "/concepts:copy", data=copy)
+    return concept
 
 
 # Read combinations from a csv file.
@@ -97,33 +121,41 @@ with app.get_http_client(token) as client:
     account_id = accounts["conceptev_saas@ansys.com"]
     hpc_id = app.get_default_hpc(token, account_id)
     base_components = get_component_id_map(client, base_concept_id)
+    # Check component headers are correct
     component_types = set(component_order.values())
     component_types_from_combo_header = set(combinations[0].keys())
     assert component_types <= component_types_from_combo_header, component_types.difference(
         component_types_from_combo_header
     )
-
+    # check combinations are in ref project
     component_names_from_combo = set([value for combo in combinations for value in combo.values()])
     component_names_from_base = set(base_components.keys())
     assert (
         component_names_from_combo <= component_names_from_base
     ), component_names_from_combo.difference(component_names_from_base)
-    # check combinations are in ref project
+    # Create a new project and copy Ref in as Ref.
+    new_project = app.create_new_project(
+        client,
+        account_id,
+        hpc_id,
+        title=f"Automated Run: {datetime.datetime.now()}",
+        project_goal=f"Automated Run: {datetime.datetime.now()} "
+        f"from reference {base_concept_id} "
+        f"with combinations {combinations}",
+    )
+    design_instance_id = create_design_instance(new_project["projectId"], "Reference")
+
+    # Copy Reference into Project
+    concept = copy_concept(base_concept_id, design_instance_id)
 
     # Submit jobs for each combination
     for combo in combinations:
         # Create a project
         try:
-            design_instance_id = create_design_instance(client, account_id, hpc_id, combo)
-            copy = {
-                "old_design_instance_id": base_concept_id,
-                "new_design_instance_id": design_instance_id,
-                "copy_jobs": False,
-            }
-            # Clone the base concept
-            params = {"design_instance_id": design_instance_id, "populated": False}
-            client.params = params
-            concept = app.post(client, "/concepts:copy", data=copy)
+            design_instance_id = create_design_instance(
+                new_project["projectId"], f"F_{combo['Front Motor']}_R_{combo['Rear Motor']}"
+            )
+            concept = copy_concept(base_concept_id, design_instance_id)
             print(f"ID of the cloned concept: {concept['id']}")
             params = {"design_instance_id": design_instance_id}
             components = get_component_id_map(client, design_instance_id)
