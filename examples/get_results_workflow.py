@@ -39,7 +39,7 @@ from ansys.conceptev.core import app, auth
 filename = "resources/design_instance_ids.csv"
 short_results = True  # For results created after 15/11/2024 improved performance.
 
-get_results_off_server = False  # Turn to false to read from file. See script for details.
+get_results_off_server = True  # Turn to false to read from file. See script for details.
 # -------Limitations -------------------------#
 # If short results is true it gets in User Units
 # If short results not true and if you have large results file
