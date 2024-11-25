@@ -165,7 +165,7 @@ with app.get_http_client(token) as client:
 
             created_arch = app.post(client, "/architectures", data=updated_architecture)
             print(f"Created architecture: {created_arch}\n")
-
+            concept["architecture_id"] = created_arch["id"]
             # Create and submit a job
             job_info = app.create_submit_job(client, concept, account_id, hpc_id)
             print(f"Submitted job for combination {combo}: {job_info}")
