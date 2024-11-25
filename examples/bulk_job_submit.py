@@ -147,13 +147,15 @@ with app.get_http_client(token) as client:
 
     # Copy Reference into Project
     concept = copy_concept(base_concept_id, design_instance_id)
-
+    created_designs = []
     # Submit jobs for each combination
     for combo in combinations:
         # Create a project
         try:
-            design_instance_id = create_design_instance(
-                new_project["projectId"], f"F_{combo['Front Motor']}_R_{combo['Rear Motor']}"
+            title = f"F_{combo['Front Motor']}_R_{combo['Rear Motor']}"
+            design_instance_id = create_design_instance(new_project["projectId"], title=title)
+            created_designs.append(
+                {"Project Name": title, "Design Instance Id": design_instance_id}
             )
             concept = copy_concept(base_concept_id, design_instance_id)
             print(f"ID of the cloned concept: {concept['id']}")
@@ -167,10 +169,18 @@ with app.get_http_client(token) as client:
             print(f"Created architecture: {created_arch}\n")
             concept["architecture_id"] = created_arch["id"]
             # Create and submit a job
-            job_info = app.create_submit_job(client, concept, account_id, hpc_id)
+            job_info = app.create_submit_job(
+                client,
+                concept,
+                account_id,
+                hpc_id,
+                job_name=f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}",
+            )
             print(f"Submitted job for combination {combo}: {job_info}")
         except Exception as err:
             # This is bad practice as the above code could raise a more serious error.
             # But this way it shouldn't break the whole loop if one job fails.
             print(f"Failed to submit job for combination {combo}: {err}")
             continue
+    all_results = pd.DataFrame(created_designs)
+    all_results.to_excel("created_designs.xlsx")
