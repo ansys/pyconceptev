@@ -304,9 +304,11 @@ def create_submit_job(
     concept: dict,
     account_id: str,
     hpc_id: str,
-    job_name: str = "cli_job: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+    job_name: str | None = None,
 ) -> dict:
     """Create and then submit a job."""
+    if job_name is None:
+        job_name = f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}"
     job_input = {
         "job_name": job_name,
         "requirement_ids": concept["requirements_ids"],
