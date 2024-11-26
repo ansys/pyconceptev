@@ -107,6 +107,19 @@ def copy_concept(base_concept_id, design_instance_id):
     return concept
 
 
+def get_project_id(design_instance_id: str) -> str:
+    """Get the project ID from the design instance ID."""
+    osm_url = auth.config["OCM_URL"]
+    project_id = httpx.post(
+        osm_url + f"/design/instance/load",
+        json={"designInstanceId": design_instance_id},
+        headers={"Authorization": token},
+    )
+    if project_id.status_code != 200:
+        raise Exception(f"Failed to get project ID from OCM {project_id.content}.")
+    return project_id.json()["projectId"]
+
+
 # Read combinations from a csv file.
 combinations = pd.read_csv(filename)
 combinations = combinations.to_dict("records")
@@ -134,26 +147,13 @@ with app.get_http_client(token) as client:
         component_names_from_combo <= component_names_from_base
     ), component_names_from_combo.difference(component_names_from_base)
     # Create a new project and copy Ref in as Ref.
-    new_project = app.create_new_project(
-        client,
-        account_id,
-        hpc_id,
-        title=f"Automated Run: {datetime.datetime.now()}",
-        project_goal=f"Automated Run: {datetime.datetime.now()} "
-        f"from reference {base_concept_id} "
-        f"with combinations {combinations}",
-    )
-    design_instance_id = create_design_instance(new_project["projectId"], "Reference")
-
-    # Copy Reference into Project
-    concept = copy_concept(base_concept_id, design_instance_id)
+    ref_project_id = get_project_id(base_concept_id)
     created_designs = []
     # Submit jobs for each combination
     for combo in combinations:
-        # Create a project
         try:
             title = f"F_{combo['Front Motor']}_R_{combo['Rear Motor']}"
-            design_instance_id = create_design_instance(new_project["projectId"], title=title)
+            design_instance_id = create_design_instance(ref_project_id, title=title)
             created_designs.append(
                 {"Project Name": title, "Design Instance Id": design_instance_id}
             )
