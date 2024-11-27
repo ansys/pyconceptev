@@ -200,6 +200,7 @@ def create_new_project(
 def create_new_concept(
     client: httpx.Client,
     project_id: str,
+    product_id: str | None = None,
     title: str | None = None,
 ) -> dict:
     """Create a concept within an existing project."""
@@ -207,7 +208,8 @@ def create_new_concept(
         title = f"CLI concept {datetime.datetime.now()}"
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
-    product_id = get_product_id(token)
+    if product_id is None:
+        product_id = get_product_id(token)
 
     design_data = {
         "projectId": project_id,
