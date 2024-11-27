@@ -190,7 +190,7 @@ def test_create_concept(httpx_mock: HTTPXMock, client: httpx.Client):
         match_json=concept_data,
         json=mocked_concept,
     )
-    value = app.create_new_concept(client, project_id, concept_title)
+    value = app.create_new_concept(client, project_id, title=concept_title)
     assert value == mocked_concept
 
 
