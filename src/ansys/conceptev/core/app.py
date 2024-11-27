@@ -200,9 +200,11 @@ def create_new_project(
 def create_new_concept(
     client: httpx.Client,
     project_id: str,
-    title: str = f"CLI concept {datetime.datetime.now()}",
+    title: str | None = None,
 ) -> dict:
     """Create a concept within an existing project."""
+    if title is None:
+        title = f"CLI concept {datetime.datetime.now()}"
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
     product_id = get_product_id(token)
@@ -304,9 +306,11 @@ def create_submit_job(
     concept: dict,
     account_id: str,
     hpc_id: str,
-    job_name: str = "cli_job: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+    job_name: str | None = None,
 ) -> dict:
     """Create and then submit a job."""
+    if job_name is None:
+        job_name = f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}"
     job_input = {
         "job_name": job_name,
         "requirement_ids": concept["requirements_ids"],
