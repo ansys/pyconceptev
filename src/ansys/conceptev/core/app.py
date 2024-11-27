@@ -378,11 +378,6 @@ def get_results(
             "calculate_units": calculate_units,
         },
     )
-    if response.status_code == 502 or response.status_code == 504:
-        raise Exception(
-            f"Request timed out {response}. Please try using either calculate_units=False or "
-            f"filtered=True."
-        )
     return process_response(response)
 
 
