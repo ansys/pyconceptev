@@ -9,6 +9,38 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.8 <https://github.com/ansys/pyconceptev/releases/tag/v0.8>`_ - 2024-11-29
+============================================================================
+
+Added
+^^^^^
+
+- added custom exceptions `#157 <https://github.com/ansys/pyconceptev/pull/157>`_
+
+
+Fixed
+^^^^^
+
+- default value was called only once bug `#154 <https://github.com/ansys/pyconceptev/pull/154>`_
+- added a product_id to create_new_concept so it doesn't call ocm to often `#155 <https://github.com/ansys/pyconceptev/pull/155>`_
+- added gateway timeout exception for get_results function `#156 <https://github.com/ansys/pyconceptev/pull/156>`_
+
+
+Dependencies
+^^^^^^^^^^^^
+
+- CHORE: Bump pytest-cov from 5.0.0 to 6.0.0 `#143 <https://github.com/ansys/pyconceptev/pull/143>`_
+- CHORE: Bump websockets from 14.0 to 14.1 `#146 <https://github.com/ansys/pyconceptev/pull/146>`_
+- CHORE: Bump jupyterlab from 4.3.0 to 4.3.1 `#151 <https://github.com/ansys/pyconceptev/pull/151>`_
+- CHORE: Bump msal from 1.31.0 to 1.31.1 `#152 <https://github.com/ansys/pyconceptev/pull/152>`_
+- CHORE: Bump tomli from 2.1.0 to 2.2.1 `#158 <https://github.com/ansys/pyconceptev/pull/158>`_
+
+
+Maintenance
+^^^^^^^^^^^
+
+- chore: update CHANGELOG for v0.7.0 `#150 <https://github.com/ansys/pyconceptev/pull/150>`_
+
 `0.7.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.7.0>`_ - 2024-11-18
 ================================================================================
 
