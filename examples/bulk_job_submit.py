@@ -62,14 +62,15 @@ def add_clutch(arch, combo):
     return arch
 
 
-def update_architecture(components, combo):
+def update_architecture(components, combo, base_architecture):
     # Update Architecture
     arch = {key: components[combo[value]] for key, value in component_order.items()}
     arch = add_clutch(arch, combo)
-    arch["number_of_front_wheels"] = 2
-    arch["number_of_front_motors"] = 1
-    arch["number_of_rear_wheels"] = 2
-    arch["number_of_rear_motors"] = 1
+    arch["number_of_front_wheels"] = base_architecture["number_of_front_wheels"]
+    arch["number_of_front_motors"] = base_architecture["number_of_front_motors"]
+    arch["number_of_rear_wheels"] = base_architecture["number_of_rear_wheels"]
+    arch["number_of_rear_motors"] = base_architecture["number_of_rear_motors"]
+    arch["wheelbase"] = base_architecture["wheelbase"]
     return arch
 
 
@@ -148,6 +149,13 @@ with app.get_http_client(token) as client:
     ), component_names_from_combo.difference(component_names_from_base)
     # Create a new project and copy Ref in as Ref.
     ref_project_id = get_project_id(base_concept_id)
+    base_concept = app.get(client, f"/concepts/{base_concept_id}")
+    base_architecture = app.get(
+        client,
+        f"/architectures/{base_concept['architecture_id']}",
+        params={"design_instance_id": base_concept_id},
+    )
+
     created_designs = []
     # Submit jobs for each combination
     for combo in combinations:
@@ -161,7 +169,7 @@ with app.get_http_client(token) as client:
             print(f"ID of the cloned concept: {concept['id']}")
             params = {"design_instance_id": design_instance_id}
             components = get_component_id_map(client, design_instance_id)
-            updated_architecture = update_architecture(components, combo)
+            updated_architecture = update_architecture(components, combo, base_architecture)
 
             # Update the architecture
 
