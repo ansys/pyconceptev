@@ -24,8 +24,6 @@
 #
 # This example shows how to use PyConcentEV to perform basic operations.
 
-# ## Perform required imports
-#
 # Perform required imports.
 
 import datetime
