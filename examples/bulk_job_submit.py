@@ -32,6 +32,7 @@ import httpx
 import pandas as pd
 
 from ansys.conceptev.core import app, auth
+from ansys.conceptev.core.exceptions import ResponseError
 
 # Inputs
 filename = "resources/combinations.csv"  # See example file for format.
@@ -200,9 +201,7 @@ with app.get_http_client(token) as client:
                 job_name=f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}",
             )
             print(f"Submitted job for combination {combo}: {job_info}")
-        except Exception as err:
-            # This is bad practice as the above code could raise a more serious error.
-            # But this way it shouldn't break the whole loop if one job fails.
+        except ResponseError as err:
             print(f"Failed to submit job for combination {combo}: {err}")
             continue
     all_results = pd.DataFrame(created_designs)
