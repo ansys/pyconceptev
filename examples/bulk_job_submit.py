@@ -20,6 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# # Bulk Job Submit.
+# Example Script to bulk submit jobs to the ConceptEV API.
+# Using a reference project and varying the components.
+# The combinations of components are specified in a CSV file format.
+
+# Required Imports.
 import datetime
 
 import httpx
@@ -28,9 +34,8 @@ import pandas as pd
 from ansys.conceptev.core import app, auth
 
 # Inputs
-filename = "resources/combinations.csv"
+filename = "resources/combinations.csv"  # See example file for format.
 base_concept_id = "a05c7f7d-4c77-48d9-98d2-19b1244718d5"  # Replace with your base concept ID
-
 component_order = {
     "front_transmission_id": "Front Transmission",
     "front_motor_id": "Front Motor",
@@ -44,12 +49,14 @@ component_order = {
 
 
 def get_component_id_map(client, design_instance_id):
+    """Get a map of component name to component id."""
     components = client.get(f"/concepts/{design_instance_id}/components")
     components = app.process_response(components)
     return {component["name"]: component["id"] for component in components}
 
 
 def add_clutch(arch, combo):
+    """Add a disconnect clutch based on motor specified."""
     if "IPM" in combo["Front Motor"]:
         arch["front_clutch_id"] = arch.pop("clutch_id")
     elif "IPM" in combo["Rear Motor"]:
@@ -63,7 +70,7 @@ def add_clutch(arch, combo):
 
 
 def update_architecture(components, combo, base_architecture):
-    # Update Architecture
+    # Update Architecture to match the new combinations.
     arch = {key: components[combo[value]] for key, value in component_order.items()}
     arch = add_clutch(arch, combo)
     arch["number_of_front_wheels"] = base_architecture["number_of_front_wheels"]
@@ -75,6 +82,7 @@ def update_architecture(components, combo, base_architecture):
 
 
 def create_design_instance(project_id, title):
+    """Create a design instance on OCM."""
     osm_url = auth.config["OCM_URL"]
 
     product_id = app.get_product_id(token)
@@ -96,6 +104,7 @@ def create_design_instance(project_id, title):
 
 
 def copy_concept(base_concept_id, design_instance_id):
+    """Copy the reference concept to the new design instance."""
     copy = {
         "old_design_instance_id": base_concept_id,
         "new_design_instance_id": design_instance_id,
@@ -130,7 +139,7 @@ token = app.auth.get_ansyId_token(msal_app)
 
 # Use API client for the Ansys ConceptEV service
 with app.get_http_client(token) as client:
-    client.timeout = 200
+    client.timeout = 200  # Extend timeout for uploading files.
     accounts = app.get_account_ids(token)
     account_id = accounts["conceptev_saas@ansys.com"]
     hpc_id = app.get_default_hpc(token, account_id)
@@ -160,23 +169,29 @@ with app.get_http_client(token) as client:
     # Submit jobs for each combination
     for combo in combinations:
         try:
+            # Create a new design instance with title.
             title = f"F_{combo['Front Motor']}_R_{combo['Rear Motor']}"
             design_instance_id = create_design_instance(ref_project_id, title=title)
+            # Save that in output list.
             created_designs.append(
                 {"Project Name": title, "Design Instance Id": design_instance_id}
             )
+            # Copy base Concept into that new design instance.
             concept = copy_concept(base_concept_id, design_instance_id)
             print(f"ID of the cloned concept: {concept['id']}")
+            # Get the component IDs for the new design instance as they change when copied.
             params = {"design_instance_id": design_instance_id}
             components = get_component_id_map(client, design_instance_id)
+            # Change the base concept to use the new components.
             updated_architecture = update_architecture(components, combo, base_architecture)
-
-            # Update the architecture
-
+            # Update the architecture on the server.
             created_arch = app.post(client, "/architectures", data=updated_architecture)
             print(f"Created architecture: {created_arch}\n")
+
+            # Update the local concept instance with the new architecture id.
             concept["architecture_id"] = created_arch["id"]
-            # Create and submit a job
+
+            # Create and submit a job using the new concept (with the new architecture)
             job_info = app.create_submit_job(
                 client,
                 concept,
@@ -191,4 +206,5 @@ with app.get_http_client(token) as client:
             print(f"Failed to submit job for combination {combo}: {err}")
             continue
     all_results = pd.DataFrame(created_designs)
+    # Save the list of created designs to a file.
     all_results.to_excel("created_designs.xlsx")

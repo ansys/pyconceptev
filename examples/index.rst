@@ -10,6 +10,8 @@ These examples show how to use PyConcentEV to perform basic operations.
 .. nbgallery::
 
     simple_workflow.py
+    get_results_workflow.py
+    bulk_job_submit.py
 
 .. note::
-    Examples require access to `Onscale <https://prod.portal.onscale.com/api>`_.
+    Examples require access to `conceptev.ansys.com`_ software as a service.

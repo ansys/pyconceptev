@@ -29,6 +29,7 @@
 # Perform required imports.
 
 import json
+import warnings
 
 import httpx
 import pandas as pd
@@ -36,34 +37,27 @@ import pandas as pd
 from ansys.conceptev.core import app, auth
 
 # INPUTS
-filename = "resources/design_instance_ids.csv"
+filename = "resources/design_instance_ids.csv"  # File with design_instance_ids see example file.
 short_results = True  # For results created after 15/11/2024 improved performance.
-
-get_results_off_server = True  # Turn to false to read from file. See script for details.
+get_results_off_server = True  # Generates an output file that can be read later.
+output_filename = "results.xlsx"  # Output filename for results.
 # -------Limitations -------------------------#
+# Assumes a front and rear motor architecture.
+# Assumes two drive cycles names UDDS_50% and HWFET_50%. See lines 159.
 # If short results is true it gets in User Units
-# If short results not true and if you have large results file
-# it will probably timeout with a gateway error.
-# Assumes first job in list for each project is the result we want. Assumes no "re-calculation".
-# Assumes name of Drive Cycle Requirements "UDDS_50%" and "HWFET_50%"
-# Assumes a 2 motor architecture
-#
+# Assumes first job in list for each project is the result we want.
+# Assumes no "re-calculation" of a project.
+# -------------------------------------------#
 
-
-# -----------TO DO --------------------#
-# Merge cells on headers
-# Units not outputted to excel
-# Non same component order
-# Front/rear clutch?
-# progress bar
-# save each result file after download so it does not have to download everything
-# and if it breaks on one file it does not stop the whole thing
-
-
-# ------------------------------#
+if not (short_results):
+    warnings.warn(
+        "This may take a long time to get results of the server which may result in an error."
+        "Consider setting short_results to True for large drive cycles."
+    )
 
 
 def get_job_info(token, job_id):
+    """Get the job info from the OnScale Cloud Manager."""
     ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
         url=f"{ocm_url}/job/load", headers={"authorization": token}, json={"jobId": job_id}
@@ -79,6 +73,7 @@ def get_job_info(token, job_id):
 
 
 def get_design_title(token, design_instance_id):
+    """Get the design Title from the OnScale Cloud Manager."""
     ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
         url=f"{ocm_url}/design/instance/load",
@@ -96,12 +91,17 @@ def get_design_title(token, design_instance_id):
 
 
 def get_component_map(client, design_instance_id):
+    """Get a map of components id to component name."""
     components = client.get(f"/concepts/{design_instance_id}/components")
     components = app.process_response(components)
     return {component["id"]: component["name"] for component in components}
 
 
 def get_project_results(client, design_instance_id, token):
+    """Get the project results from ConceptEV API.
+
+    Assumes the first results only.
+    """
     client.params = {"design_instance_id": design_instance_id}
     concept = app.get(client, "/concepts", id=design_instance_id)
 
@@ -125,7 +125,7 @@ def get_project_results(client, design_instance_id, token):
 
 
 def get_results(design_instance_ids):
-
+    """Get results from a list of design instance ids."""
     msal_app = auth.create_msal_app()
     token = auth.get_ansyId_token(msal_app)
 
@@ -139,6 +139,7 @@ def get_results(design_instance_ids):
 
 
 def get_component_name(project_result, name):
+    """Get Component Name or returns empty string."""
     name = project_result["component_map"].get(project_result["architecture"][name], "")
     return name
 
@@ -153,7 +154,9 @@ def get_drive_cycle_result(project_result, name):
 
 if __name__ == "__main__":
 
-    # Get Results off server
+    # Get Results off server this may take time depending on number of files needed to download.
+    # Recommendation: Run once then set get_results_off_server to False.
+    # This allows faster iteration of improving the Excel output.
     if get_results_off_server:
         design_instance_ids = pd.read_csv(filename, header=None)[0]
         project_results = get_results(design_instance_ids)
@@ -162,10 +165,13 @@ if __name__ == "__main__":
     else:
         with open("project_results.json", "r") as f:
             project_results = json.load(f)
-    # Create data we want.
 
+    # Create data we want.
     output_results = []
-    for project_result in project_results:
+    for (
+        project_result
+    ) in project_results:  # For each project results get the data we want to output into the row.
+        # Assumes only drive cycle results UDDS and HWFET that we are interested in.
         # UDDS
         UDDS_result = get_drive_cycle_result(project_result, "UDDS_50%")
         Range_UDDS = UDDS_result["vehicle_range"]
@@ -177,7 +183,7 @@ if __name__ == "__main__":
         HWFET_50_efficiency = HWFET_result["efficiency"]
         HWFET_50_Component_Loss = HWFET_result["total_values"]["loss_by_component"]
 
-        # Component Names
+        # Get the Component Names for each of components we are interested in.
         front_tranmsission_name = (
             get_component_name(project_result, "front_transmission_id") + " (Front)"
         )
@@ -196,9 +202,7 @@ if __name__ == "__main__":
         )
         battery_name = get_component_name(project_result, "battery_id")
 
-        # todo check front/rear
-
-        # Each row of Excel
+        # Creating a records list for each row.
         output_results.append(
             {
                 "Project Name": project_result["design_name"],
@@ -248,5 +252,5 @@ if __name__ == "__main__":
                 ("HWFET Losses", "Rear motor"): HWFET_50_Component_Loss[rear_motor_name],
             }
         )
-    all_results = pd.DataFrame(output_results)
-    all_results.to_excel("output.xlsx")
+    all_results = pd.DataFrame(output_results)  # Convert to Pandas DataFrame
+    all_results.to_excel(output_filename)  # Output to excel.
