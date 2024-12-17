@@ -86,7 +86,7 @@ optional = true
 
 [tool.poetry.group.build.dependencies]
 build = "^1.0.3"
-twine = "^5.0.0"
+twine = ">=5,<7"
 
 [tool.black]
 line-length = 100
