@@ -124,6 +124,7 @@ with app.get_http_client(token) as client:
 
     account_id = accounts["conceptev_saas@ansys.com"]
     hpc_id = app.get_default_hpc(token, account_id)
+    product_id = app.get_product_id(token)
     # Uncomment to print HPC ID
     # print(f"HPC ID: {hpc_id}\n")
     # Create a project
@@ -133,8 +134,9 @@ with app.get_http_client(token) as client:
     print(f"ID of the created project: {project['projectId']}")
 
     # Create a concept with that project
+
     concept = app.create_new_concept(
-        client, project["projectId"], f"New Concept +{datetime.datetime.now()}"
+        client, project["projectId"], product_id, f"New Concept +{datetime.datetime.now()}"
     )
     print(f"ID of the created concept: {concept['id']}")
 

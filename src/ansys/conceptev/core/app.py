@@ -31,6 +31,18 @@ import dotenv
 import httpx
 
 from ansys.conceptev.core import auth
+from ansys.conceptev.core.exceptions import (
+    AccountsError,
+    DeleteError,
+    DesignError,
+    ProductAccessError,
+    ProductIdsError,
+    ProjectError,
+    ResponseError,
+    ResultsError,
+    TokenError,
+    UserDetailsError,
+)
 from ansys.conceptev.core.progress import check_status, monitor_job_progress
 
 dotenv.load_dotenv()
@@ -79,7 +91,7 @@ def get_token() -> str:
         url=ocm_url + "/auth/login/", json={"emailAddress": username, "password": password}
     )
     if response.status_code != 200:
-        raise Exception(f"Failed to get token {response.content}")
+        raise TokenError(f"Failed to get token {response.content}")
     return response.json()["accessToken"]
 
 
@@ -106,7 +118,7 @@ def process_response(response) -> dict:
             return response.json()
         except JSONDecodeError:
             return response.content
-    raise Exception(f"Response Failed:{response.content}")
+    raise ResponseError(f"Response Failed:{response.content}")
 
 
 def get(
@@ -145,7 +157,7 @@ def check_product_access(router: Router, account_id: str | None, params: dict) -
     """Check account_id is there for product access."""
     if router in PRODUCT_ACCESS_ROUTES:
         if not account_id:
-            raise Exception(f"Account ID is required for {router}.")
+            raise ProductAccessError(f"Account ID is required for {router}.")
         params = params | {"account_id": account_id}
     return params
 
@@ -159,7 +171,7 @@ def delete(client: httpx.Client, router: Router, id: str, account_id: str | None
     path = "/".join([router, id])
     response = client.delete(url=path, params=params)
     if response.status_code != 204:
-        raise Exception(f"Failed to delete from {router} with ID:{id}.")
+        raise DeleteError(f"Failed to delete from {router} with ID:{id}.")
 
 
 def put(client: httpx.Client, router: Router, id: str, data: dict) -> dict:
@@ -192,7 +204,7 @@ def create_new_project(
         osm_url + "/project/create", headers={"Authorization": token}, json=project_data
     )
     if created_project.status_code != 200 and created_project.status_code != 204:
-        raise Exception(f"Failed to create a project {created_project}.")
+        raise ProjectError(f"Failed to create a project {created_project}.")
 
     return created_project.json()
 
@@ -200,12 +212,16 @@ def create_new_project(
 def create_new_concept(
     client: httpx.Client,
     project_id: str,
-    title: str = f"CLI concept {datetime.datetime.now()}",
+    product_id: str | None = None,
+    title: str | None = None,
 ) -> dict:
     """Create a concept within an existing project."""
+    if title is None:
+        title = f"CLI concept {datetime.datetime.now()}"
     osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
-    product_id = get_product_id(token)
+    if product_id is None:
+        product_id = get_product_id(token)
 
     design_data = {
         "projectId": project_id,
@@ -217,7 +233,7 @@ def create_new_concept(
     )
 
     if created_design.status_code not in (200, 204):
-        raise Exception(f"Failed to create a design on OCM {created_design.content}.")
+        raise DesignError(f"Failed to create a design on OCM {created_design.content}.")
 
     user_id = get_user_id(token)
 
@@ -249,7 +265,7 @@ def get_product_id(token: str) -> str:
     osm_url = auth.config["OCM_URL"]
     products = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
     if products.status_code != 200:
-        raise Exception(f"Failed to get product id.")
+        raise ProductIdsError(f"Failed to get product id.")
 
     product_id = [
         product["productId"] for product in products.json() if product["productName"] == "CONCEPTEV"
@@ -262,7 +278,7 @@ def get_user_id(token):
     osm_url = auth.config["OCM_URL"]
     user_details = httpx.post(osm_url + "/user/details", headers={"Authorization": token})
     if user_details.status_code not in (200, 204):
-        raise Exception(f"Failed to get a user details on OCM {user_details}.")
+        raise UserDetailsError(f"Failed to get a user details on OCM {user_details}.")
     user_id = user_details.json()["userId"]
     return user_id
 
@@ -278,7 +294,7 @@ def get_account_ids(token: str) -> dict:
     ocm_url = auth.config["OCM_URL"]
     response = httpx.post(url=ocm_url + "/account/list", headers={"authorization": token})
     if response.status_code != 200:
-        raise Exception(f"Failed to get accounts {response}.")
+        raise AccountsError(f"Failed to get accounts {response}.")
     accounts = {
         account["account"]["accountName"]: account["account"]["accountId"]
         for account in response.json()
@@ -295,7 +311,7 @@ def get_default_hpc(token: str, account_id: str) -> dict:
         headers={"authorization": token},
     )
     if response.status_code != 200:
-        raise Exception(f"Failed to get accounts {response}.")
+        raise AccountsError(f"Failed to get accounts {response}.")
     return response.json()["hpcId"]
 
 
@@ -304,9 +320,11 @@ def create_submit_job(
     concept: dict,
     account_id: str,
     hpc_id: str,
-    job_name: str = "cli_job: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+    job_name: str | None = None,
 ) -> dict:
     """Create and then submit a job."""
+    if job_name is None:
+        job_name = f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}"
     job_input = {
         "job_name": job_name,
         "requirement_ids": concept["requirements_ids"],
@@ -376,6 +394,11 @@ def get_results(
             "calculate_units": calculate_units,
         },
     )
+    if response.status_code == 502 or response.status_code == 504:
+        raise ResultsError(
+            f"Request timed out {response}. "
+            f"Please try using either calculate_units=False or filtered=True."
+        )
     return process_response(response)
 
 
