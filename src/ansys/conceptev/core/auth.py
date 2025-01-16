@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -51,9 +51,12 @@ try:
 except FileNotFoundError:
     pass  # No local config file.
 
-scope = config["scope"]
-client_id = config["client_id"]
-authority = config["authority"]
+ENVIRONMENT = config["ENVIRONMENT"]
+scope = config[ENVIRONMENT]["scope"]
+client_id = config[ENVIRONMENT]["client_id"]
+authority = config[ENVIRONMENT]["authority"]
+USERNAME = config["Testing"]["USERNAME"]
+PASSWORD = config["Testing"]["PASSWORD"]
 
 
 def create_msal_app(cache_filepath="token_cache.bin") -> PublicClientApplication:
@@ -88,6 +91,10 @@ def get_ansyId_token(app) -> str:
     """Get token from AnsysID."""
     result = None
     accounts = app.get_accounts()
+    if ENVIRONMENT == "Testing":
+        result = app.acquire_token_by_username_password(
+            username=USERNAME, password=PASSWORD, scopes=[scope]
+        )
     if accounts:
         # Assuming the end user chose this one
         chosen = accounts[0]
