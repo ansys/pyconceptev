@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -40,8 +40,9 @@ else:
 STATUS_COMPLETE = "complete"
 STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "failed"
-OCM_SOCKET_URL = config["OCM_SOCKET_URL"]
-JOB_TIMEOUT = config["JOB_TIMEOUT"]
+ENVIRONMENT = config["ENVIRONMENT"]
+OCM_SOCKET_URL = config[ENVIRONMENT]["OCM_SOCKET_URL"]
+JOB_TIMEOUT = config["Job"]["TIMEOUT"]
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.load_verify_locations(certifi.where())
 

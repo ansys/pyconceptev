@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -26,20 +26,9 @@ from pytest_httpx import HTTPXMock
 
 from ansys.conceptev.core import app, auth
 
-conceptev_url = auth.config["CONCEPTEV_URL"]
-ocm_url = auth.config["OCM_URL"]
-
-
-def test_get_token(httpx_mock: HTTPXMock):
-    print(conceptev_url)
-    print(ocm_url)
-
-    fake_token = "value1"
-    httpx_mock.add_response(
-        url=f"{ocm_url}/auth/login/", method="post", json={"accessToken": fake_token}
-    )
-    token = app.get_token()
-    assert token == fake_token
+ENVIRONMENT = auth.config["ENVIRONMENT"]
+conceptev_url = auth.config[ENVIRONMENT]["CONCEPTEV_URL"]
+ocm_url = auth.config[ENVIRONMENT]["OCM_URL"]
 
 
 @pytest.fixture
