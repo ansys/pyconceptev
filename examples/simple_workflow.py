@@ -24,24 +24,26 @@
 #
 # This example shows how to use PyConcentEV to perform basic operations.
 
+import datetime
+
 # ## Perform required imports
 #
 # Perform required imports.
-
-import datetime
+import os
 from pathlib import Path
+
+SETTINGS_FILE = Path(__file__).parents[1] / "tests" / "config.toml"
+os.environ["PYCONCEPTEV_SETTINGS"] = str(SETTINGS_FILE)
+
 
 import plotly.graph_objects as go
 
 from ansys.conceptev.core import app, auth
 
-# ## Set up environment variables
-
 # ## Define example data
 #
 # You can obtain example data from the schema sections of the API documentation.
 
-# +
 MOTOR_LAB_FILE = Path("resources") / "e9.lab"
 MOTOR_LOSS_MAP_FILE = Path("resources") / "e9.xlsx"
 AERO_1 = {

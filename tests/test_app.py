@@ -24,11 +24,12 @@ import httpx
 import pytest
 from pytest_httpx import HTTPXMock
 
-from ansys.conceptev.core import app, auth
+from ansys.conceptev.core import app
+from ansys.conceptev.core.settings import settings
 
-ENVIRONMENT = auth.config["ENVIRONMENT"]
-conceptev_url = auth.config[ENVIRONMENT]["CONCEPTEV_URL"]
-ocm_url = auth.config[ENVIRONMENT]["OCM_URL"]
+ENVIRONMENT = settings.environment
+conceptev_url = settings.conceptev_url
+ocm_url = settings.ocm_url
 
 
 @pytest.fixture

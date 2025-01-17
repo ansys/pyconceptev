@@ -23,13 +23,7 @@
 """Authentication for AnsysID."""
 
 import logging
-import pathlib
 import sys
-
-try:
-    import tomllib
-except ImportError:
-    import tomli as tomllib
 
 from msal import PublicClientApplication
 from msal_extensions import (
@@ -40,23 +34,14 @@ from msal_extensions import (
     token_cache,
 )
 
-file_directory = pathlib.Path(__file__).parent.resolve()
+from ansys.conceptev.core.settings import Environment, settings
 
-with open(file_directory.joinpath("resources", "config.toml"), "rb") as f:
-    config = tomllib.load(f)
-try:
-    with open("config.toml", "rb") as f:
-        config2 = tomllib.load(f)
-        config.update(config2)
-except FileNotFoundError:
-    pass  # No local config file.
-
-ENVIRONMENT = config["ENVIRONMENT"]
-scope = config[ENVIRONMENT]["scope"]
-client_id = config[ENVIRONMENT]["client_id"]
-authority = config[ENVIRONMENT]["authority"]
-USERNAME = config["Testing"]["USERNAME"]
-PASSWORD = config["Testing"]["PASSWORD"]
+scope = settings.scope
+client_id = settings.client_id
+authority = settings.authority
+USERNAME = settings.conceptev_username
+PASSWORD = settings.conceptev_password
+ENVIRONMENT = settings.environment
 
 
 def create_msal_app(cache_filepath="token_cache.bin") -> PublicClientApplication:
@@ -91,7 +76,7 @@ def get_ansyId_token(app) -> str:
     """Get token from AnsysID."""
     result = None
     accounts = app.get_accounts()
-    if ENVIRONMENT == "Testing":
+    if ENVIRONMENT == Environment.testing:
         result = app.acquire_token_by_username_password(
             username=USERNAME, password=PASSWORD, scopes=[scope]
         )

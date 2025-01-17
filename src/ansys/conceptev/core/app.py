@@ -41,6 +41,7 @@ from ansys.conceptev.core.exceptions import (
     UserDetailsError,
 )
 from ansys.conceptev.core.progress import check_status, monitor_job_progress
+from ansys.conceptev.core.settings import settings
 
 Router = Literal[
     "/architectures",
@@ -73,10 +74,9 @@ PRODUCT_ACCESS_ROUTES = [
     "/jobs:start",
 ]
 
-JOB_TIMEOUT = auth.config["Job"]["TIMEOUT"]
-ENVIRONMENT = auth.config["ENVIRONMENT"]
-OCM_URL = auth.config[ENVIRONMENT]["OCM_URL"]
-BASE_URL = auth.config[ENVIRONMENT]["CONCEPTEV_URL"]
+JOB_TIMEOUT = settings.job_timeout
+OCM_URL = settings.ocm_url
+BASE_URL = settings.conceptev_url
 app = auth.create_msal_app()
 
 
