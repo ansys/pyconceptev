@@ -135,6 +135,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pandoc
           sudo apt-get install texlive-latex-extra texlive-xetex texlive-fonts-extra
+          sudo apt-get install libgirepository1.0-dev libcairo2-dev python3-dev gir1.2-secret-1
           # sudo apt-get install libgl1-mesa-glx xvfb texlive-latex-extra latexmk graphviz texlive-xetex texlive-fonts-extra qpdf texlive-xetex xindy
 
       - name: Verify Pandoc installation
@@ -146,7 +147,6 @@ jobs:
         uses: ansys/actions/doc-build@v8
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
-          dependencies: "libgirepository1.0-dev libcairo2-dev python3-dev gir1.2-secret-1"
           check-links: false
 
   package:
