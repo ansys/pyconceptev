@@ -146,6 +146,7 @@ jobs:
         uses: ansys/actions/doc-build@v8
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
+          dependencies: "libgirepository1.0-dev libcairo2-dev python3-dev gir1.2-secret-1"
           check-links: false
 
   package:
