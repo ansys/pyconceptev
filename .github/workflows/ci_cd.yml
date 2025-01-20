@@ -90,7 +90,7 @@ jobs:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
-          check-licenses: false
+          whitelist-license-check: email_validator
 
   tests:
     name: Tests and coverage
@@ -105,9 +105,6 @@ jobs:
       - uses: ansys/actions/tests-pytest@v8
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
-          CONCEPTEV_URL: ${{ vars.CONCEPTEV_URL }}
-          CONCEPTEV_USERNAME: ${{ vars.CONCEPTEV_USERNAME }}
-          OCM_URL: ${{ vars.OCM_URL }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           pytest-extra-args: "-m 'not integration' --cov=ansys --cov-report=term --cov-report=html:.cov/html"
@@ -145,7 +142,6 @@ jobs:
 
       - name: Build documentation
         env:
-          CONCEPTEV_USERNAME: ${{ secrets.CONCEPTEV_USERNAME }}
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
         uses: ansys/actions/doc-build@v8
         with:
