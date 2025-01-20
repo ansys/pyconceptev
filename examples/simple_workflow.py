@@ -32,7 +32,9 @@ import datetime
 import os
 from pathlib import Path
 
-SETTINGS_FILE = Path(__file__).parents[1] / "tests" / "config.toml"
+print(Path())
+print(Path().cwd())
+SETTINGS_FILE = Path().parents[1] / "tests" / "config.toml"
 os.environ["PYCONCEPTEV_SETTINGS"] = str(SETTINGS_FILE)
 
 
