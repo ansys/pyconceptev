@@ -33,7 +33,9 @@ import os
 from pathlib import Path
 
 # Set the path to the configuration file
-SETTINGS_FILE = Path().cwd().parents[3] / "tests" / "config.toml"
+SETTINGS_FILE = Path().cwd().parents[2] / "tests" / "config.toml"
+print(SETTINGS_FILE)
+print(SETTINGS_FILE.exists())
 os.environ["PYCONCEPTEV_SETTINGS"] = str(SETTINGS_FILE)
 
 
