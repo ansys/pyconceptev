@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -294,6 +294,23 @@ def test_put(httpx_mock: HTTPXMock, client: httpx.Client):
 
     results = app.put(client, "/configurations", mocked_id, example_aero)
     assert results == example_aero
+
+
+def test_get_project_id(httpx_mock: HTTPXMock):
+    name = "poject_name"
+    account_id = "123"
+    token = "456"
+    project_id = "789"
+    example_data = {"projects": [{"projectId": project_id, "projectTitle": name}]}
+    httpx_mock.add_response(
+        url=ocm_url + "/project/list/page",
+        method="post",
+        match_json={"filterByName": name, "accountId": account_id},
+        headers={"authorization": token},
+        json=example_data,
+    )
+    result = app.get_project_ids(name, account_id, token)
+    assert result == {name: project_id}
 
 
 def test_read_file(mocker):
