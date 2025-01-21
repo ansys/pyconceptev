@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -413,6 +413,19 @@ def get_status(job_info: dict, token: str) -> str:
     processed_response = process_response(response)
     initial_status = processed_response["jobStatus"][-1]["jobStatus"]
     return initial_status
+
+
+def get_project_ids(name: str, account_id: str, token: str) -> dict:
+    """Get projects."""
+    ocm_url = auth.config["OCM_URL"]  # TODO update to use settings when merged.
+    response = httpx.post(
+        url=ocm_url + "/projects/list",
+        json={"accountId": account_id, "filterByName": name},
+        headers={"Authorization": token},
+    )
+    processed_response = process_response(response)
+    projects = processed_response["projects"]
+    return {project["projectName"]: project["projectId"] for project in projects}
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
