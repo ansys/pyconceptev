@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -36,7 +36,9 @@ from ansys.conceptev.core.exceptions import ResponseError
 
 # Inputs
 filename = "resources/combinations.csv"  # See example file for format.
+# TODO use template ID
 base_concept_id = "a05c7f7d-4c77-48d9-98d2-19b1244718d5"  # Replace with your base concept ID
+
 component_order = {
     "front_transmission_id": "Front Transmission",
     "front_motor_id": "Front Motor",
@@ -51,6 +53,7 @@ component_order = {
 
 def get_component_id_map(client, design_instance_id):
     """Get a map of component name to component id."""
+    ###TODO common things in app
     components = client.get(f"/concepts/{design_instance_id}/components")
     components = app.process_response(components)
     return {component["name"]: component["id"] for component in components}
@@ -58,6 +61,7 @@ def get_component_id_map(client, design_instance_id):
 
 def add_clutch(arch, combo):
     """Add a disconnect clutch based on motor specified."""
+    ##TODO get clutch from combo
     if "IPM" in combo["Front Motor"]:
         arch["front_clutch_id"] = arch.pop("clutch_id")
     elif "IPM" in combo["Rear Motor"]:

@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -38,14 +38,18 @@ from ansys.conceptev.core import app, auth
 
 # INPUTS
 filename = "resources/design_instance_ids.csv"  # File with design_instance_ids see example file.
-short_results = True  # For results created after 15/11/2024 improved performance.
+short_results = (
+    True  # For results created after 15/11/2024 improved performance. #TODO results make clear
+)
 get_results_off_server = True  # Generates an output file that can be read later.
 output_filename = "results.xlsx"  # Output filename for results.
 # -------Limitations -------------------------#
 # Assumes a front and rear motor architecture.
-# Assumes two drive cycles names UDDS_50% and HWFET_50%. See lines 159.
+# Assumes two drive cycles names UDDS_50% and HWFET_50%.
+# See lines 159. #TODO single drive cycle for example?
 # If short results is true it gets in User Units
 # Assumes first job in list for each project is the result we want.
+# '#TODO get result by keyword or something?
 # Assumes no "re-calculation" of a project.
 # -------------------------------------------#
 
@@ -159,14 +163,14 @@ if __name__ == "__main__":
     # This allows faster iteration of improving the Excel output.
     if get_results_off_server:
         design_instance_ids = pd.read_csv(filename, header=None)[0]
-        project_results = get_results(design_instance_ids)
+        project_results = get_results(design_instance_ids)  # move to api? or file export mode?
         with open("project_results.json", "w") as f:
             json.dump(project_results, f)
     else:
         with open("project_results.json", "r") as f:
             project_results = json.load(f)
 
-    # Create data we want.
+    # Create data we want. #TODO filter, get certain data from structure.
     output_results = []
     for (
         project_result
