@@ -106,6 +106,8 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
+          sudo apt-get install -y pandoc
+          sudo apt-get install texlive-latex-extra texlive-xetex texlive-fonts-extra
           sudo apt-get install gobject-introspection
           sudo apt update
           sudo apt install python3-dev libgirepository1.0-dev libcairo2-dev gir1.2-secret-1 gnome-keyring
