@@ -84,12 +84,20 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python-version: ["3.9", "3.10", "3.11"]
     steps:
+      - name: Install dependencies
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install gobject-introspection
+          sudo apt update
+          sudo apt install python3-dev libgirepository1.0-dev libcairo2-dev gir1.2-secret-1 gnome-keyring
       - name: Build wheelhouse and perform smoke test
         uses: ansys/actions/build-wheelhouse@v8
         with:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
+          whitelist-license-check: email_validator
 
   tests:
     name: Tests and coverage
@@ -101,12 +109,18 @@ jobs:
        python-version: ["3.9","3.10","3.11"]
       fail-fast: false
     steps:
+      - name: Install dependencies
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+          sudo apt-get install texlive-latex-extra texlive-xetex texlive-fonts-extra
+          sudo apt-get install gobject-introspection
+          sudo apt update
+          sudo apt install python3-dev libgirepository1.0-dev libcairo2-dev gir1.2-secret-1 gnome-keyring
       - uses: ansys/actions/tests-pytest@v8
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
-          CONCEPTEV_URL: ${{ vars.CONCEPTEV_URL }}
-          CONCEPTEV_USERNAME: ${{ vars.CONCEPTEV_USERNAME }}
-          OCM_URL: ${{ vars.OCM_URL }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           pytest-extra-args: "-m 'not integration' --cov=ansys --cov-report=term --cov-report=html:.cov/html"
@@ -137,6 +151,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pandoc
           sudo apt-get install texlive-latex-extra texlive-xetex texlive-fonts-extra
+          sudo apt-get install gobject-introspection
+          sudo apt update
+          sudo apt install python3-dev libgirepository1.0-dev libcairo2-dev gir1.2-secret-1 gnome-keyring
           # sudo apt-get install libgl1-mesa-glx xvfb texlive-latex-extra latexmk graphviz texlive-xetex texlive-fonts-extra qpdf texlive-xetex xindy
 
       - name: Verify Pandoc installation
@@ -144,7 +161,6 @@ jobs:
 
       - name: Build documentation
         env:
-          CONCEPTEV_USERNAME: ${{ secrets.CONCEPTEV_USERNAME }}
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
         uses: ansys/actions/doc-build@v8
         with:

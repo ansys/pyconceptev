@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -24,16 +24,24 @@
 
 import datetime
 from json import JSONDecodeError
-import os
 from typing import Literal
 
-import dotenv
 import httpx
 
 from ansys.conceptev.core import auth
+from ansys.conceptev.core.exceptions import (
+    AccountsError,
+    DeleteError,
+    DesignError,
+    ProductAccessError,
+    ProductIdsError,
+    ProjectError,
+    ResponseError,
+    ResultsError,
+    UserDetailsError,
+)
 from ansys.conceptev.core.progress import check_status, monitor_job_progress
-
-dotenv.load_dotenv()
+from ansys.conceptev.core.settings import settings
 
 Router = Literal[
     "/architectures",
@@ -66,21 +74,11 @@ PRODUCT_ACCESS_ROUTES = [
     "/jobs:start",
 ]
 
-JOB_TIMEOUT = auth.config["JOB_TIMEOUT"]
+JOB_TIMEOUT = settings.job_timeout
+OCM_URL = settings.ocm_url
+BASE_URL = settings.conceptev_url
+ACCOUNT_NAME = settings.account_name
 app = auth.create_msal_app()
-
-
-def get_token() -> str:
-    """Get token from OCM."""
-    username = os.environ["CONCEPTEV_USERNAME"]
-    password = os.environ["CONCEPTEV_PASSWORD"]
-    ocm_url = auth.config["OCM_URL"]
-    response = httpx.post(
-        url=ocm_url + "/auth/login/", json={"emailAddress": username, "password": password}
-    )
-    if response.status_code != 200:
-        raise Exception(f"Failed to get token {response.content}")
-    return response.json()["accessToken"]
 
 
 def get_http_client(token: str, design_instance_id: str | None = None) -> httpx.Client:
@@ -89,11 +87,10 @@ def get_http_client(token: str, design_instance_id: str | None = None) -> httpx.
     The HTTP client creates and maintains the connection, which is more performant than
     re-creating this connection for each call.
     """
-    base_url = auth.config["CONCEPTEV_URL"]
     params = None
     if design_instance_id:
         params = {"design_instance_id": design_instance_id}
-    return httpx.Client(headers={"Authorization": token}, params=params, base_url=base_url)
+    return httpx.Client(headers={"Authorization": token}, params=params, base_url=BASE_URL)
 
 
 def process_response(response) -> dict:
@@ -106,7 +103,7 @@ def process_response(response) -> dict:
             return response.json()
         except JSONDecodeError:
             return response.content
-    raise Exception(f"Response Failed:{response.content}")
+    raise ResponseError(f"Response Failed:{response.content}")
 
 
 def get(
@@ -145,7 +142,7 @@ def check_product_access(router: Router, account_id: str | None, params: dict) -
     """Check account_id is there for product access."""
     if router in PRODUCT_ACCESS_ROUTES:
         if not account_id:
-            raise Exception(f"Account ID is required for {router}.")
+            raise ProductAccessError(f"Account ID is required for {router}.")
         params = params | {"account_id": account_id}
     return params
 
@@ -159,7 +156,7 @@ def delete(client: httpx.Client, router: Router, id: str, account_id: str | None
     path = "/".join([router, id])
     response = client.delete(url=path, params=params)
     if response.status_code != 204:
-        raise Exception(f"Failed to delete from {router} with ID:{id}.")
+        raise DeleteError(f"Failed to delete from {router} with ID:{id}.")
 
 
 def put(client: httpx.Client, router: Router, id: str, data: dict) -> dict:
@@ -180,7 +177,6 @@ def create_new_project(
     project_goal: str = "Created from the CLI",
 ) -> dict:
     """Create a project."""
-    osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
     project_data = {
         "accountId": account_id,
@@ -189,10 +185,10 @@ def create_new_project(
         "projectGoal": project_goal,
     }
     created_project = httpx.post(
-        osm_url + "/project/create", headers={"Authorization": token}, json=project_data
+        OCM_URL + "/project/create", headers={"Authorization": token}, json=project_data
     )
     if created_project.status_code != 200 and created_project.status_code != 204:
-        raise Exception(f"Failed to create a project {created_project}.")
+        raise ProjectError(f"Failed to create a project {created_project}.")
 
     return created_project.json()
 
@@ -200,12 +196,16 @@ def create_new_project(
 def create_new_concept(
     client: httpx.Client,
     project_id: str,
-    title: str = f"CLI concept {datetime.datetime.now()}",
+    product_id: str | None = None,
+    title: str | None = None,
 ) -> dict:
     """Create a concept within an existing project."""
-    osm_url = auth.config["OCM_URL"]
+    if title is None:
+        title = f"CLI concept {datetime.datetime.now()}"
+
     token = client.headers["Authorization"]
-    product_id = get_product_id(token)
+    if product_id is None:
+        product_id = get_product_id(token)
 
     design_data = {
         "projectId": project_id,
@@ -213,11 +213,11 @@ def create_new_concept(
         "designTitle": title,
     }
     created_design = httpx.post(
-        osm_url + "/design/create", headers={"Authorization": token}, json=design_data
+        OCM_URL + "/design/create", headers={"Authorization": token}, json=design_data
     )
 
     if created_design.status_code not in (200, 204):
-        raise Exception(f"Failed to create a design on OCM {created_design.content}.")
+        raise DesignError(f"Failed to create a design on OCM {created_design.content}.")
 
     user_id = get_user_id(token)
 
@@ -246,10 +246,9 @@ def create_new_concept(
 
 def get_product_id(token: str) -> str:
     """Get the product ID."""
-    osm_url = auth.config["OCM_URL"]
-    products = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
+    products = httpx.get(OCM_URL + "/product/list", headers={"Authorization": token})
     if products.status_code != 200:
-        raise Exception(f"Failed to get product id.")
+        raise ProductIdsError(f"Failed to get product id.")
 
     product_id = [
         product["productId"] for product in products.json() if product["productName"] == "CONCEPTEV"
@@ -259,10 +258,9 @@ def get_product_id(token: str) -> str:
 
 def get_user_id(token):
     """Get the user ID."""
-    osm_url = auth.config["OCM_URL"]
-    user_details = httpx.post(osm_url + "/user/details", headers={"Authorization": token})
+    user_details = httpx.post(OCM_URL + "/user/details", headers={"Authorization": token})
     if user_details.status_code not in (200, 204):
-        raise Exception(f"Failed to get a user details on OCM {user_details}.")
+        raise UserDetailsError(f"Failed to get a user details on OCM {user_details}.")
     user_id = user_details.json()["userId"]
     return user_id
 
@@ -275,10 +273,9 @@ def get_concept_ids(client: httpx.Client) -> dict:
 
 def get_account_ids(token: str) -> dict:
     """Get account IDs."""
-    ocm_url = auth.config["OCM_URL"]
-    response = httpx.post(url=ocm_url + "/account/list", headers={"authorization": token})
+    response = httpx.post(url=OCM_URL + "/account/list", headers={"authorization": token})
     if response.status_code != 200:
-        raise Exception(f"Failed to get accounts {response}.")
+        raise AccountsError(f"Failed to get accounts {response}.")
     accounts = {
         account["account"]["accountName"]: account["account"]["accountId"]
         for account in response.json()
@@ -286,16 +283,22 @@ def get_account_ids(token: str) -> dict:
     return accounts
 
 
+def get_account_id(token: str) -> str:
+    """Get the account ID from OCM using name from config file."""
+    accounts = get_account_ids(token)
+    account_id = accounts[ACCOUNT_NAME]
+    return account_id
+
+
 def get_default_hpc(token: str, account_id: str) -> dict:
     """Get the default HPC ID."""
-    ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
-        url=ocm_url + "/account/hpc/default",
+        url=OCM_URL + "/account/hpc/default",
         json={"accountId": account_id},
         headers={"authorization": token},
     )
     if response.status_code != 200:
-        raise Exception(f"Failed to get accounts {response}.")
+        raise AccountsError(f"Failed to get accounts {response}.")
     return response.json()["hpcId"]
 
 
@@ -304,9 +307,11 @@ def create_submit_job(
     concept: dict,
     account_id: str,
     hpc_id: str,
-    job_name: str = "cli_job: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+    job_name: str | None = None,
 ) -> dict:
     """Create and then submit a job."""
+    if job_name is None:
+        job_name = f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}"
     job_input = {
         "job_name": job_name,
         "requirement_ids": concept["requirements_ids"],
@@ -327,7 +332,7 @@ def create_submit_job(
 
 def read_file(filename: str) -> str:
     """Read a given file."""
-    with open(filename) as f:
+    with open(filename, "r+b") as f:
         content = f.read()
     return content
 
@@ -337,6 +342,8 @@ def read_results(
     job_info: dict,
     calculate_units: bool = True,
     timeout: int = JOB_TIMEOUT,
+    filtered: bool = False,
+    msal_app: auth.PublicClientApplication | None = None,
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]
@@ -344,37 +351,66 @@ def read_results(
     user_id = get_user_id(token)
     initial_status = get_status(job_info, token)
     if check_status(initial_status):  # Job already completed
-        return get_results(client, job_info, calculate_units)
+        return get_results(client, job_info, calculate_units, filtered)
     else:  # Job is still running
         monitor_job_progress(job_id, user_id, token, timeout)  # Wait for completion
-        return get_results(client, job_info, calculate_units)
+        if msal_app is None:
+            msal_app = auth.create_msal_app()
+        token = auth.get_ansyId_token(msal_app)
+        client.headers["Authorization"] = token  # Update the token
+        return get_results(client, job_info, calculate_units, filtered)
 
 
-def get_results(client, job_info: dict, calculate_units: bool = True):
+def get_results(
+    client,
+    job_info: dict,
+    calculate_units: bool = True,
+    filtered: bool = False,
+):
     """Get the results."""
     version_number = get(client, "/utilities:data_format_version")
+    if filtered:
+        filename = f"filtered_output_v{version_number}.json"
+    else:
+        filename = f"output_file_v{version_number}.json"
     response = client.post(
         url="/jobs:result",
         json=job_info,
         params={
-            "results_file_name": f"output_file_v{version_number}.json",
+            "results_file_name": filename,
             "calculate_units": calculate_units,
         },
     )
+    if response.status_code == 502 or response.status_code == 504:
+        raise ResultsError(
+            f"Request timed out {response}. "
+            f"Please try using either calculate_units=False or filtered=True."
+        )
     return process_response(response)
 
 
 def get_status(job_info: dict, token: str) -> str:
     """Get the status of the job."""
-    ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
-        url=ocm_url + "/job/load",
+        url=OCM_URL + "/job/load",
         json={"jobId": job_info["job_id"]},
         headers={"Authorization": token},
     )
     processed_response = process_response(response)
     initial_status = processed_response["jobStatus"][-1]["jobStatus"]
     return initial_status
+
+
+def get_project_ids(name: str, account_id: str, token: str) -> dict:
+    """Get projects."""
+    response = httpx.post(
+        url=OCM_URL + "/project/list/page",
+        json={"accountId": account_id, "filterByName": name},
+        headers={"Authorization": token},
+    )
+    processed_response = process_response(response)
+    projects = processed_response["projects"]
+    return {project["projectTitle"]: project["projectId"] for project in projects}
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:

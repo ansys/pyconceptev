@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -24,22 +24,12 @@ import httpx
 import pytest
 from pytest_httpx import HTTPXMock
 
-from ansys.conceptev.core import app, auth
+from ansys.conceptev.core import app
+from ansys.conceptev.core.settings import settings
 
-conceptev_url = auth.config["CONCEPTEV_URL"]
-ocm_url = auth.config["OCM_URL"]
-
-
-def test_get_token(httpx_mock: HTTPXMock):
-    print(conceptev_url)
-    print(ocm_url)
-
-    fake_token = "value1"
-    httpx_mock.add_response(
-        url=f"{ocm_url}/auth/login/", method="post", json={"accessToken": fake_token}
-    )
-    token = app.get_token()
-    assert token == fake_token
+ENVIRONMENT = settings.environment
+conceptev_url = settings.conceptev_url
+ocm_url = settings.ocm_url
 
 
 @pytest.fixture
@@ -190,7 +180,7 @@ def test_create_concept(httpx_mock: HTTPXMock, client: httpx.Client):
         match_json=concept_data,
         json=mocked_concept,
     )
-    value = app.create_new_concept(client, project_id, concept_title)
+    value = app.create_new_concept(client, project_id, title=concept_title)
     assert value == mocked_concept
 
 
@@ -294,6 +284,23 @@ def test_put(httpx_mock: HTTPXMock, client: httpx.Client):
 
     results = app.put(client, "/configurations", mocked_id, example_aero)
     assert results == example_aero
+
+
+def test_get_project_id(httpx_mock: HTTPXMock):
+    name = "poject_name"
+    account_id = "123"
+    token = "456"
+    project_id = "789"
+    example_data = {"projects": [{"projectId": project_id, "projectTitle": name}]}
+    httpx_mock.add_response(
+        url=ocm_url + "/project/list/page",
+        method="post",
+        match_json={"filterByName": name, "accountId": account_id},
+        headers={"authorization": token},
+        json=example_data,
+    )
+    result = app.get_project_ids(name, account_id, token)
+    assert result == {name: project_id}
 
 
 def test_read_file(mocker):

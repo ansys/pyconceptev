@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -24,38 +24,28 @@
 #
 # This example shows how to use PyConcentEV to perform basic operations.
 
+import datetime
+
 # ## Perform required imports
 #
 # Perform required imports.
-
-import datetime
 import os
 from pathlib import Path
+
+# Set the path to the configuration file
+SETTINGS_FILE = Path().cwd().parents[2] / "tests" / "config.toml"
+os.environ["PYCONCEPTEV_SETTINGS"] = str(SETTINGS_FILE)
 
 import plotly.graph_objects as go
 
 from ansys.conceptev.core import app, auth
 
-# ## Set up environment variables
-# AnsysID is the only supported method.
-# We only use the other one here for automated testing. So set to True.
-use_ansys_id = False  # True
-
-
-if not (use_ansys_id):
-    # Set environment variables for ConceptEV username and password if they don't exist!
-    if os.environ.get("CONCEPTEV_USERNAME") is None:
-        os.environ["CONCEPTEV_USERNAME"] = "joe.blogs@my_work.com"
-    if os.environ.get("CONCEPTEV_PASSWORD") is None:
-        os.environ["CONCEPTEV_PASSWORD"] = "sup3r_s3cr3t_passw0rd"
-
 # ## Define example data
 #
 # You can obtain example data from the schema sections of the API documentation.
 
-# +
-MOTOR_FILE_NAME = Path("resources") / "e9.lab"
-
+MOTOR_LAB_FILE = Path("resources") / "e9.lab"
+MOTOR_LOSS_MAP_FILE = Path("resources") / "e9.xlsx"
 AERO_1 = {
     "name": "New Aero Config",
     "drag_coefficient": 0.3,
@@ -106,13 +96,10 @@ BATTERY = {
 
 motor_data = {"name": "e9", "component_type": "MotorLabID", "inverter_losses_included": False}
 
-if use_ansys_id:
-    # Get a token from Ansys ID (Preferred)
-    msal_app = auth.create_msal_app()
-    token = auth.get_ansyId_token(msal_app)
-else:
-    # Get a token from OCM (Deprecated)
-    token = app.get_token()
+
+# Get a token from Ansys ID
+msal_app = auth.create_msal_app()
+token = auth.get_ansyId_token(msal_app)
 
 
 # Use API client for the Ansys ConceptEV service
@@ -120,12 +107,10 @@ with app.get_http_client(token) as client:
     health = app.get(client, "/health")
     print(f"API is healthy: {health}\n")
 
-    accounts = app.get_account_ids(token)
-    # Uncomment to print accounts IDs
-    # print(f"Account IDs: {accounts}\n")
+    account_id = app.get_account_id(token)
 
-    account_id = accounts["conceptev_saas@ansys.com"]
     hpc_id = app.get_default_hpc(token, account_id)
+    product_id = app.get_product_id(token)
     # Uncomment to print HPC ID
     # print(f"HPC ID: {hpc_id}\n")
     # Create a project
@@ -135,8 +120,9 @@ with app.get_http_client(token) as client:
     print(f"ID of the created project: {project['projectId']}")
 
     # Create a concept with that project
+
     concept = app.create_new_concept(
-        client, project["projectId"], f"New Concept +{datetime.datetime.now()}"
+        client, project["projectId"], product_id, f"New Concept +{datetime.datetime.now()}"
     )
     print(f"ID of the created concept: {concept['id']}")
 
@@ -171,11 +157,24 @@ with app.get_http_client(token, design_instance_id) as client:
     created_transmission = app.post(client, "/components", data=TRANSMISSION)
 
     # Create component from file
-    motor_loss_map = app.post_component_file(client, MOTOR_FILE_NAME, "motor_lab_file")
-    motor_data["data_id"] = motor_loss_map[0]
-    motor_data["max_speed"] = motor_loss_map[1]
+    motor_lab = app.post_component_file(client, MOTOR_LAB_FILE, "motor_lab_file")
+    motor_data["data_id"] = motor_lab[0]
+    motor_data["max_speed"] = motor_lab[1]
 
-    created_motor = app.post(client, "/components", data=motor_data)
+    created_motor_lab = app.post(client, "/components", data=motor_data)
+    print(f"Created motor: {created_motor_lab}\n")
+
+    # Create loss map motor component from file
+    client.timeout = 2000
+    motor_loss_map = app.post_component_file(client, MOTOR_LOSS_MAP_FILE, "motor_torque_grid_file")
+    loss_map_motor_data = {
+        "name": "e9_loss_map",
+        "component_type": "MotorLossMapID",
+        "poles": 8,
+        "data_id": motor_loss_map[0],
+    }
+
+    created_motor = app.post(client, "/components", data=loss_map_motor_data)
     print(f"Created motor: {created_motor}\n")
 
     # Extend client timeout to get loss map from the motor
@@ -184,7 +183,7 @@ with app.get_http_client(token, design_instance_id) as client:
         client,
         "/components:get_display_data",
         data={},
-        params={"component_id": created_motor["id"]},
+        params={"component_id": created_motor_lab["id"]},
     )
 
     # Show a figure of the loss map from the motor in you browser
@@ -198,11 +197,11 @@ with app.get_http_client(token, design_instance_id) as client:
 
     # Create an architecture
     architecture = {
-        "number_of_front_wheels": 1,
+        "number_of_front_wheels": 2,
         "number_of_front_motors": 1,
         "front_transmission_id": created_transmission["id"],
         "front_motor_id": created_motor["id"],
-        "number_of_rear_wheels": 0,
+        "number_of_rear_wheels": 2,
         "number_of_rear_motors": 0,
         "battery_id": created_battery["id"],
     }
@@ -222,19 +221,14 @@ with app.get_http_client(token, design_instance_id) as client:
     }
     created_requirement = app.post(client, "requirements", data=requirement)
     print(f"Created requirement: {created_requirement}")
-# -
-
-# Submit a job and show the result.
-
-with app.get_http_client(token, design_instance_id) as client:
 
     # Create and submit a job
     concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
-    # Following code is not working in the pipelne but should work in a local environment.
 
-    # Read the results and show the result in your browser
-    # results = app.read_results(client, job_info, calculate_units=False)
+    # Doesn't work in test environment but should work for users.
+    # # Read the results and show the result in your browser
+    # results = app.read_results(client, job_info, calculate_units=False, filtered=True)
     # x = results[0]["capability_curve"]["speeds"]
     # y = results[0]["capability_curve"]["torques"]
     #
