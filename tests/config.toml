@@ -5,5 +5,6 @@ client_id = "9c9edb71-06f9-4c4b-afed-9201668385de"
 authority = "https://a365dev.b2clogin.com/a365dev.onmicrosoft.com/b2c_1a_ansysid_signup_signin_test"
 scope = "https://a365dev.onmicrosoft.com/AnsysID/Authentication"
 CONCEPTEV_USERNAME = "conceptev_testing@ansys.com"
+account_name = "ConceptEv Test Account"
 JOB_TIMEOUT = 3600
 ENVIRONMENT = "testing"
