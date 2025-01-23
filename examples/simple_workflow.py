@@ -34,10 +34,7 @@ from pathlib import Path
 
 # Set the path to the configuration file
 SETTINGS_FILE = Path().cwd().parents[2] / "tests" / "config.toml"
-print(SETTINGS_FILE)
-print(SETTINGS_FILE.exists())
 os.environ["PYCONCEPTEV_SETTINGS"] = str(SETTINGS_FILE)
-
 
 import plotly.graph_objects as go
 
@@ -110,11 +107,8 @@ with app.get_http_client(token) as client:
     health = app.get(client, "/health")
     print(f"API is healthy: {health}\n")
 
-    accounts = app.get_account_ids(token)
-    # Uncomment to print accounts IDs
-    # print(f"Account IDs: {accounts}\n")
+    account_id = app.get_account_id(token)
 
-    account_id = accounts["ConceptEv Test Account"]
     hpc_id = app.get_default_hpc(token, account_id)
     product_id = app.get_product_id(token)
     # Uncomment to print HPC ID
