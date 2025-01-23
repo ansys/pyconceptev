@@ -77,6 +77,7 @@ PRODUCT_ACCESS_ROUTES = [
 JOB_TIMEOUT = settings.job_timeout
 OCM_URL = settings.ocm_url
 BASE_URL = settings.conceptev_url
+ACCOUNT_NAME = settings.account_name
 app = auth.create_msal_app()
 
 
@@ -282,6 +283,13 @@ def get_account_ids(token: str) -> dict:
     return accounts
 
 
+def get_account_id(token: str) -> str:
+    """Get the account ID from OCM using name from config file."""
+    accounts = get_account_ids(token)
+    account_id = accounts[ACCOUNT_NAME]
+    return account_id
+
+
 def get_default_hpc(token: str, account_id: str) -> dict:
     """Get the default HPC ID."""
     response = httpx.post(
@@ -391,6 +399,18 @@ def get_status(job_info: dict, token: str) -> str:
     processed_response = process_response(response)
     initial_status = processed_response["jobStatus"][-1]["jobStatus"]
     return initial_status
+
+
+def get_project_ids(name: str, account_id: str, token: str) -> dict:
+    """Get projects."""
+    response = httpx.post(
+        url=OCM_URL + "/project/list/page",
+        json={"accountId": account_id, "filterByName": name},
+        headers={"Authorization": token},
+    )
+    processed_response = process_response(response)
+    projects = processed_response["projects"]
+    return {project["projectTitle"]: project["projectId"] for project in projects}
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
