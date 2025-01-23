@@ -401,6 +401,18 @@ def get_status(job_info: dict, token: str) -> str:
     return initial_status
 
 
+def get_project_ids(name: str, account_id: str, token: str) -> dict:
+    """Get projects."""
+    response = httpx.post(
+        url=OCM_URL + "/project/list/page",
+        json={"accountId": account_id, "filterByName": name},
+        headers={"Authorization": token},
+    )
+    processed_response = process_response(response)
+    projects = processed_response["projects"]
+    return {project["projectTitle"]: project["projectId"] for project in projects}
+
+
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
     """Send a POST request to the base client with a file.
 
