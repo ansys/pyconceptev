@@ -77,6 +77,7 @@ PRODUCT_ACCESS_ROUTES = [
 JOB_TIMEOUT = settings.job_timeout
 OCM_URL = settings.ocm_url
 BASE_URL = settings.conceptev_url
+ACCOUNT_NAME = settings.account_name
 app = auth.create_msal_app()
 
 
@@ -280,6 +281,13 @@ def get_account_ids(token: str) -> dict:
         for account in response.json()
     }
     return accounts
+
+
+def get_account_id(token: str) -> str:
+    """Get the account ID from OCM using name from config file."""
+    accounts = get_account_ids(token)
+    account_id = accounts[ACCOUNT_NAME]
+    return account_id
 
 
 def get_default_hpc(token: str, account_id: str) -> dict:
