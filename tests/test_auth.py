@@ -50,6 +50,10 @@ class MockApp:
     def acquire_token_interactive(self, scopes):
         return {"access_token": "mock_token"}
 
+    def acquire_token_by_username_password(self, username, password, scopes):
+        assert auth.ENVIRONMENT == "testing"
+        return {"access_token": "mock_token"}
+
 
 @pytest.fixture
 def mockPublcClientCreation(mocker: MockerFixture) -> None:

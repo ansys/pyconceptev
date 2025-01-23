@@ -24,22 +24,12 @@ import httpx
 import pytest
 from pytest_httpx import HTTPXMock
 
-from ansys.conceptev.core import app, auth
+from ansys.conceptev.core import app
+from ansys.conceptev.core.settings import settings
 
-conceptev_url = auth.config["CONCEPTEV_URL"]
-ocm_url = auth.config["OCM_URL"]
-
-
-def test_get_token(httpx_mock: HTTPXMock):
-    print(conceptev_url)
-    print(ocm_url)
-
-    fake_token = "value1"
-    httpx_mock.add_response(
-        url=f"{ocm_url}/auth/login/", method="post", json={"accessToken": fake_token}
-    )
-    token = app.get_token()
-    assert token == fake_token
+ENVIRONMENT = settings.environment
+conceptev_url = settings.conceptev_url
+ocm_url = settings.ocm_url
 
 
 @pytest.fixture

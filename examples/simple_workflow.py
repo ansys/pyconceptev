@@ -24,36 +24,29 @@
 #
 # This example shows how to use PyConcentEV to perform basic operations.
 
+import datetime
+
 # ## Perform required imports
 #
 # Perform required imports.
-
-import datetime
 import os
 from pathlib import Path
+
+# Set the path to the configuration file
+SETTINGS_FILE = Path().cwd().parents[2] / "tests" / "config.toml"
+print(SETTINGS_FILE)
+print(SETTINGS_FILE.exists())
+os.environ["PYCONCEPTEV_SETTINGS"] = str(SETTINGS_FILE)
+
 
 import plotly.graph_objects as go
 
 from ansys.conceptev.core import app, auth
 
-# ## Set up environment variables
-# AnsysID is the only supported method.
-# We only use the other one here for automated testing. So set to True.
-use_ansys_id = False  # True
-
-
-if not (use_ansys_id):
-    # Set environment variables for ConceptEV username and password if they don't exist!
-    if os.environ.get("CONCEPTEV_USERNAME") is None:
-        os.environ["CONCEPTEV_USERNAME"] = "joe.blogs@my_work.com"
-    if os.environ.get("CONCEPTEV_PASSWORD") is None:
-        os.environ["CONCEPTEV_PASSWORD"] = "sup3r_s3cr3t_passw0rd"
-
 # ## Define example data
 #
 # You can obtain example data from the schema sections of the API documentation.
 
-# +
 MOTOR_LAB_FILE = Path("resources") / "e9.lab"
 MOTOR_LOSS_MAP_FILE = Path("resources") / "e9.xlsx"
 AERO_1 = {
@@ -106,13 +99,10 @@ BATTERY = {
 
 motor_data = {"name": "e9", "component_type": "MotorLabID", "inverter_losses_included": False}
 
-if use_ansys_id:
-    # Get a token from Ansys ID (Preferred)
-    msal_app = auth.create_msal_app()
-    token = auth.get_ansyId_token(msal_app)
-else:
-    # Get a token from OCM (Deprecated)
-    token = app.get_token()
+
+# Get a token from Ansys ID
+msal_app = auth.create_msal_app()
+token = auth.get_ansyId_token(msal_app)
 
 
 # Use API client for the Ansys ConceptEV service
@@ -124,7 +114,7 @@ with app.get_http_client(token) as client:
     # Uncomment to print accounts IDs
     # print(f"Account IDs: {accounts}\n")
 
-    account_id = accounts["conceptev_saas@ansys.com"]
+    account_id = accounts["ConceptEv Test Account"]
     hpc_id = app.get_default_hpc(token, account_id)
     product_id = app.get_product_id(token)
     # Uncomment to print HPC ID
@@ -237,22 +227,16 @@ with app.get_http_client(token, design_instance_id) as client:
     }
     created_requirement = app.post(client, "requirements", data=requirement)
     print(f"Created requirement: {created_requirement}")
-# -
 
+    # Create and submit a job
+    concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
+    job_info = app.create_submit_job(client, concept, account_id, hpc_id)
 
-# Following code is not working in the pipelne but should work in a local environment.
-
-# Submit a job and show the result.
-# with app.get_http_client(token, design_instance_id) as client:
-#
-#     # Create and submit a job
-#     concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
-#     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
-#
-#     # Read the results and show the result in your browser
-#     results = app.read_results(client, job_info, calculate_units=False, filtered=True)
-#     x = results[0]["capability_curve"]["speeds"]
-#     y = results[0]["capability_curve"]["torques"]
-#
-#     fig = go.Figure(data=go.Scatter(x=x, y=y))
-#     fig.show()
+    # Doesn't work in test environment but should work for users.
+    # # Read the results and show the result in your browser
+    # results = app.read_results(client, job_info, calculate_units=False, filtered=True)
+    # x = results[0]["capability_curve"]["speeds"]
+    # y = results[0]["capability_curve"]["torques"]
+    #
+    # fig = go.Figure(data=go.Scatter(x=x, y=y))
+    # fig.show()
