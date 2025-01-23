@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -24,10 +24,8 @@
 
 import datetime
 from json import JSONDecodeError
-import os
 from typing import Literal
 
-import dotenv
 import httpx
 
 from ansys.conceptev.core import auth
@@ -40,12 +38,10 @@ from ansys.conceptev.core.exceptions import (
     ProjectError,
     ResponseError,
     ResultsError,
-    TokenError,
     UserDetailsError,
 )
 from ansys.conceptev.core.progress import check_status, monitor_job_progress
-
-dotenv.load_dotenv()
+from ansys.conceptev.core.settings import settings
 
 Router = Literal[
     "/architectures",
@@ -78,21 +74,10 @@ PRODUCT_ACCESS_ROUTES = [
     "/jobs:start",
 ]
 
-JOB_TIMEOUT = auth.config["JOB_TIMEOUT"]
+JOB_TIMEOUT = settings.job_timeout
+OCM_URL = settings.ocm_url
+BASE_URL = settings.conceptev_url
 app = auth.create_msal_app()
-
-
-def get_token() -> str:
-    """Get token from OCM."""
-    username = os.environ["CONCEPTEV_USERNAME"]
-    password = os.environ["CONCEPTEV_PASSWORD"]
-    ocm_url = auth.config["OCM_URL"]
-    response = httpx.post(
-        url=ocm_url + "/auth/login/", json={"emailAddress": username, "password": password}
-    )
-    if response.status_code != 200:
-        raise TokenError(f"Failed to get token {response.content}")
-    return response.json()["accessToken"]
 
 
 def get_http_client(token: str, design_instance_id: str | None = None) -> httpx.Client:
@@ -101,11 +86,10 @@ def get_http_client(token: str, design_instance_id: str | None = None) -> httpx.
     The HTTP client creates and maintains the connection, which is more performant than
     re-creating this connection for each call.
     """
-    base_url = auth.config["CONCEPTEV_URL"]
     params = None
     if design_instance_id:
         params = {"design_instance_id": design_instance_id}
-    return httpx.Client(headers={"Authorization": token}, params=params, base_url=base_url)
+    return httpx.Client(headers={"Authorization": token}, params=params, base_url=BASE_URL)
 
 
 def process_response(response) -> dict:
@@ -192,7 +176,6 @@ def create_new_project(
     project_goal: str = "Created from the CLI",
 ) -> dict:
     """Create a project."""
-    osm_url = auth.config["OCM_URL"]
     token = client.headers["Authorization"]
     project_data = {
         "accountId": account_id,
@@ -201,7 +184,7 @@ def create_new_project(
         "projectGoal": project_goal,
     }
     created_project = httpx.post(
-        osm_url + "/project/create", headers={"Authorization": token}, json=project_data
+        OCM_URL + "/project/create", headers={"Authorization": token}, json=project_data
     )
     if created_project.status_code != 200 and created_project.status_code != 204:
         raise ProjectError(f"Failed to create a project {created_project}.")
@@ -218,7 +201,7 @@ def create_new_concept(
     """Create a concept within an existing project."""
     if title is None:
         title = f"CLI concept {datetime.datetime.now()}"
-    osm_url = auth.config["OCM_URL"]
+
     token = client.headers["Authorization"]
     if product_id is None:
         product_id = get_product_id(token)
@@ -229,7 +212,7 @@ def create_new_concept(
         "designTitle": title,
     }
     created_design = httpx.post(
-        osm_url + "/design/create", headers={"Authorization": token}, json=design_data
+        OCM_URL + "/design/create", headers={"Authorization": token}, json=design_data
     )
 
     if created_design.status_code not in (200, 204):
@@ -262,8 +245,7 @@ def create_new_concept(
 
 def get_product_id(token: str) -> str:
     """Get the product ID."""
-    osm_url = auth.config["OCM_URL"]
-    products = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
+    products = httpx.get(OCM_URL + "/product/list", headers={"Authorization": token})
     if products.status_code != 200:
         raise ProductIdsError(f"Failed to get product id.")
 
@@ -275,8 +257,7 @@ def get_product_id(token: str) -> str:
 
 def get_user_id(token):
     """Get the user ID."""
-    osm_url = auth.config["OCM_URL"]
-    user_details = httpx.post(osm_url + "/user/details", headers={"Authorization": token})
+    user_details = httpx.post(OCM_URL + "/user/details", headers={"Authorization": token})
     if user_details.status_code not in (200, 204):
         raise UserDetailsError(f"Failed to get a user details on OCM {user_details}.")
     user_id = user_details.json()["userId"]
@@ -291,8 +272,7 @@ def get_concept_ids(client: httpx.Client) -> dict:
 
 def get_account_ids(token: str) -> dict:
     """Get account IDs."""
-    ocm_url = auth.config["OCM_URL"]
-    response = httpx.post(url=ocm_url + "/account/list", headers={"authorization": token})
+    response = httpx.post(url=OCM_URL + "/account/list", headers={"authorization": token})
     if response.status_code != 200:
         raise AccountsError(f"Failed to get accounts {response}.")
     accounts = {
@@ -304,9 +284,8 @@ def get_account_ids(token: str) -> dict:
 
 def get_default_hpc(token: str, account_id: str) -> dict:
     """Get the default HPC ID."""
-    ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
-        url=ocm_url + "/account/hpc/default",
+        url=OCM_URL + "/account/hpc/default",
         json={"accountId": account_id},
         headers={"authorization": token},
     )
@@ -404,9 +383,8 @@ def get_results(
 
 def get_status(job_info: dict, token: str) -> str:
     """Get the status of the job."""
-    ocm_url = auth.config["OCM_URL"]
     response = httpx.post(
-        url=ocm_url + "/job/load",
+        url=OCM_URL + "/job/load",
         json={"jobId": job_info["job_id"]},
         headers={"Authorization": token},
     )
