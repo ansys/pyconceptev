@@ -403,9 +403,8 @@ def get_status(job_info: dict, token: str) -> str:
 
 def get_project_ids(name: str, account_id: str, token: str) -> dict:
     """Get projects."""
-    ocm_url = auth.config["OCM_URL"]  # TODO update to use settings when merged.
     response = httpx.post(
-        url=ocm_url + "/project/list/page",
+        url=OCM_URL + "/project/list/page",
         json={"accountId": account_id, "filterByName": name},
         headers={"Authorization": token},
     )
