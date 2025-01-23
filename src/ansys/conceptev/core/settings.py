@@ -60,6 +60,7 @@ class Settings(BaseSettings):
     environment: Environment
     conceptev_username: EmailStr | None  # Only works in testing environment
     conceptev_password: str | None  # Only works in testing environment
+    account_name: str | None
     model_config = SettingsConfigDict(
         env_file=[TOML_FILE, "./config.toml"], secrets_dir=RESOURCE_DIRECTORY
     )
