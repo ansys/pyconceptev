@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -26,6 +26,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from ansys.conceptev.core.progress import (
+    OCM_SOCKET_URL,
     STATUS_COMPLETE,
     STATUS_ERROR,
     STATUS_FINISHED,
@@ -42,9 +43,7 @@ from ansys.conceptev.core.progress import (
 async def test_connect_to_ocm():
     user_id = "test_user"
     token = "test_token"
-    expected_uri = (
-        f"wss://sockets.prod.portal.onscale.com/socket/user?userId={user_id}&Authorization={token}"
-    )
+    expected_uri = OCM_SOCKET_URL + f"/user?userId={user_id}&Authorization={token}"
 
     with patch("ansys.conceptev.core.progress.connect") as mock_connect:
         connect_to_ocm(user_id, token)

@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -30,7 +30,7 @@ import sys
 import certifi
 from websockets.asyncio.client import connect
 
-from ansys.conceptev.core.auth import config
+from ansys.conceptev.core.settings import settings
 
 if sys.version_info >= (3, 11):
     import asyncio as async_timeout
@@ -40,8 +40,8 @@ else:
 STATUS_COMPLETE = "complete"
 STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "failed"
-OCM_SOCKET_URL = config["OCM_SOCKET_URL"]
-JOB_TIMEOUT = config["JOB_TIMEOUT"]
+OCM_SOCKET_URL = settings.ocm_socket_url
+JOB_TIMEOUT = settings.job_timeout
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.load_verify_locations(certifi.where())
 
