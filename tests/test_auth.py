@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -48,6 +48,10 @@ class MockApp:
         return {"access_token": "mock_cached_token"}
 
     def acquire_token_interactive(self, scopes):
+        return {"access_token": "mock_token"}
+
+    def acquire_token_by_username_password(self, username, password, scopes):
+        assert auth.ENVIRONMENT == "testing"
         return {"access_token": "mock_token"}
 
 
