@@ -24,21 +24,20 @@
 #
 # This example shows how to use PyConcentEV to perform basic operations.
 
-import datetime
-
-# ## Perform required imports
-#
 # Perform required imports.
+
+import datetime
 import os
 from pathlib import Path
+
+import plotly.graph_objects as go
+
+from ansys.conceptev.core import app, auth
 
 # Set the path to the configuration file
 SETTINGS_FILE = Path().cwd().parents[2] / "tests" / "config.toml"
 os.environ["PYCONCEPTEV_SETTINGS"] = str(SETTINGS_FILE)
 
-import plotly.graph_objects as go
-
-from ansys.conceptev.core import app, auth
 
 # ## Define example data
 #
