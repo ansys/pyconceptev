@@ -19,25 +19,64 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""
+Get Results workflow
+====================
 
-# # Get Results workflow
-#
-# This example shows how to use PyConcentEV to get a list of result parameters
-# from a list of design_instance_ids
-# These lists are provided in design_instance_ids.csv
-
+This example shows how to use PyConcentEV to get a list of result parameters
+from a list of design_instance_ids
+These lists are provided in design_instance_ids.csv
+"""
 # Perform required imports.
 
+import datetime
 import json
+import time
 import warnings
 
 import httpx
 import pandas as pd
 
 from ansys.conceptev.core import app, auth
+from ansys.conceptev.core.settings import settings
+
+OCM_URL = settings.ocm_url
+
 
 # INPUTS
-filename = "resources/design_instance_ids.csv"  # File with design_instance_ids see example file.
+
+
+def generate_and_run_templates(client, account_id, hpc_id):
+    project_id = app.create_new_project(
+        client, account_id, hpc_id, f"New Project {datetime.datetime.now()}"
+    )
+    template_ids = ["ae7ca4d7-4bac-48f5-be42-d5f0b6a24b00"]
+    design_instance_ids = []
+    for template_id in template_ids:
+        design_instance_id = app.create_design_instance(
+            project_id["projectId"], f"New Concept {datetime.datetime.now()}", token
+        )
+        concept = app.copy_concept(template_id, design_instance_id, client)
+        job_info = app.create_submit_job(
+            client,
+            concept,
+            account_id,
+            hpc_id,
+            job_name=f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}",
+        )
+        design_instance_ids.append(design_instance_id)
+    return design_instance_ids
+
+
+msal_app = auth.create_msal_app()
+token = auth.get_ansyId_token(msal_app)
+
+with app.get_http_client(token) as client:
+    account_id = app.get_account_id(token)
+    hpc_id = app.get_default_hpc(token, account_id)
+    design_instance_ids = generate_and_run_templates(client, account_id, hpc_id)
+
+
 short_results = (
     True  # For results created after 15/11/2024 improved performance. #TODO results make clear
 )
@@ -62,9 +101,9 @@ if not (short_results):
 
 def get_job_info(token, job_id):
     """Get the job info from the OnScale Cloud Manager."""
-    ocm_url = auth.config["OCM_URL"]
+
     response = httpx.post(
-        url=f"{ocm_url}/job/load", headers={"authorization": token}, json={"jobId": job_id}
+        url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
     )
     response = app.process_response(response)
     job_info = {
@@ -78,15 +117,15 @@ def get_job_info(token, job_id):
 
 def get_design_title(token, design_instance_id):
     """Get the design Title from the OnScale Cloud Manager."""
-    ocm_url = auth.config["OCM_URL"]
+
     response = httpx.post(
-        url=f"{ocm_url}/design/instance/load",
+        url=f"{OCM_URL}/design/instance/load",
         headers={"authorization": token},
         json={"designInstanceId": design_instance_id},
     )
     response = app.process_response(response)
     design = httpx.post(
-        url=f"{ocm_url}/design/load",
+        url=f"{OCM_URL}/design/load",
         headers={"authorization": token},
         json={"designId": response["designId"]},
     )
@@ -162,7 +201,8 @@ if __name__ == "__main__":
     # Recommendation: Run once then set get_results_off_server to False.
     # This allows faster iteration of improving the Excel output.
     if get_results_off_server:
-        design_instance_ids = pd.read_csv(filename, header=None)[0]
+
+        time.sleep(20)  # Wait for the server to process the results.
         project_results = get_results(design_instance_ids)  # move to api? or file export mode?
         with open("project_results.json", "w") as f:
             json.dump(project_results, f)
@@ -175,17 +215,21 @@ if __name__ == "__main__":
     for (
         project_result
     ) in project_results:  # For each project results get the data we want to output into the row.
-        # Assumes only drive cycle results UDDS and HWFET that we are interested in.
-        # UDDS
-        UDDS_result = get_drive_cycle_result(project_result, "UDDS_50%")
-        Range_UDDS = UDDS_result["vehicle_range"]
-        UDDS_efficiency = UDDS_result["efficiency"]
-        UDDS_Component_Loss = UDDS_result["total_values"]["loss_by_component"]
-        # HWFET
-        HWFET_result = get_drive_cycle_result(project_result, "HWFET_50%")
-        Range_HWFET_50 = HWFET_result["vehicle_range"]
-        HWFET_50_efficiency = HWFET_result["efficiency"]
-        HWFET_50_Component_Loss = HWFET_result["total_values"]["loss_by_component"]
+
+        # Parse the results we are interested in.
+        steady_drive = get_drive_cycle_result(project_result, "180 km/h")
+
+        # # Assumes only drive cycle results UDDS and HWFET that we are interested in.
+        # # UDDS
+        # UDDS_result = get_drive_cycle_result(project_result, "UDDS_50%")
+        # Range_UDDS = UDDS_result["vehicle_range"]
+        # UDDS_efficiency = UDDS_result["efficiency"]
+        # UDDS_Component_Loss = UDDS_result["total_values"]["loss_by_component"]
+        # # HWFET
+        # HWFET_result = get_drive_cycle_result(project_result, "HWFET_50%")
+        # Range_HWFET_50 = HWFET_result["vehicle_range"]
+        # HWFET_50_efficiency = HWFET_result["efficiency"]
+        # HWFET_50_Component_Loss = HWFET_result["total_values"]["loss_by_component"]
 
         # Get the Component Names for each of components we are interested in.
         front_tranmsission_name = (
@@ -219,41 +263,42 @@ if __name__ == "__main__":
                 "Rear Inverter": rear_inverter_name,
                 "Battery": battery_name,
                 "Cost": project_result["cost"],
-                "Range UDDS": Range_UDDS,
-                "Range HWFET": Range_HWFET_50,
-                "UDDS efficiency": UDDS_efficiency,
-                "HWFET efficiency": HWFET_50_efficiency,
-                "Weighted Efficiency": (0.6 * UDDS_efficiency + 0.4 * HWFET_50_efficiency) * -1.0,
-                ("UDDS Losses", "Battery"): UDDS_Component_Loss[battery_name],
-                ("UDDS Losses", "Front disconnect clutch"): UDDS_Component_Loss.get(
-                    front_disconnect_clutch_name, None
-                ),
-                ("UDDS Losses", "Front transmission"): UDDS_Component_Loss[front_tranmsission_name],
-                ("UDDS Losses", "Front inverter"): UDDS_Component_Loss[front_inverter_name],
-                ("UDDS Losses", "Front motor"): UDDS_Component_Loss[front_motor_name],
-                ("UDDS Losses", "Rear disconnect clutch"): UDDS_Component_Loss.get(
-                    rear_disconnect_clutch_name, None
-                ),
-                ("UDDS Losses", "Rear transmission"): UDDS_Component_Loss[rear_transmission_name],
-                ("UDDS Losses", "Rear inverter"): UDDS_Component_Loss[rear_inverter_name],
-                ("UDDS Losses", "Rear motor"): UDDS_Component_Loss[rear_motor_name],
-                ("HWFET Losses", "Battery"): HWFET_50_Component_Loss[battery_name],
-                ("HWFET Losses", "Front disconnect clutch"): HWFET_50_Component_Loss.get(
-                    front_disconnect_clutch_name, None
-                ),
-                ("HWFET Losses", "Front transmission"): HWFET_50_Component_Loss[
-                    front_tranmsission_name
-                ],
-                ("HWFET Losses", "Front inverter"): HWFET_50_Component_Loss[front_inverter_name],
-                ("HWFET Losses", "Front motor"): HWFET_50_Component_Loss[front_motor_name],
-                ("HWFET Losses", "Rear disconnect clutch"): HWFET_50_Component_Loss.get(
-                    rear_disconnect_clutch_name, None
-                ),
-                ("HWFET Losses", "Rear transmission"): HWFET_50_Component_Loss[
-                    rear_transmission_name
-                ],
-                ("HWFET Losses", "Rear inverter"): HWFET_50_Component_Loss[rear_inverter_name],
-                ("HWFET Losses", "Rear motor"): HWFET_50_Component_Loss[rear_motor_name],
+                "steady": steady_drive,
+                # "Range UDDS": Range_UDDS,
+                # "Range HWFET": Range_HWFET_50,
+                # "UDDS efficiency": UDDS_efficiency,
+                # "HWFET efficiency": HWFET_50_efficiency,
+                # "Weighted Efficiency": (0.6 * UDDS_efficiency + 0.4 * HWFET_50_efficiency) * -1.0,
+                # ("UDDS Losses", "Battery"): UDDS_Component_Loss[battery_name],
+                # ("UDDS Losses", "Front disconnect clutch"): UDDS_Component_Loss.get(
+                #     front_disconnect_clutch_name, None
+                # ),
+                # ("UDDS Losses", "Front transmission"): UDDS_Component_Loss[front_tranmsission
+                # ("UDDS Losses", "Front inverter"): UDDS_Component_Loss[front_inverter_name],
+                # ("UDDS Losses", "Front motor"): UDDS_Component_Loss[front_motor_name],
+                # ("UDDS Losses", "Rear disconnect clutch"): UDDS_Component_Loss.get(
+                #     rear_disconnect_clutch_name, None
+                # ),
+                # ("UDDS Losses", "Rear transmission"): UDDS_Component_Loss[rear_transmission_name],
+                # ("UDDS Losses", "Rear inverter"): UDDS_Component_Loss[rear_inverter_name],
+                # ("UDDS Losses", "Rear motor"): UDDS_Component_Loss[rear_motor_name],
+                # ("HWFET Losses", "Battery"): HWFET_50_Component_Loss[battery_name],
+                # ("HWFET Losses", "Front disconnect clutch"): HWFET_50_Component_Loss.get(
+                #     front_disconnect_clutch_name, None
+                # ),
+                # ("HWFET Losses", "Front transmission"): HWFET_50_Component_Loss[
+                #     front_tranmsission_name
+                # ],
+                # ("HWFET Losses", "Front inverter"): HWFET_50_Component_Loss[front_inverter_name],
+                # ("HWFET Losses", "Front motor"): HWFET_50_Component_Loss[front_motor_name],
+                # ("HWFET Losses", "Rear disconnect clutch"): HWFET_50_Component_Loss.get(
+                #     rear_disconnect_clutch_name, None
+                # ),
+                # ("HWFET Losses", "Rear transmission"): HWFET_50_Component_Loss[
+                #     rear_transmission_name
+                # ],
+                # ("HWFET Losses", "Rear inverter"): HWFET_50_Component_Loss[rear_inverter_name],
+                # ("HWFET Losses", "Rear motor"): HWFET_50_Component_Loss[rear_motor_name],
             }
         )
     all_results = pd.DataFrame(output_results)  # Convert to Pandas DataFrame

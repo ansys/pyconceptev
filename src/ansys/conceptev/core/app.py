@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 """Simple API client for the Ansys ConceptEV service."""
-
 import datetime
 from json import JSONDecodeError
 from typing import Literal
@@ -438,6 +437,41 @@ def get_concept(client: httpx.Client, design_instance_id: str) -> dict:
     concept["requirements"] = get(client, f"/concepts/{design_instance_id}/requirements")
 
     concept["architecture"] = get(client, f"/concepts/{design_instance_id}/architecture")
+    return concept
+
+
+def create_design_instance(project_id, title, token, product_id=None):
+    """Create a design instance on OCM."""
+    if product_id is None:
+        product_id = get_product_id(token)
+
+    design_data = {
+        "projectId": project_id,
+        "productId": product_id,
+        "designTitle": title,
+    }
+    created_design = httpx.post(
+        OCM_URL + "/design/create", headers={"Authorization": token}, json=design_data
+    )
+
+    if created_design.status_code not in (200, 204):
+        raise Exception(f"Failed to create a design on OCM {created_design.content}.")
+
+    design_instance_id = created_design.json()["designInstanceList"][0]["designInstanceId"]
+    return design_instance_id
+
+
+def copy_concept(base_concept_id, design_instance_id, client):
+    """Copy the reference concept to the new design instance."""
+    copy = {
+        "old_design_instance_id": base_concept_id,
+        "new_design_instance_id": design_instance_id,
+        "copy_jobs": False,
+    }
+    # Clone the base concept
+    params = {"design_instance_id": design_instance_id, "populated": False}
+    client.params = params
+    concept = post(client, "/concepts:copy", data=copy)
     return concept
 
 

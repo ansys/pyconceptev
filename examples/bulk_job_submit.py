@@ -19,26 +19,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""
+Bulk Job Submit.
+================
 
-# # Bulk Job Submit.
-# Example Script to bulk submit jobs to the ConceptEV API.
-# Using a reference project and varying the components.
-# The combinations of components are specified in a CSV file format.
-
+Example Script to bulk submit jobs to the ConceptEV API.
+Using a reference project and varying the components.
+The combinations of components are specified in a CSV file format.
+"""
 # Required Imports.
 import datetime
 
 import httpx
 import pandas as pd
 
-from ansys.conceptev.core import app, auth
+from ansys.conceptev.core import app
 from ansys.conceptev.core.exceptions import ResponseError
+from ansys.conceptev.core.settings import settings
 
 # Inputs
 filename = "resources/combinations.csv"  # See example file for format.
 # TODO use template ID
-base_concept_id = "a05c7f7d-4c77-48d9-98d2-19b1244718d5"  # Replace with your base concept ID
-
+base_concept_id = "ae7ca4d7-4bac-48f5-be42-d5f0b6a24b00"  # Replace with your base concept ID
+ocm_url = settings.ocm_url
 component_order = {
     "front_transmission_id": "Front Transmission",
     "front_motor_id": "Front Motor",
@@ -47,7 +50,7 @@ component_order = {
     "rear_motor_id": "Rear Motor",
     "rear_inverter_id": "Rear Inverter",
     "battery_id": "Battery",
-    "clutch_id": "Clutch",
+    #'"clutch_id": "Clutch",
 }
 
 
@@ -77,7 +80,7 @@ def add_clutch(arch, combo):
 def update_architecture(components, combo, base_architecture):
     # Update Architecture to match the new combinations.
     arch = {key: components[combo[value]] for key, value in component_order.items()}
-    arch = add_clutch(arch, combo)
+    # arch = add_clutch(arch, combo)
     arch["number_of_front_wheels"] = base_architecture["number_of_front_wheels"]
     arch["number_of_front_motors"] = base_architecture["number_of_front_motors"]
     arch["number_of_rear_wheels"] = base_architecture["number_of_rear_wheels"]
@@ -86,47 +89,11 @@ def update_architecture(components, combo, base_architecture):
     return arch
 
 
-def create_design_instance(project_id, title):
-    """Create a design instance on OCM."""
-    osm_url = auth.config["OCM_URL"]
-
-    product_id = app.get_product_id(token)
-
-    design_data = {
-        "projectId": project_id,
-        "productId": product_id,
-        "designTitle": title,
-    }
-    created_design = httpx.post(
-        osm_url + "/design/create", headers={"Authorization": token}, json=design_data
-    )
-
-    if created_design.status_code not in (200, 204):
-        raise Exception(f"Failed to create a design on OCM {created_design.content}.")
-
-    design_instance_id = created_design.json()["designInstanceList"][0]["designInstanceId"]
-    return design_instance_id
-
-
-def copy_concept(base_concept_id, design_instance_id):
-    """Copy the reference concept to the new design instance."""
-    copy = {
-        "old_design_instance_id": base_concept_id,
-        "new_design_instance_id": design_instance_id,
-        "copy_jobs": False,
-    }
-    # Clone the base concept
-    params = {"design_instance_id": design_instance_id, "populated": False}
-    client.params = params
-    concept = app.post(client, "/concepts:copy", data=copy)
-    return concept
-
-
 def get_project_id(design_instance_id: str) -> str:
     """Get the project ID from the design instance ID."""
-    osm_url = auth.config["OCM_URL"]
+
     project_id = httpx.post(
-        osm_url + f"/design/instance/load",
+        ocm_url + f"/design/instance/load",
         json={"designInstanceId": design_instance_id},
         headers={"Authorization": token},
     )
@@ -148,6 +115,15 @@ with app.get_http_client(token) as client:
     accounts = app.get_account_ids(token)
     account_id = accounts["conceptev_saas@ansys.com"]
     hpc_id = app.get_default_hpc(token, account_id)
+
+    project_id = app.create_new_project(
+        client, account_id, hpc_id, f"New Project {datetime.datetime.now()}"
+    )
+    design_instance_id = app.create_design_instance(
+        project_id["projectId"], f"New Concept {datetime.datetime.now()}", token
+    )
+    app.copy_concept(base_concept_id, design_instance_id, client)
+    base_concept_id = design_instance_id
     base_components = get_component_id_map(client, base_concept_id)
     # Check component headers are correct
     component_types = set(component_order.values())
@@ -175,14 +151,16 @@ with app.get_http_client(token) as client:
     for combo in combinations:
         try:
             # Create a new design instance with title.
-            title = f"F_{combo['Front Motor']}_R_{combo['Rear Motor']}"
-            design_instance_id = create_design_instance(ref_project_id, title=title)
+            title = f"F_{combo['Front Motor']}_R_{combo['Rear Motor']} {datetime.datetime.now()}"
+            design_instance_id = app.create_design_instance(
+                ref_project_id, title=title, token=token
+            )
             # Save that in output list.
             created_designs.append(
                 {"Project Name": title, "Design Instance Id": design_instance_id}
             )
             # Copy base Concept into that new design instance.
-            concept = copy_concept(base_concept_id, design_instance_id)
+            concept = app.copy_concept(base_concept_id, design_instance_id, client)
             print(f"ID of the cloned concept: {concept['id']}")
             # Get the component IDs for the new design instance as they change when copied.
             params = {"design_instance_id": design_instance_id}

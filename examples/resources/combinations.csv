@@ -1,0 +1,2 @@
+Front Transmission,Front Motor,Front Inverter,Rear Transmission,Rear Motor,Rear Inverter,Battery
+Single Speed 8:1,IM_300kW_20kRPM_500A,MOSFET Inverter Model,Single Speed 14:1,IPM_340kW_15kRPM_8p48s_460A,IGBT Inverter Model,CellA_800Vdc_67kWh

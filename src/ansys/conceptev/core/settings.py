@@ -23,16 +23,14 @@
 from enum import Enum
 import os
 from pathlib import Path
+import tomllib as toml
 from typing import Annotated
 
 from pydantic import AfterValidator, EmailStr, HttpUrl, WebsocketUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 RESOURCE_DIRECTORY = Path(__file__).parents[0].joinpath("resources")
-if os.environ.get("PYCONCEPTEV_SETTINGS"):
-    TOML_FILE = Path(os.environ["PYCONCEPTEV_SETTINGS"])
-else:
-    TOML_FILE = RESOURCE_DIRECTORY / "config.toml"
+
 SECRETS_DIR = RESOURCE_DIRECTORY
 
 HttpUrlString = Annotated[HttpUrl, AfterValidator(str)]
@@ -62,8 +60,19 @@ class Settings(BaseSettings):
     conceptev_password: str | None  # Only works in testing environment
     account_name: str | None
     model_config = SettingsConfigDict(
-        env_file=[TOML_FILE, "./config.toml"], secrets_dir=RESOURCE_DIRECTORY
+        env_file=[
+            os.environ.get("PYCONCEPTEV_SETTINGS", RESOURCE_DIRECTORY / "config.toml"),
+            "./config.toml",
+        ],
+        secrets_dir=RESOURCE_DIRECTORY,
     )
+
+
+def load_settings(toml_file) -> Settings:
+    """Load settings."""
+    with open(toml_file, "rb") as f:
+        settings_data = toml.load(f)
+    return Settings.model_validate(settings_data)
 
 
 settings = Settings()

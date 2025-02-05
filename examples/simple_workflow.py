@@ -19,11 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""
+Simple workflow
+===============
 
-# # Simple workflow
-#
-# This example shows how to use PyConcentEV to perform basic operations.
-
+This example shows how to use PyConcentEV to perform basic operations.
+"""
 # Perform required imports.
 
 import datetime
