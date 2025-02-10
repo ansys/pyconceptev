@@ -412,6 +412,27 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     return {project["projectTitle"]: project["projectId"] for project in projects}
 
 
+def delete_project(project_id, token):
+    """Delete a project."""
+    ocm_delete_init = httpx.request(
+        method="DELETE",
+        url=OCM_URL + "/project/delete/init",
+        headers={"Authorization": token},
+        json={"projectId": project_id},
+        timeout=20,
+    )
+    ocm_delete_init = process_response(ocm_delete_init)
+    ocm_delete = httpx.request(
+        method="DELETE",
+        url=OCM_URL + "/project/delete/execute",
+        headers={"Authorization": token},
+        json={"projectId": project_id, "hash": ocm_delete_init["hash"]},
+        timeout=20,
+    )
+    ocm_delete = process_response(ocm_delete)
+    return ocm_delete
+
+
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
     """Send a POST request to the base client with a file.
 
@@ -473,6 +494,15 @@ def copy_concept(base_concept_id, design_instance_id, client):
     client.params = params
     concept = post(client, "/concepts:copy", data=copy)
     return concept
+
+
+def get_component_id_map(client, design_instance_id):
+    """Get a map of component name to component id."""
+    ###TODO move to results file so its self contained.
+    components = client.get(f"/concepts/{design_instance_id}/components")
+    components = process_response(components)
+    components.append({"name": "N/A", "id": None})
+    return {component["name"]: component["id"] for component in components}
 
 
 if __name__ == "__main__":

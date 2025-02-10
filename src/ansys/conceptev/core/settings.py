@@ -56,8 +56,8 @@ class Settings(BaseSettings):
     scope: HttpUrlString
     job_timeout: int
     environment: Environment
-    conceptev_username: EmailStr | None  # Only works in testing environment
-    conceptev_password: str | None  # Only works in testing environment
+    conceptev_username: EmailStr | None = None  # Only works in testing environment
+    conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None
     model_config = SettingsConfigDict(
         env_file=[

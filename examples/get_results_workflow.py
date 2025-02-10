@@ -133,11 +133,12 @@ def get_design_title(token, design_instance_id):
     return design["designTitle"]
 
 
-def get_component_map(client, design_instance_id):
-    """Get a map of components id to component name."""
-    components = client.get(f"/concepts/{design_instance_id}/components")
-    components = app.process_response(components)
-    return {component["id"]: component["name"] for component in components}
+# Hopefully replaced by the version in app.
+# def get_component_map(client, design_instance_id):
+#     """Get a map of components id to component name."""
+#     components = client.get(f"/concepts/{design_instance_id}/components")
+#     components = app.process_response(components)
+#     return {component["id"]: component["name"] for component in components}
 
 
 def get_project_results(client, design_instance_id, token):
@@ -160,7 +161,7 @@ def get_project_results(client, design_instance_id, token):
         "architecture": architecture,
         "cost": architecture["components_cost"],
         "design_instance_id": design_instance_id,
-        "component_map": get_component_map(client, design_instance_id),
+        "component_map": app.get_component_id_map(client, design_instance_id),
         "design_name": get_design_title(token, design_instance_id),
         "results": results,
     }
