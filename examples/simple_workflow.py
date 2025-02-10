@@ -24,24 +24,26 @@ Simple workflow
 ===============
 
 This example shows how to use PyConcentEV to perform basic operations.
+- Required imports
+- Define example data
+- Get a token from Ansys ID
+- Use API client for the Ansys ConceptEV service
 """
-# Perform required imports.
+
+# %%
+# Perform Required imports
+# ------------------------
 
 import datetime
-import os
 from pathlib import Path
 
 import plotly.graph_objects as go
 
 from ansys.conceptev.core import app, auth
 
-# Set the path to the configuration file
-SETTINGS_FILE = Path().cwd().parents[2] / "tests" / "config.toml"
-os.environ["PYCONCEPTEV_SETTINGS"] = str(SETTINGS_FILE)
-
-
-# ## Define example data
-#
+# %%
+# Define example data
+# ---------------------
 # You can obtain example data from the schema sections of the API documentation.
 
 MOTOR_LAB_FILE = Path("resources") / "e9.lab"
@@ -96,13 +98,25 @@ BATTERY = {
 
 motor_data = {"name": "e9", "component_type": "MotorLabID", "inverter_losses_included": False}
 
-
+# %%
 # Get a token from Ansys ID
+# -------------------------
+# Get a token from Ansys ID to authenticate with the Ansys ConceptEV service.
+
 msal_app = auth.create_msal_app()
 token = auth.get_ansyId_token(msal_app)
 
-
+# %%
 # Use API client for the Ansys ConceptEV service
+# ----------------------------------------------
+# Use the API client to perform basic operations on the Ansys ConceptEV service.
+# Such as:
+# - Check api connection is healthy.
+# - Get the account ID and HPC ID.
+# - Create a new project.
+# - Create a new concept within that project.
+
+
 with app.get_http_client(token) as client:
     health = app.get(client, "/health")
     print(f"API is healthy: {health}\n")
@@ -126,12 +140,18 @@ with app.get_http_client(token) as client:
     )
     print(f"ID of the created concept: {concept['id']}")
 
-
-# ### Perform basic operations
-#
+# %%
+# Perform basic operations
+# ------------------------
 # Perform basic operations on the design instance associated with the new project.
+# Such as:
+# - Create configurations.
+# - Create components.
+# - Create architectures.
+# - Create requirements.
+# - Create and submit a job.
+# - Read the results and show the result in your browser.
 
-# +
 design_instance_id = concept["design_instance_id"]
 
 with app.get_http_client(token, design_instance_id) as client:
@@ -227,10 +247,27 @@ with app.get_http_client(token, design_instance_id) as client:
     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
 
     # Doesn't work in test environment but should work for users.
-    # # Read the results and show the result in your browser
-    # results = app.read_results(client, job_info, calculate_units=False, filtered=True)
-    # x = results[0]["capability_curve"]["speeds"]
-    # y = results[0]["capability_curve"]["torques"]
-    #
-    # fig = go.Figure(data=go.Scatter(x=x, y=y))
-    # fig.show()
+    # Read the results and show the result in your browser
+    results = app.read_results(client, job_info, calculate_units=False, filtered=True)
+    x = results[0]["capability_curve"]["speeds"]
+    y = results[0]["capability_curve"]["torques"]
+
+    fig = go.Figure(data=go.Scatter(x=x, y=y))
+    fig.show()
+
+
+# %%
+# Delete the extra project on the server.
+# ---------------------------------------
+# Delete the project on the server.
+#
+# .. warning::
+#    This will delete the project and all its contents.
+#    Only needed for keep test environment clean.
+
+with app.get_http_client(token) as client:
+
+    client.params = client.params.set("design_instance_id", concept["design_instance_id"])
+    app.delete(client, "concepts", id=concept["id"])
+    app.delete_project(concept["project_id"], token)
+    print(f"Deleted project {concept['project_id']}")

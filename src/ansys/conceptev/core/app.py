@@ -388,6 +388,38 @@ def get_results(
     return process_response(response)
 
 
+def get_job_info(token, job_id):
+    """Get the job info from the OnScale Cloud Manager."""
+    response = httpx.post(
+        url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
+    )
+    response = app.process_response(response)
+    job_info = {
+        "job_id": job_id,
+        "simulation_id": response["simulations"][0]["simulationId"],
+        "job_name": response["jobName"],
+        "docker_tag": response["dockerTag"],
+    }
+    return job_info
+
+
+def get_design_title(token, design_instance_id):
+    """Get the design Title from the OnScale Cloud Manager."""
+    response = httpx.post(
+        url=f"{OCM_URL}/design/instance/load",
+        headers={"authorization": token},
+        json={"designInstanceId": design_instance_id},
+    )
+    response = app.process_response(response)
+    design = httpx.post(
+        url=f"{OCM_URL}/design/load",
+        headers={"authorization": token},
+        json={"designId": response["designId"]},
+    )
+    design = app.process_response(design)
+    return design["designTitle"]
+
+
 def get_status(job_info: dict, token: str) -> str:
     """Get the status of the job."""
     response = httpx.post(

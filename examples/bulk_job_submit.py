@@ -76,7 +76,7 @@ def update_architecture(components, combo, base_architecture):
 
 # %%
 # Create a client and create a new project from template.
-# ------------------------
+# -------------------------------------------------------
 # Authenticate and get a token
 # Create an API client.
 # Get the account ID and HPC ID.
@@ -130,7 +130,7 @@ with app.get_http_client(token) as client:
 
 # %%
 # Read combinations from a csv file and check they match the combinations file.
-# ------------------------
+# -----------------------------------------------------------------------------
 # Read combinations from a csv file.
 # Get the component types from the component_order dictionary.
 # Turn them into set.
@@ -212,7 +212,7 @@ with app.get_http_client(token) as client:
             continue  # If one job fails to submit keep trying the other jobs.
 # %%
 # Save the list of created designs to a file.
-# ------------------------------------------
+# -------------------------------------------
 # Create a pandas dataframe.
 # Export to Excel.
 all_results = pd.DataFrame(created_designs)
@@ -224,8 +224,8 @@ all_results.to_excel("created_designs.xlsx")
 # ---------------------------------------
 # Delete the project on the server.
 # .. warning::
-#   This will delete the project and all its contents.
-#   Only needed for keep test environment clean.
+#    This will delete the project and all its contents.
+#    Only needed for keep test environment clean.
 
 with app.get_http_client(token) as client:
     for concept in created_designs:
