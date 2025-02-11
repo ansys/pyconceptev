@@ -34,29 +34,9 @@ the health check endpoint to check your connection.
        print(health)
 
 
-Configure a session using OnScale Cognito (deprecated)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Update Configuration
+^^^^^^^^^^^^^^^^^^^^
 
-Create an ``ENV`` file to keep your username and password.
-The file should look like this:
-
-.. code-block:: bash
-
-   CONCEPTEV_USERNAME = joe.blogs@my_work.com
-   CONCEPTEV_PASSWORD = sup3r_s3cr3t_passw0rd
-
-
-Get a token using OnScale Cognito (deprecated)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Import the PyConceptEV core module and use the :code:`get_token()` method to get a
-a random access string from the server.
-
-.. code-block:: python
-
-   import ansys.conceptev.core.main as pyconceptev
-
-   token = pyconceptev.get_token()
-
-
-
+Update the configuration of the client by using the `config.toml` the defaults are located in `src/ansys/conceptev/core/resources/config.toml`.
+Create a new config.toml file in your working directory with the account_name set or create an environment variable called `ACCOUNT_NAME` and the settings management should find it.
+Most things can be left as default but the account_name should be changed to match your company account name.
