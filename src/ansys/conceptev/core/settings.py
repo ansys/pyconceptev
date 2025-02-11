@@ -23,8 +23,12 @@
 from enum import Enum
 import os
 from pathlib import Path
-import tomllib as toml
 from typing import Annotated
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 from pydantic import AfterValidator, EmailStr, HttpUrl, WebsocketUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -71,7 +75,7 @@ class Settings(BaseSettings):
 def load_settings(toml_file) -> Settings:
     """Load settings."""
     with open(toml_file, "rb") as f:
-        settings_data = toml.load(f)
+        settings_data = tomllib.load(f)
     return Settings.model_validate(settings_data)
 
 
