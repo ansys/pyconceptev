@@ -166,6 +166,7 @@ jobs:
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           check-links: false
+          requires-xvfb: true
 
   package:
     name: Package library
