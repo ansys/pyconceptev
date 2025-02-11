@@ -212,10 +212,10 @@ with app.get_http_client(token, design_instance_id) as client:
     z = motor_loss_map["losses_total"]
 
     fig, ax = plt.subplots()
-    fig = ax.contourf(x, y, z)
+    im = ax.pcolormesh(x, y, z)
     ax.set_xlabel("Currents (A)")
     ax.set_ylabel("Phase Advances (deg)")
-    ax.set_zlabel("Total Losses (kW)")
+    fig.colorbar(im, ax=ax, label="Total Losses (W)")
     plt.show()
 
     created_battery = app.post(client, "/components", data=BATTERY)

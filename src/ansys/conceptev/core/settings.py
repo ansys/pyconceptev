@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Settings specification and reading."""
-from enum import Enum
 import os
 from pathlib import Path
 from typing import Annotated
@@ -41,14 +40,6 @@ HttpUrlString = Annotated[HttpUrl, AfterValidator(str)]
 WebSocketUrlString = Annotated[WebsocketUrl, AfterValidator(str)]
 
 
-class Environment(str, Enum):
-    """Environments."""
-
-    testing = "testing"
-    development = "development"
-    production = "production"
-
-
 class Settings(BaseSettings):
     """Settings."""
 
@@ -59,7 +50,6 @@ class Settings(BaseSettings):
     authority: HttpUrlString
     scope: HttpUrlString
     job_timeout: int
-    environment: Environment
     conceptev_username: EmailStr | None = None  # Only works in testing environment
     conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None
