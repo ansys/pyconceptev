@@ -34,9 +34,9 @@ the health check endpoint to check your connection.
        print(health)
 
 
-Update Configuration
+Update configuration
 ^^^^^^^^^^^^^^^^^^^^
 
 Update the configuration of the client by using the `config.toml` the defaults are located in `src/ansys/conceptev/core/resources/config.toml`.
-Create a new config.toml file in your working directory with the account_name set or create an environment variable called `ACCOUNT_NAME` and the settings management should find it.
-Most things can be left as default but the account_name should be changed to match your company account name.
+Create a new config.toml file in your working directory with the `account_name` set or create an environment variable called `ACCOUNT_NAME` and the settings management should find it.
+Most things can be left as default but the `account_name` should be changed to match your `company account name`.
