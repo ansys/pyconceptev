@@ -22,11 +22,12 @@
 
 import os
 
-os.environ["ACCOUNT_NAME"] = "borked"
-from ansys.conceptev.core.settings import settings
+from ansys.conceptev.core.settings import Settings
 
 
 def test_settings():
+    os.environ["ACCOUNT_NAME"] = "borked"
+    settings = Settings()
     assert settings.job_timeout == 3600  # from resources
     assert settings.ocm_url == "https://dev.portal.onscale.com/api"  # from working directory
     assert settings.account_name == "borked"  # from environment variable
