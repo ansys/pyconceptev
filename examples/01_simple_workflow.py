@@ -37,7 +37,7 @@ This example shows how to use PyConcentEV to perform basic operations.
 import datetime
 from pathlib import Path
 
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
 from ansys.conceptev.core import app, auth
 
@@ -210,8 +210,13 @@ with app.get_http_client(token, design_instance_id) as client:
     x = motor_loss_map["currents"]
     y = motor_loss_map["phase_advances"]
     z = motor_loss_map["losses_total"]
-    fig = go.Figure(data=go.Contour(x=x, y=y, z=z))
-    fig.show()
+
+    fig, ax = plt.subplots()
+    fig = ax.contourf(x, y, z)
+    ax.set_xlabel("Currents (A)")
+    ax.set_ylabel("Phase Advances (deg)")
+    ax.set_zlabel("Total Losses (kW)")
+    plt.show()
 
     created_battery = app.post(client, "/components", data=BATTERY)
 
@@ -246,14 +251,16 @@ with app.get_http_client(token, design_instance_id) as client:
     concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
 
-    # Doesn't work in test environment but should work for users.
-    # Read the results and show the result in your browser
+    # Read and plot the results
     results = app.read_results(client, job_info, calculate_units=False, filtered=True)
     x = results[0]["capability_curve"]["speeds"]
     y = results[0]["capability_curve"]["torques"]
 
-    fig = go.Figure(data=go.Scatter(x=x, y=y))
-    fig.show()
+    fig, ax = plt.subplots()
+    fig = ax.scatter(x, y, label="Capability Curve")
+    ax.set_xlabel("Speed (rad/s)")
+    ax.set_ylabel("Torque (Nm)")
+    plt.show()
 
 
 # %%

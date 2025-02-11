@@ -6,4 +6,3 @@ authority = "https://a365dev.b2clogin.com/a365dev.onmicrosoft.com/b2c_1a_ansysid
 scope = "https://a365dev.onmicrosoft.com/AnsysID/Authentication"
 CONCEPTEV_USERNAME = "conceptev_testing@ansys.com"
 account_name = "ConceptEv Test Account"
-ENVIRONMENT = "testing"

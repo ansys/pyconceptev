@@ -7,4 +7,3 @@ scope ='https://ansysaccount.onmicrosoft.com/AnsysID/Authentication'
 conceptev_username = "conceptev_testing@ansys.com"
 account_name = "conceptev_saas@ansys.com"
 job_timeout= 3600
-ENVIRONMENT = "production"

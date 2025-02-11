@@ -27,14 +27,13 @@ import logging
 from msal import PublicClientApplication
 from msal_extensions import FilePersistence, build_encrypted_persistence, token_cache
 
-from ansys.conceptev.core.settings import Environment, settings
+from ansys.conceptev.core.settings import settings
 
 scope = settings.scope
 client_id = settings.client_id
 authority = settings.authority
 USERNAME = settings.conceptev_username
 PASSWORD = settings.conceptev_password
-ENVIRONMENT = settings.environment
 
 
 def create_msal_app(cache_filepath="token_cache.bin") -> PublicClientApplication:
@@ -60,7 +59,7 @@ def get_ansyId_token(app) -> str:
     """Get token from AnsysID."""
     result = None
     accounts = app.get_accounts()
-    if ENVIRONMENT == Environment.testing:
+    if USERNAME and PASSWORD:
         result = app.acquire_token_by_username_password(
             username=USERNAME, password=PASSWORD, scopes=[scope]
         )
