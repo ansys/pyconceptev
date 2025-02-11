@@ -123,6 +123,7 @@ jobs:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
+          pytest-postargs: 'tests'
           pytest-extra-args: "-m 'not integration' --cov=ansys --cov-report=term --cov-report=html:.cov/html"
 
       - name: Upload coverage results
