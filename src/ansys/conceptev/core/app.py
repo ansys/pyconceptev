@@ -393,7 +393,7 @@ def get_job_info(token, job_id):
     response = httpx.post(
         url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
     )
-    response = app.process_response(response)
+    response = process_response(response)
     job_info = {
         "job_id": job_id,
         "simulation_id": response["simulations"][0]["simulationId"],

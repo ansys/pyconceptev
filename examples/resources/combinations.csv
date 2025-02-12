@@ -1,2 +1,3 @@
 Front Transmission,Front Motor,Front Inverter,Rear Transmission,Rear Motor,Rear Inverter,Battery,Front Clutch,Rear Clutch
 Single Speed 10:1,IM_300kW_20kRPM_800V_50Bars36Slots_500A,MOSFET Inverter Model,Single Speed 14:1,IPM_345kW_15kRPM_800V_8Poles48Slots_460A_LABupTo15krpm,IGBT Inverter Model,CellA_800Vdc_100kWh,Disconnect Clutch,N/A
+Single Speed 10:1,WRSM_330kW_15kRPM_800V_8Poles48Slots_500A_LABupTo15krpm,MOSFET Inverter Model,Single Speed 14:1,IPM_345kW_15kRPM_800V_8Poles48Slots_460A_LABupTo15krpm,IGBT Inverter Model,CellA_800Vdc_100kWh,Disconnect Clutch,N/A
