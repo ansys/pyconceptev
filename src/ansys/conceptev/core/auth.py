@@ -29,6 +29,7 @@ from msal_extensions import FilePersistence, build_encrypted_persistence, token_
 
 from ansys.conceptev.core.settings import settings
 
+logger = logging.getLogger(__name__)
 scope = settings.scope
 client_id = settings.client_id
 authority = settings.authority
@@ -51,7 +52,7 @@ def build_persistence(location, fallback_to_plaintext=True):
     except:
         if not fallback_to_plaintext:
             raise
-        logging.exception("Encryption unavailable. Opting in to plain text.")
+        logger.exception("Encryption unavailable. Opting in to plain text.")
     return FilePersistence(location)
 
 
@@ -60,7 +61,7 @@ def get_ansyId_token(app) -> str:
     result = None
     accounts = app.get_accounts()
     if USERNAME and PASSWORD:
-        logging.INFO("Trying to acquire token with username and password")
+        logger.info("Trying to acquire token with username and password")
         result = app.acquire_token_by_username_password(
             username=USERNAME, password=PASSWORD, scopes=[scope]
         )
@@ -68,10 +69,10 @@ def get_ansyId_token(app) -> str:
         # Assuming the end user chose this one
         chosen = accounts[0]
         # Now let's try to find a token in cache for this account
-        logging.INFO("Trying to acquire token silently")
+        logger.info("Trying to acquire token silently")
         result = app.acquire_token_silent(scopes=[scope], account=chosen)
     if not result:
-        logging.INFO("Trying to acquire token interactively")
+        logger.info("Trying to acquire token interactively")
         result = app.acquire_token_interactive(scopes=[scope])
     if "access_token" in result:
         return result["access_token"]

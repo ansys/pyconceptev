@@ -26,4 +26,7 @@ try:
 except ModuleNotFoundError:
     import importlib_metadata
 
-__version__ = importlib_metadata.version(__name__.replace(".", "-"))
+try:
+    __version__ = importlib_metadata.version(__name__.replace(".", "-"))
+except importlib_metadata.PackageNotFoundError:
+    __version__ = "DEBUG"
