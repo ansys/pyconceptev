@@ -60,7 +60,7 @@ def get_ansyId_token(app) -> str:
     result = None
     accounts = app.get_accounts()
     if USERNAME and PASSWORD:
-        print("Trying to acquire token with username and password")
+        logging.INFO("Trying to acquire token with username and password")
         result = app.acquire_token_by_username_password(
             username=USERNAME, password=PASSWORD, scopes=[scope]
         )
@@ -68,10 +68,10 @@ def get_ansyId_token(app) -> str:
         # Assuming the end user chose this one
         chosen = accounts[0]
         # Now let's try to find a token in cache for this account
-        print("Trying to acquire token silently")
+        logging.INFO("Trying to acquire token silently")
         result = app.acquire_token_silent(scopes=[scope], account=chosen)
     if not result:
-        print("Trying to acquire token interactively")
+        logging.INFO("Trying to acquire token interactively")
         result = app.acquire_token_interactive(scopes=[scope])
     if "access_token" in result:
         return result["access_token"]
