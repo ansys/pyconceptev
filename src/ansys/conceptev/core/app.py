@@ -410,13 +410,13 @@ def get_design_title(token, design_instance_id):
         headers={"authorization": token},
         json={"designInstanceId": design_instance_id},
     )
-    response = app.process_response(response)
+    response = process_response(response)
     design = httpx.post(
         url=f"{OCM_URL}/design/load",
         headers={"authorization": token},
         json={"designId": response["designId"]},
     )
-    design = app.process_response(design)
+    design = process_response(design)
     return design["designTitle"]
 
 
