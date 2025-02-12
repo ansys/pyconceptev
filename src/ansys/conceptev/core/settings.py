@@ -58,7 +58,7 @@ class Settings(BaseSettings):
             os.environ.get("PYCONCEPTEV_SETTINGS", RESOURCE_DIRECTORY / "config.toml"),
             "./config.toml",
         ],
-        secrets_dir=RESOURCE_DIRECTORY,
+        secrets_dir=[RESOURCE_DIRECTORY, "."],
     )
 
 
