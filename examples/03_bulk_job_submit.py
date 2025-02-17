@@ -35,6 +35,7 @@ The combinations of components are specified in a CSV file format.
 
 import datetime
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 from ansys.conceptev.core import app
@@ -218,6 +219,8 @@ with app.get_http_client(token) as client:
 all_results = pd.DataFrame(created_designs)
 all_results.to_excel("created_designs.xlsx")
 
+plt.plot(all_results["Project Name"], all_results["Cost"])
+plt.show()
 
 # %%
 # Delete the extra project on the server.

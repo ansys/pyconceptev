@@ -43,6 +43,7 @@ import datetime
 import json
 import time
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 from ansys.conceptev.core import app, auth
@@ -259,4 +260,7 @@ for (
 # Convert the output results to a pandas DataFrame.
 # Output the results to an Excel file.
 all_results = pd.DataFrame(output_results)  # Convert to Pandas DataFrame
+plt.plot(all_results["Cost"], all_results["steady"])  # Plot the results.
+plt.show()
+
 all_results.to_excel(output_filename)  # Output to excel.
