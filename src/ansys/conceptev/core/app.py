@@ -193,6 +193,17 @@ def create_new_project(
     return created_project.json()
 
 
+def get_or_create_project(client: httpx.Client, account_id: str, hpc_id: str, title: str) -> dict:
+    """Get or create a project."""
+    projects = get_project_ids(title, account_id, client.headers["Authorization"])
+    if title in projects:
+        project_id = projects[title]
+    else:
+        project = create_new_project(client, account_id, hpc_id, title)
+        project_id = project["projectId"]
+    return project_id
+
+
 def create_new_concept(
     client: httpx.Client,
     project_id: str,
@@ -405,7 +416,7 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     """Get projects."""
     response = httpx.post(
         url=OCM_URL + "/project/list/page",
-        json={"accountId": account_id, "filterByName": name},
+        json={"accountId": account_id, "filterByName": name, "pageNumber": 0, "pageSize": 30},
         headers={"Authorization": token},
     )
     processed_response = process_response(response)
