@@ -295,7 +295,7 @@ def test_get_project_id(httpx_mock: HTTPXMock):
     httpx_mock.add_response(
         url=ocm_url + "/project/list/page",
         method="post",
-        match_json={"filterByName": name, "accountId": account_id},
+        match_json={"filterByName": name, "accountId": account_id, "pageNumber": 0, "pageSize": 30},
         headers={"authorization": token},
         json=example_data,
     )
@@ -359,3 +359,49 @@ def test_post_file(mocker, httpx_mock: HTTPXMock, client: httpx.Client):
 
     result = app.post_component_file(client, filename, component_file_type)
     assert result == file_post_response_data
+
+
+def test_get_or_create_project(httpx_mock: HTTPXMock, client: httpx.Client):
+    """Test get or create project."""
+
+    mocked_account_id, mocked_hpc_id = "123", "456"
+    httpx_mock.add_response(
+        url=f"{ocm_url}/projects/list/page",
+        method="post",
+        match_json={
+            "filterByName": "some name",
+            "accountId": mocked_account_id,
+            "pageNumber": 0,
+            "pageSize": 30,
+        },
+        json={"projects": [{"projectId": "789"}]},
+    )
+
+    results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
+    assert results == "789"
+
+    httpx_mock.add_response(
+        url=f"{ocm_url}/projects/list/page",
+        method="post",
+        match_json={
+            "filterByName": "some name",
+            "accountId": mocked_account_id,
+            "pageNumber": 0,
+            "pageSize": 30,
+        },
+        json={"projects": []},
+    )
+    httpx_mock.add_response(
+        url=f"{ocm_url}/projects/",
+        method="post",
+        match_json={
+            "accountId": mocked_account_id,
+            "hpcId": mocked_hpc_id,
+            "projectTitle": "some name",
+            "projectGoal": "Created from the CLI",
+        },
+        json={"projectId": "101112"},
+    )
+
+    results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
+    assert results == "101112"
