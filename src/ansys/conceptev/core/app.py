@@ -438,9 +438,12 @@ def get_concept(client: httpx.Client, design_instance_id: str) -> dict:
     concept["requirements"] = get(client, f"/concepts/{design_instance_id}/requirements")
 
     arch_id = concept["architecture_id"]
-    concept["architecture"] = get(
-        client, f"/architectures/{arch_id}", params={"design_instance_id": design_instance_id}
-    )
+    try:
+        concept["architecture"] = get(
+            client, f"/architectures/{arch_id}", params={"design_instance_id": design_instance_id}
+        )
+    except ResponseError as e:
+        concept["architecture"] = {}
     return concept
 
 

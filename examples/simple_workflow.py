@@ -223,7 +223,8 @@ with app.get_http_client(token, design_instance_id) as client:
     print(f"Created requirement: {created_requirement}")
 
     # Create and submit a job
-    concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
+    concept = app.get_concept(client, design_instance_id)
+    # concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": True})
     job_info = app.create_submit_job(client, concept, account_id, hpc_id)
 
     # Doesn't work in test environment but should work for users.
