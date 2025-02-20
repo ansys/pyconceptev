@@ -160,13 +160,13 @@ jobs:
         run: pandoc --version
 
       - name: Build documentation
-        env:
-          CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
         uses: ansys/actions/doc-build@v8
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           check-links: false
           requires-xvfb: true
+        env:
+          CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
 
   package:
     name: Package library
