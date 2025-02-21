@@ -65,7 +65,7 @@ OCM_URL = settings.ocm_url
 #     This allows faster iteration of improving the Excel output.
 
 short_results = True  # For results created after 15/11/2024 improved performance.
-get_results_off_server = False  # Generates an output file that can be read later.
+get_results_off_server = True  # Generates an output file that can be read later.
 output_filename = "results.xlsx"  # Output filename for results.
 
 # %%
