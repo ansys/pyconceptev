@@ -65,7 +65,7 @@ OCM_URL = settings.ocm_url
 #     This allows faster iteration of improving the Excel output.
 
 short_results = True  # For results created after 15/11/2024 improved performance.
-get_results_off_server = True  # Generates an output file that can be read later.
+get_results_off_server = False  # Generates an output file that can be read later.
 output_filename = "results.xlsx"  # Output filename for results.
 
 # %%
@@ -250,7 +250,8 @@ for (
             "Rear Inverter": rear_inverter_name,
             "Battery": battery_name,
             "Cost": project_result["cost"],
-            "steady": steady_drive,
+            "total_tractive_power": steady_drive["requirement"]["total_tractive_power"],
+            # Extend as required to add the data you need.
         }
     )
 
@@ -260,7 +261,7 @@ for (
 # Convert the output results to a pandas DataFrame.
 # Output the results to an Excel file.
 all_results = pd.DataFrame(output_results)  # Convert to Pandas DataFrame
-plt.plot(all_results["Cost"], all_results["steady"])  # Plot the results.
+plt.plot(all_results["Cost"], all_results["total_tractive_power"], "*")  # Plot the results.
 plt.show()
 
 all_results.to_excel(output_filename)  # Output to excel.
