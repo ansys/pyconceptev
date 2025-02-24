@@ -55,10 +55,12 @@ OCM_URL = settings.ocm_url
 # Inputs
 # ------
 # Change the following variables to match your data.
+#
 # .. warning:
 #    Setting short results to False.
 #    This may take a long time to get results of the server which may result in an error.
 #    Consider setting short_results to True for large drive cycles.
+#
 # .. note:
 #     Get Results off server this may take time depending on number of files needed to download.
 #     Recommendation: Run once then set get_results_off_server to False.
@@ -183,6 +185,8 @@ def get_component_name(project_result, name):
 # Get results for a drive cycle requirement.
 # ----------------------------------------------------------
 # Get the results for a drive cycle requirement.
+
+
 def get_drive_cycle_result(project_result, name):
     """Assumes the first requirement in a concept with the matching name is the one we want."""
     requirement = [
@@ -260,6 +264,7 @@ for (
 # ----------------------------------------------------------
 # Convert the output results to a pandas DataFrame.
 # Output the results to an Excel file.
+
 all_results = pd.DataFrame(output_results)  # Convert to Pandas DataFrame
 plt.plot(all_results["Cost"], all_results["total_tractive_power"], "*")  # Plot the results.
 plt.show()

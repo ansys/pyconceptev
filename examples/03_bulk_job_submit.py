@@ -222,6 +222,7 @@ all_results.to_excel("created_designs.xlsx")
 # Delete the extra project on the server.
 # ---------------------------------------
 # Delete the project on the server.
+#
 # .. warning::
 #    This will delete the project and all its contents.
 #    Only needed for keep test environment clean.
