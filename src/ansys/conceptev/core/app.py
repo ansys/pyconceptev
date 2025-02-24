@@ -196,15 +196,17 @@ def create_new_project(
 def get_or_create_project(client: httpx.Client, account_id: str, hpc_id: str, title: str) -> dict:
     """Get or create a project."""
     # try to create project first
-    # except try and search
-
-    # modify search term  whitespace split take first word
-    projects = get_project_ids(title, account_id, client.headers["Authorization"])
-    if title in projects:
-        project_id = projects[title]
-    else:
+    try:
         project = create_new_project(client, account_id, hpc_id, title)
         project_id = project["projectId"]
+    except ProjectError as err:
+        first_word = title.split(maxsplit=1)[0]
+        projects = get_project_ids(first_word, account_id, client.headers["Authorization"])
+        if title in projects:
+            project_id = projects[title]
+        else:
+            raise ProjectError(f"Failed to get or create a project {projects}.") from err
+
     return project_id
 
 
