@@ -19,14 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Python wrapper for the Ansys ConceptEV service."""
 
-try:
-    import importlib.metadata as importlib_metadata
-except ModuleNotFoundError:
-    import importlib_metadata
+import os
+from pathlib import Path
 
-try:
-    __version__ = importlib_metadata.version(__name__.replace(".", "-"))
-except importlib_metadata.PackageNotFoundError:
-    __version__ = "DEBUG"
+from ansys.conceptev.core.settings import Settings
+
+
+def test_settings():
+    os.environ["ACCOUNT_NAME"] = "borked"
+    os.chdir(Path(__file__).parent)
+    settings = Settings()
+    assert settings.job_timeout == 3600  # from resources
+    assert settings.ocm_url == "https://dev.portal.onscale.com/api"  # from working directory
+    assert settings.account_name == "borked"  # from environment variable

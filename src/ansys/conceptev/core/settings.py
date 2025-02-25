@@ -20,31 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Settings specification and reading."""
-from enum import Enum
 import os
 from pathlib import Path
 from typing import Annotated
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 from pydantic import AfterValidator, EmailStr, HttpUrl, WebsocketUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 RESOURCE_DIRECTORY = Path(__file__).parents[0].joinpath("resources")
-if os.environ.get("PYCONCEPTEV_SETTINGS"):
-    TOML_FILE = Path(os.environ["PYCONCEPTEV_SETTINGS"])
-else:
-    TOML_FILE = RESOURCE_DIRECTORY / "config.toml"
+
 SECRETS_DIR = RESOURCE_DIRECTORY
 
 HttpUrlString = Annotated[HttpUrl, AfterValidator(str)]
 WebSocketUrlString = Annotated[WebsocketUrl, AfterValidator(str)]
-
-
-class Environment(str, Enum):
-    """Environments."""
-
-    testing = "testing"
-    development = "development"
-    production = "production"
 
 
 class Settings(BaseSettings):
@@ -57,13 +50,23 @@ class Settings(BaseSettings):
     authority: HttpUrlString
     scope: HttpUrlString
     job_timeout: int
-    environment: Environment
-    conceptev_username: EmailStr | None  # Only works in testing environment
-    conceptev_password: str | None  # Only works in testing environment
+    conceptev_username: EmailStr | None = None  # Only works in testing environment
+    conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None
     model_config = SettingsConfigDict(
-        env_file=[TOML_FILE, "./config.toml"], secrets_dir=RESOURCE_DIRECTORY
+        env_file=[
+            os.environ.get("PYCONCEPTEV_SETTINGS", RESOURCE_DIRECTORY / "config.toml"),
+            "./config.toml",
+        ],
+        secrets_dir=[RESOURCE_DIRECTORY, "."],
     )
+
+
+def load_settings(toml_file) -> Settings:
+    """Load settings."""
+    with open(toml_file, "rb") as f:
+        settings_data = tomllib.load(f)
+    return Settings.model_validate(settings_data)
 
 
 settings = Settings()
