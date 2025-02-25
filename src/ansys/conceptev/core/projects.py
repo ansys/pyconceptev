@@ -95,7 +95,7 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     """Get projects."""
     response = httpx.post(
         url=OCM_URL + "/project/list/page",
-        json={"accountId": account_id, "filterByName": name, "pageNumber": 0, "pageSize": 30},
+        json={"accountId": account_id, "filterByName": name, "pageNumber": 0, "pageSize": 1000},
         headers={"Authorization": token},
     )
     if response.status_code != 200:
@@ -152,20 +152,3 @@ def create_new_design(
     if created_design.status_code not in (200, 204):
         raise DesignError(f"Failed to create a design on OCM {created_design.content}.")
     return created_design.json()
-
-
-def get_or_create_project(client: httpx.Client, account_id: str, hpc_id: str, title: str) -> dict:
-    """Get or create a project."""
-    # try to create project first
-    try:
-        project = create_new_project(client, account_id, hpc_id, title)
-        project_id = project["projectId"]
-    except ProjectError as err:
-        first_word = title.split(maxsplit=1)[0]
-        projects = get_project_ids(first_word, account_id, client.headers["Authorization"])
-        if title in projects:
-            project_id = projects[title]
-        else:
-            raise ProjectError(f"Failed to get or create a project {projects}.") from err
-
-    return project_id
