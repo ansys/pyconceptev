@@ -360,47 +360,52 @@ def test_post_file(mocker, httpx_mock: HTTPXMock, client: httpx.Client):
     assert result == file_post_response_data
 
 
-def test_get_or_create_project(httpx_mock: HTTPXMock, client: httpx.Client):
-    """Test get or create project."""
-
+def test_successful_create(httpx_mock: HTTPXMock, client: httpx.Client):
     mocked_account_id, mocked_hpc_id = "123", "456"
+    name = "some name"
     httpx_mock.add_response(
-        url=f"{ocm_url}/projects/list/page",
-        method="post",
-        match_json={
-            "filterByName": "some name",
-            "accountId": mocked_account_id,
-            "pageNumber": 0,
-            "pageSize": 30,
-        },
-        json={"projects": [{"projectId": "789"}]},
-    )
-
-    results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
-    assert results == "789"
-
-    httpx_mock.add_response(
-        url=f"{ocm_url}/projects/list/page",
-        method="post",
-        match_json={
-            "filterByName": "some name",
-            "accountId": mocked_account_id,
-            "pageNumber": 0,
-            "pageSize": 30,
-        },
-        json={"projects": []},
-    )
-    httpx_mock.add_response(
-        url=f"{ocm_url}/projects/",
+        url=f"{ocm_url}/project/create",
         method="post",
         match_json={
             "accountId": mocked_account_id,
             "hpcId": mocked_hpc_id,
-            "projectTitle": "some name",
+            "projectTitle": name,
             "projectGoal": "Created from the CLI",
         },
-        json={"projectId": "101112"},
+        json={"projectId": "789"},
+    )
+    results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
+    assert results == "789"
+
+
+def test_succesful_get(httpx_mock: HTTPXMock, client: httpx.Client):
+    """Test get or create project."""
+
+    mocked_account_id, mocked_hpc_id = "123", "456"
+    name = "some name"
+    first_word = name.split(maxsplit=1)[0]
+    httpx_mock.add_response(
+        url=f"{ocm_url}/project/create",
+        method="post",
+        match_json={
+            "accountId": mocked_account_id,
+            "hpcId": mocked_hpc_id,
+            "projectTitle": name,
+            "projectGoal": "Created from the CLI",
+        },
+        status_code=400,
+    )
+    httpx_mock.add_response(
+        url=f"{ocm_url}/project/list/page",
+        method="post",
+        match_json={
+            "filterByName": first_word,
+            "accountId": mocked_account_id,
+            "pageNumber": 0,
+            "pageSize": 30,
+        },
+        json={"projects": [{"projectTitle": name, "projectId": "789"}]},
     )
 
     results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
-    assert results == "101112"
+    assert results == "789"
