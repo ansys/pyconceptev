@@ -53,7 +53,6 @@ html_theme_options = {
 
 # Sphinx extensions
 extensions = [
-    "nbsphinx",
     "numpydoc",
     "recommonmark",
     "sphinx.ext.autodoc",
@@ -62,6 +61,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_copybutton",
     "sphinx_design",
+    "sphinx_gallery.gen_gallery",
 ]
 
 # Intersphinx mapping
@@ -119,13 +119,26 @@ source_suffix = {
 master_doc = "index"
 
 # Examples gallery customization
-nbsphinx_execute = "always"
-nbsphinx_allow_errors = False
-nbsphinx_thumbnails = {
-    "examples/simple_workflow": "_static/thumbnails/simple_workflow.png",
-}
-nbsphinx_custom_formats = {
-    ".py": ["jupytext.reads", {"fmt": ""}],
+sphinx_gallery_conf = {
+    # convert rst to md for IPYNBb
+    "pypandoc": True,
+    # path to your examples scripts
+    "examples_dirs": ["../../examples"],
+    # path where to save gallery generated examples
+    "gallery_dirs": ["auto_examples"],
+    # Pattern to search for examples files
+    "filename_pattern": r"\.py",
+    # Remove the "Download all examples" button from the top level gallery
+    "download_all_examples": False,
+    # Sort gallery examples by file name instead of number of lines (default)
+    "within_subsection_order": "FileNameSortKey",
+    # directory where function granular galleries are stored
+    "backreferences_dir": None,
+    # Modules for which function level galleries are created.  In
+    "doc_module": "ansys-conceptev-core",
+    "image_scrapers": ("matplotlib"),
+    "ignore_pattern": "flycheck*",
+    "thumbnail_size": (350, 350),
 }
 
 linkcheck_exclude_documents = ["index"]
@@ -204,6 +217,6 @@ def setup(app: sphinx.application.Sphinx):
     app : sphinx.application.Sphinx
         Sphinx instance containing all the configuration for the documentation build.
     """
-    app.connect("builder-inited", copy_examples)
+    # app.connect("builder-inited", copy_examples)
     app.connect("builder-inited", check_pandoc_installed)
-    app.connect("build-finished", remove_examples)
+    # app.connect("build-finished", remove_examples)
