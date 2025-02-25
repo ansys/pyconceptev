@@ -76,7 +76,7 @@ sphinx-design = "^0.6.0"
 pypandoc-binary = "^1.13"
 
 # Optional testing dependencies
-sphinx-gallery = "^0.18.0"
+sphinx-gallery = ">=0.18,<0.20"
 matplotlib = "3.9"
 [tool.poetry.group.tests]
 optional = true
