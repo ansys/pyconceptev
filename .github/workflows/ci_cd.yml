@@ -140,7 +140,17 @@ jobs:
           name: coverage-file-tests-${{ matrix.os }}
           path: .coverage
           retention-days: 7
-
+  tests-integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs : [tests]
+    steps:
+      - uses: ansys/actions/tests-pytest@v8
+        env:
+          CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
+          POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
+        with:
+          pytest-extra-args: "-m 'integration"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
