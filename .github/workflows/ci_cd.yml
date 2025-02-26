@@ -158,7 +158,7 @@ jobs:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
-          pytest-extra-args: "-m 'integration"
+          pytest-extra-args: "-m integration"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
