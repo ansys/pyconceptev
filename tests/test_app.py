@@ -27,7 +27,6 @@ from pytest_httpx import HTTPXMock
 from ansys.conceptev.core import app
 from ansys.conceptev.core.settings import settings
 
-ENVIRONMENT = settings.environment
 conceptev_url = settings.conceptev_url
 ocm_url = settings.ocm_url
 
