@@ -156,7 +156,6 @@ jobs:
       - uses: ansys/actions/tests-pytest@v8
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
-          CONCEPTEV_USERNAME: ${{ secrets.CONCEPTEV_USERNAME }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
