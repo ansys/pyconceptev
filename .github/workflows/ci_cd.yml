@@ -159,6 +159,7 @@ jobs:
           CONCEPTEV_USERNAME: ${{ secrets.CONCEPTEV_USERNAME }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
+          python-version: ${{ env.MAIN_PYTHON_VERSION }}
           pytest-extra-args: "-s -m integration --log-cli-level=INFO"
   doc-build:
     name: Build documentation
