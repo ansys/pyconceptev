@@ -150,7 +150,7 @@ jobs:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
-          pytest-extra-args: "-s -m integration --log_cli=true --log_cli_level=INFO"
+          pytest-extra-args: "-s -m integration --log-cli-level=INFO"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
