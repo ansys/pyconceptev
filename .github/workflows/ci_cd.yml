@@ -156,6 +156,7 @@ jobs:
           cd tests
       - uses: ansys/actions/tests-pytest@v8
         env:
+          PYCONCEPTEV_SETTINGS: "tests/config.toml"
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
