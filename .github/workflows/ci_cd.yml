@@ -153,6 +153,7 @@ jobs:
           sudo apt-get install gobject-introspection
           sudo apt update
           sudo apt install python3-dev libgirepository1.0-dev libcairo2-dev gir1.2-secret-1 gnome-keyring
+          cd tests
       - uses: ansys/actions/tests-pytest@v8
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
