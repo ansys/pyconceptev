@@ -33,7 +33,7 @@ of EV powertrains.
 
     .. grid-item-card:: Examples :material-regular:`play_arrow`
         :padding: 2 2 2 2
-        :link: examples/index
+        :link: auto_examples/index
         :link-type: doc
 
         Explore examples that show how to use PyConcept EV.
@@ -53,6 +53,6 @@ of EV powertrains.
    getting_started
    user_guide
    api_ref
-   examples/index
+   auto_examples/index
    contributing
    changelog

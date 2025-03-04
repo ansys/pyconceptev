@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import re
 
 import httpx
 import pytest
@@ -27,7 +28,6 @@ from pytest_httpx import HTTPXMock
 from ansys.conceptev.core import app
 from ansys.conceptev.core.settings import settings
 
-ENVIRONMENT = settings.environment
 conceptev_url = settings.conceptev_url
 ocm_url = settings.ocm_url
 
@@ -295,7 +295,12 @@ def test_get_project_id(httpx_mock: HTTPXMock):
     httpx_mock.add_response(
         url=ocm_url + "/project/list/page",
         method="post",
-        match_json={"filterByName": name, "accountId": account_id},
+        match_json={
+            "filterByName": name,
+            "accountId": account_id,
+            "pageNumber": 0,
+            "pageSize": 1000,
+        },
         headers={"authorization": token},
         json=example_data,
     )
@@ -359,3 +364,67 @@ def test_post_file(mocker, httpx_mock: HTTPXMock, client: httpx.Client):
 
     result = app.post_component_file(client, filename, component_file_type)
     assert result == file_post_response_data
+
+
+def test_successful_create(httpx_mock: HTTPXMock, client: httpx.Client):
+    mocked_account_id, mocked_hpc_id = "123", "456"
+    name = "some name"
+    first_word = name.split()[0]
+    escaped = re.escape(name)
+    for search_string in [name, escaped, first_word]:
+        httpx_mock.add_response(
+            url=f"{ocm_url}/project/list/page",
+            method="post",
+            match_json={
+                "filterByName": search_string,
+                "accountId": mocked_account_id,
+                "pageNumber": 0,
+                "pageSize": 1000,
+            },
+            json={"projects": []},
+        )
+
+    httpx_mock.add_response(
+        url=f"{ocm_url}/project/create",
+        method="post",
+        match_json={
+            "accountId": mocked_account_id,
+            "hpcId": mocked_hpc_id,
+            "projectTitle": name,
+            "projectGoal": "Created from the CLI",
+        },
+        json={"projectId": "789"},
+    )
+    results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
+    assert results == "789"
+
+
+search_strings = ["some name", re.escape("some name"), "some"]
+
+
+@pytest.mark.parametrize("search_string", search_strings)
+def test_successful_get(httpx_mock: HTTPXMock, client: httpx.Client, search_string):
+    """Test get or create project."""
+
+    mocked_account_id, mocked_hpc_id = "123", "456"
+    for search_string_try in search_strings:
+        if search_string_try == search_string:
+            project_response = [{"projectId": "789", "projectTitle": "some name"}]
+        else:
+            project_response = []
+        httpx_mock.add_response(
+            url=f"{ocm_url}/project/list/page",
+            method="post",
+            match_json={
+                "filterByName": search_string_try,
+                "accountId": mocked_account_id,
+                "pageNumber": 0,
+                "pageSize": 1000,
+            },
+            json={"projects": project_response},
+        )
+        if search_string_try == search_string:
+            break
+
+    results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
+    assert results == "789"
