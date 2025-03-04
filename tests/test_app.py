@@ -358,3 +358,78 @@ def test_post_file(mocker, httpx_mock: HTTPXMock, client: httpx.Client):
 
     result = app.post_component_file(client, filename, component_file_type)
     assert result == file_post_response_data
+
+
+def test_successful_create(httpx_mock: HTTPXMock, client: httpx.Client):
+    mocked_account_id, mocked_hpc_id = "123", "456"
+    name = "some name"
+    first_word = name.split()[0]
+    escaped = re.escape(name)
+    for search_string in [name, escaped, first_word]:
+        httpx_mock.add_response(
+            url=f"{ocm_url}/project/list/page",
+            method="post",
+            match_json={
+                "filterByName": search_string,
+                "accountId": mocked_account_id,
+                "pageNumber": 0,
+                "pageSize": 1000,
+            },
+            json={"projects": []},
+        )
+
+    httpx_mock.add_response(
+        url=f"{ocm_url}/project/create",
+        method="post",
+        match_json={
+            "accountId": mocked_account_id,
+            "hpcId": mocked_hpc_id,
+            "projectTitle": name,
+            "projectGoal": "Created from the CLI",
+        },
+        json={"projectId": "789"},
+    )
+    results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
+    assert results == "789"
+
+
+search_strings = ["some name", re.escape("some name"), "some"]
+
+
+@pytest.mark.parametrize("search_string", search_strings)
+def test_successful_get(httpx_mock: HTTPXMock, client: httpx.Client, search_string):
+    """Test get or create project."""
+
+    mocked_account_id, mocked_hpc_id = "123", "456"
+    for search_string_try in search_strings:
+        if search_string_try == search_string:
+            project_response = [{"projectId": "789", "projectTitle": "some name"}]
+        else:
+            project_response = []
+        httpx_mock.add_response(
+            url=f"{ocm_url}/project/list/page",
+            method="post",
+            match_json={
+                "filterByName": search_string_try,
+                "accountId": mocked_account_id,
+                "pageNumber": 0,
+                "pageSize": 1000,
+            },
+            json={"projects": project_response},
+        )
+        if search_string_try == search_string:
+            break
+
+    results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
+    assert results == "789"
+
+
+def test_get_job_file(httpx_mock: HTTPXMock):
+    job_id = "123"
+    file_name = "cev_job.json"
+    token = "123"
+    httpx_mock.add_response(
+        url=f"{ocm_url}/job/files/{job_id}/{file_name}", method="get", content=b"""{"json":"1"}"""
+    )
+    results = app.get_job_file(token, job_id, file_name)
+    assert results == {"json": "1"}
