@@ -77,16 +77,20 @@ def test_create_build_persistance() -> None:
     )
 
 
-def test_create_msal_app_try_token(mockPublcClientCreation) -> None:
+def test_create_msal_app_try_token(mockPublcClientCreation, mocker) -> None:
     """Test Creating MSAL App."""
+    mocker.patch("ansys.conceptev.core.auth.USERNAME", None)
+    mocker.patch("ansys.conceptev.core.auth.PASSWORD", None)
     app = auth.create_msal_app()
     assert isinstance(app, MockApp)
     token = auth.get_ansyId_token(app)
     assert token == "mock_token"
 
 
-def test_create_msal_app_try_token_cache(mockPublcClientCreation, mockCache) -> None:
+def test_create_msal_app_try_token_cache(mockPublcClientCreation, mockCache, mocker) -> None:
     """Test Creating MSAL App with cache"""
+    mocker.patch("ansys.conceptev.core.auth.USERNAME", None)
+    mocker.patch("ansys.conceptev.core.auth.PASSWORD", None)
     app = auth.create_msal_app()
     assert isinstance(app, MockApp)
     token = auth.get_ansyId_token(app)
