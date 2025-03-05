@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import re
 
 import httpx
 import pytest
@@ -294,7 +295,12 @@ def test_get_project_id(httpx_mock: HTTPXMock):
     httpx_mock.add_response(
         url=ocm_url + "/project/list/page",
         method="post",
-        match_json={"filterByName": name, "accountId": account_id},
+        match_json={
+            "filterByName": name,
+            "accountId": account_id,
+            "pageNumber": 0,
+            "pageSize": 1000,
+        },
         headers={"authorization": token},
         json=example_data,
     )

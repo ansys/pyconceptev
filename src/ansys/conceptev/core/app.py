@@ -24,6 +24,7 @@
 import datetime
 import json
 from json import JSONDecodeError
+import re
 from typing import Literal
 
 import httpx
@@ -191,6 +192,24 @@ def create_new_project(
         raise ProjectError(f"Failed to create a project {created_project}.")
 
     return created_project.json()
+
+
+def get_or_create_project(client: httpx.Client, account_id: str, hpc_id: str, title: str) -> dict:
+    """Get or create a project."""
+    stored_errors = []
+    options = [title, re.escape(title), title.split(maxsplit=1)[0]]
+    for search_string in options:
+        try:
+            projects = get_project_ids(search_string, account_id, client.headers["Authorization"])
+            project_id = projects[title]
+            return project_id
+        except (ProjectError, KeyError) as err:
+            stored_errors.append(err)
+
+    project = create_new_project(client, account_id, hpc_id, title)
+    project_id = project["projectId"]
+
+    return project_id
 
 
 def create_new_concept(
@@ -453,7 +472,7 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     """Get projects."""
     response = httpx.post(
         url=OCM_URL + "/project/list/page",
-        json={"accountId": account_id, "filterByName": name},
+        json={"accountId": account_id, "filterByName": name, "pageNumber": 0, "pageSize": 1000},
         headers={"Authorization": token},
     )
     processed_response = process_response(response)
@@ -552,11 +571,3 @@ def get_component_id_map(client, design_instance_id):
     components = process_response(components)
     components.append({"name": "N/A", "id": None})
     return {component["name"]: component["id"] for component in components}
-
-
-if __name__ == "__main__":
-    token = get_token()
-
-    with get_http_client(token) as client:  # Create a client to talk to the API
-        health = get(client, "/health")  # Check that the API is healthy
-        print(health)
