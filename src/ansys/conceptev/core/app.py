@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 """Simple API client for the Ansys ConceptEV service."""
-
 import datetime
 from json import JSONDecodeError
+import re
 from typing import Literal
 
 import httpx
@@ -191,6 +191,24 @@ def create_new_project(
         raise ProjectError(f"Failed to create a project {created_project}.")
 
     return created_project.json()
+
+
+def get_or_create_project(client: httpx.Client, account_id: str, hpc_id: str, title: str) -> dict:
+    """Get or create a project."""
+    stored_errors = []
+    options = [title, re.escape(title), title.split(maxsplit=1)[0]]
+    for search_string in options:
+        try:
+            projects = get_project_ids(search_string, account_id, client.headers["Authorization"])
+            project_id = projects[title]
+            return project_id
+        except (ProjectError, KeyError) as err:
+            stored_errors.append(err)
+
+    project = create_new_project(client, account_id, hpc_id, title)
+    project_id = project["projectId"]
+
+    return project_id
 
 
 def create_new_concept(
@@ -389,6 +407,38 @@ def get_results(
     return process_response(response)
 
 
+def get_job_info(token, job_id):
+    """Get the job info from the OnScale Cloud Manager."""
+    response = httpx.post(
+        url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
+    )
+    response = process_response(response)
+    job_info = {
+        "job_id": job_id,
+        "simulation_id": response["simulations"][0]["simulationId"],
+        "job_name": response["jobName"],
+        "docker_tag": response["dockerTag"],
+    }
+    return job_info
+
+
+def get_design_title(token, design_instance_id):
+    """Get the design Title from the OnScale Cloud Manager."""
+    response = httpx.post(
+        url=f"{OCM_URL}/design/instance/load",
+        headers={"authorization": token},
+        json={"designInstanceId": design_instance_id},
+    )
+    response = process_response(response)
+    design = httpx.post(
+        url=f"{OCM_URL}/design/load",
+        headers={"authorization": token},
+        json={"designId": response["designId"]},
+    )
+    design = process_response(design)
+    return design["designTitle"]
+
+
 def get_status(job_info: dict, token: str) -> str:
     """Get the status of the job."""
     response = httpx.post(
@@ -405,12 +455,33 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     """Get projects."""
     response = httpx.post(
         url=OCM_URL + "/project/list/page",
-        json={"accountId": account_id, "filterByName": name},
+        json={"accountId": account_id, "filterByName": name, "pageNumber": 0, "pageSize": 1000},
         headers={"Authorization": token},
     )
     processed_response = process_response(response)
     projects = processed_response["projects"]
     return {project["projectTitle"]: project["projectId"] for project in projects}
+
+
+def delete_project(project_id, token):
+    """Delete a project."""
+    ocm_delete_init = httpx.request(
+        method="DELETE",
+        url=OCM_URL + "/project/delete/init",
+        headers={"Authorization": token},
+        json={"projectId": project_id},
+        timeout=20,
+    )
+    ocm_delete_init = process_response(ocm_delete_init)
+    ocm_delete = httpx.request(
+        method="DELETE",
+        url=OCM_URL + "/project/delete/execute",
+        headers={"Authorization": token},
+        json={"projectId": project_id, "hash": ocm_delete_init["hash"]},
+        timeout=20,
+    )
+    ocm_delete = process_response(ocm_delete)
+    return ocm_delete
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
@@ -441,9 +512,45 @@ def get_concept(client: httpx.Client, design_instance_id: str) -> dict:
     return concept
 
 
-if __name__ == "__main__":
-    token = get_token()
+def create_design_instance(project_id, title, token, product_id=None):
+    """Create a design instance on OCM."""
+    if product_id is None:
+        product_id = get_product_id(token)
 
-    with get_http_client(token) as client:  # Create a client to talk to the API
-        health = get(client, "/health")  # Check that the API is healthy
-        print(health)
+    design_data = {
+        "projectId": project_id,
+        "productId": product_id,
+        "designTitle": title,
+    }
+    created_design = httpx.post(
+        OCM_URL + "/design/create", headers={"Authorization": token}, json=design_data
+    )
+
+    if created_design.status_code not in (200, 204):
+        raise Exception(f"Failed to create a design on OCM {created_design.content}.")
+
+    design_instance_id = created_design.json()["designInstanceList"][0]["designInstanceId"]
+    return design_instance_id
+
+
+def copy_concept(base_concept_id, design_instance_id, client):
+    """Copy the reference concept to the new design instance."""
+    copy = {
+        "old_design_instance_id": base_concept_id,
+        "new_design_instance_id": design_instance_id,
+        "copy_jobs": False,
+    }
+    # Clone the base concept
+    params = {"design_instance_id": design_instance_id, "populated": False}
+    client.params = params
+    concept = post(client, "/concepts:copy", data=copy)
+    return concept
+
+
+def get_component_id_map(client, design_instance_id):
+    """Get a map of component name to component id."""
+    ###TODO move to results file so its self contained.
+    components = client.get(f"/concepts/{design_instance_id}/components")
+    components = process_response(components)
+    components.append({"name": "N/A", "id": None})
+    return {component["name"]: component["id"] for component in components}

@@ -20,9 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-
-import httpx
 from msal_extensions import (
     FilePersistence,
     FilePersistenceWithDataProtection,
@@ -51,8 +48,7 @@ class MockApp:
         return {"access_token": "mock_token"}
 
     def acquire_token_by_username_password(self, username, password, scopes):
-        assert auth.ENVIRONMENT == "testing"
-        return {"access_token": "mock_token"}
+        return {"access_token": "mock_token_password"}
 
 
 @pytest.fixture
@@ -65,16 +61,6 @@ def mockCache(mocker: MockerFixture) -> None:
     mocker.patch(
         "ansys.conceptev.core.auth.PublicClientApplication.get_accounts", return_value=["account"]
     )
-
-
-@pytest.mark.skip  # Not mocked
-def test_integration(clean_file) -> None:
-    """Test Creating a token from AnsysID."""
-    app = auth.create_msal_app()
-    token = auth.get_ansyId_token(app)
-    results = httpx.get(url=os.environ["ocm_url"] + "/auth", headers={"Authorization": token})
-
-    assert results.status_code == 200
 
 
 def test_create_build_persistance() -> None:
@@ -91,17 +77,31 @@ def test_create_build_persistance() -> None:
     )
 
 
-def test_create_msal_app_try_token(mockPublcClientCreation) -> None:
+def test_create_msal_app_try_token(mockPublcClientCreation, mocker) -> None:
     """Test Creating MSAL App."""
+    mocker.patch("ansys.conceptev.core.auth.USERNAME", None)
+    mocker.patch("ansys.conceptev.core.auth.PASSWORD", None)
     app = auth.create_msal_app()
     assert isinstance(app, MockApp)
     token = auth.get_ansyId_token(app)
     assert token == "mock_token"
 
 
-def test_create_msal_app_try_token_cache(mockPublcClientCreation, mockCache) -> None:
-    """Test Creating MSAL App."""
+def test_create_msal_app_try_token_cache(mockPublcClientCreation, mockCache, mocker) -> None:
+    """Test Creating MSAL App with cache"""
+    mocker.patch("ansys.conceptev.core.auth.USERNAME", None)
+    mocker.patch("ansys.conceptev.core.auth.PASSWORD", None)
     app = auth.create_msal_app()
     assert isinstance(app, MockApp)
     token = auth.get_ansyId_token(app)
     assert token == "mock_cached_token"
+
+
+def test_create_msal_app_password(mockPublcClientCreation, mocker) -> None:
+    """Test Creating MSAL App."""
+    mocker.patch("ansys.conceptev.core.auth.USERNAME", "something")
+    mocker.patch("ansys.conceptev.core.auth.PASSWORD", "something")
+    app = auth.create_msal_app()
+    assert isinstance(app, MockApp)
+    token = auth.get_ansyId_token(app)
+    assert token == "mock_token_password"
