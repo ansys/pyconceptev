@@ -428,3 +428,14 @@ def test_successful_get(httpx_mock: HTTPXMock, client: httpx.Client, search_stri
 
     results = app.get_or_create_project(client, mocked_account_id, mocked_hpc_id, "some name")
     assert results == "789"
+
+
+def test_get_job_file(httpx_mock: HTTPXMock):
+    job_id = "123"
+    file_name = "cev_job.json"
+    token = "123"
+    httpx_mock.add_response(
+        url=f"{ocm_url}/job/files/{job_id}/{file_name}", method="get", content=b"""{"json":"1"}"""
+    )
+    results = app.get_job_file(token, job_id, file_name)
+    assert results == {"json": "1"}

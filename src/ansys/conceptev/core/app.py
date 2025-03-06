@@ -22,6 +22,7 @@
 
 """Simple API client for the Ansys ConceptEV service."""
 import datetime
+import json
 from json import JSONDecodeError
 import re
 from typing import Literal
@@ -405,6 +406,22 @@ def get_results(
             f"Please try using either calculate_units=False or filtered=True."
         )
     return process_response(response)
+
+
+def get_job_file(token, job_id, filename, simulation_id=None, encrypted=False):
+    """Get the job file from the OnScale Cloud Manager."""
+    encrypted_part = "decrypted/" if encrypted else ""
+    if simulation_id is not None:
+        path = f"{OCM_URL}/job/files/{encrypted_part}{job_id}/{simulation_id}/{filename}"
+    else:
+        path = f"{OCM_URL}/job/files/{encrypted_part}{job_id}/{filename}"
+    response = httpx.get(
+        url=path, headers={"authorization": token, "accept": "application/octet-stream"}
+    )
+    if response.status_code != 200:
+        raise ResponseError(f"Failed to get file {response}.")
+
+    return json.loads(response.content)
 
 
 def get_job_info(token, job_id):

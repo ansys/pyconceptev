@@ -77,7 +77,7 @@ def test_get_default_hpc(token):
     """Test default HPC from OCM."""
     account_id = "2a566ece-938d-4658-bae5-ffa387ac0547"
     hpc_id = projects.get_default_hpc(token, account_id)
-    assert hpc_id == "23c70728-b930-d1eb-a0b1-dbf9ea0f6278"
+    assert hpc_id == "3ded64e3-5a83-24a8-b6e4-9fc30f97a654"
 
 
 @pytest.mark.integration
