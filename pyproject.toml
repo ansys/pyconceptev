@@ -44,7 +44,7 @@ async-timeout = { version = ">=4", python = "<3.11" }
 pandas = {extras = ["excel"], version = "^2.2.3"}
 pydantic-settings = "^2.7.1"
 email-validator = "^2.2.0"
-pygobject = {version = "<3.52.1", platform = "linux"}
+pygobject = {version = "<3.52.3", platform = "linux"}
 matplotlib = "~3.9"
 [tool.poetry.group.dev.dependencies] # Common packages for test and examples
 plotly = "^5.18.0"
