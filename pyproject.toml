@@ -74,6 +74,7 @@ sphinx-design = "^0.6.0"
 pypandoc-binary = "^1.13"
 sphinx-gallery = ">=0.18,<0.20"
 matplotlib = "3.9.4"
+pandas = {extras = ["excel"], version = "^2.2.3"}
 
 [tool.poetry.group.tests] # Optional testing dependencies
 optional = true
@@ -93,11 +94,7 @@ optional = true
 build = "^1.0.3"
 twine = ">=5,<7"
 
-[tool.poetry.group.examples]
-optional = true
 
-[tool.poetry.group.examples.dependencies]
-pandas = {extras = ["excel"], version = "^2.2.3"}
 
 [tool.poetry.group.linux-encryption]
 optional = true
