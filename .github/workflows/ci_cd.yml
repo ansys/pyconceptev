@@ -97,7 +97,6 @@ jobs:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
-          whitelist-license-check: email_validator
 
   tests:
     name: Tests and coverage
