@@ -377,9 +377,10 @@ def read_results(
     if check_status(initial_status):  # Job already completed
         return get_results(client, job_info, calculate_units, filtered)
     else:  # Job is still running
-        monitor_job_progress(job_id, user_id, token, timeout)  # Wait for completion
         if msal_app is None:
             msal_app = auth.create_msal_app()
+        monitor_job_progress(job_id, user_id, token, msal_app, timeout)  # Wait for completion
+
         token = auth.get_ansyId_token(msal_app)
         client.headers["Authorization"] = token  # Update the token
         return get_results(client, job_info, calculate_units, filtered)
