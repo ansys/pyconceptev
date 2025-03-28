@@ -82,16 +82,21 @@ ACCOUNT_NAME = settings.account_name
 app = auth.create_msal_app()
 
 
-def get_http_client(token: str, design_instance_id: str | None = None) -> httpx.Client:
+def get_http_client(
+    token: str | None = None,
+    design_instance_id: str | None = None,
+    cache_filepath: str = "token_cache.bin",
+) -> httpx.Client:
     """Get an HTTP client.
 
     The HTTP client creates and maintains the connection, which is more performant than
     re-creating this connection for each call.
     """
-    params = None
-    if design_instance_id:
-        params = {"design_instance_id": design_instance_id}
-    return httpx.Client(headers={"Authorization": token}, params=params, base_url=BASE_URL)
+    httpx_auth = auth.AnsysIDAuth(cache_filepath=cache_filepath) if token is None else None
+    params = {"design_instance_id": design_instance_id} if design_instance_id else None
+    header = {"Authorization": token} if token else None
+
+    return httpx.Client(headers=header, auth=httpx_auth, params=params, base_url=BASE_URL)
 
 
 def process_response(response) -> dict:

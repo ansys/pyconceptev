@@ -26,6 +26,7 @@ import pytest
 from pytest_httpx import HTTPXMock
 
 from ansys.conceptev.core import app
+from ansys.conceptev.core.auth import AnsysIDAuth
 from ansys.conceptev.core.settings import settings
 
 conceptev_url = settings.conceptev_url
@@ -46,6 +47,15 @@ def test_get_http_client():
     client = app.get_http_client(fake_token, design_instance_id=design_instance_id)
     assert isinstance(client, httpx.Client)
     assert client.headers["authorization"] == fake_token
+    assert str(client.base_url).strip("/") == conceptev_url.strip("/")
+    assert client.params["design_instance_id"] == design_instance_id
+
+
+def test_get_http_client_auth():
+    design_instance_id = "123"
+    client = app.get_http_client(design_instance_id=design_instance_id)
+    assert isinstance(client, httpx.Client)
+    assert isinstance(client.auth, AnsysIDAuth)
     assert str(client.base_url).strip("/") == conceptev_url.strip("/")
     assert client.params["design_instance_id"] == design_instance_id
 
