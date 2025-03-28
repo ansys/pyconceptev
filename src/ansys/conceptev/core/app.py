@@ -28,6 +28,7 @@ import re
 from typing import Literal
 
 import httpx
+from tenacity import retry, retry_if_result, stop_after_delay, wait_random_exponential
 
 from ansys.conceptev.core import auth
 from ansys.conceptev.core.exceptions import (
@@ -82,6 +83,13 @@ ACCOUNT_NAME = settings.account_name
 app = auth.create_msal_app()
 
 
+def is_gaetway_error(response) -> bool:
+    """Check if the response is a gateway error."""
+    if isinstance(response, httpx.Response):
+        return response.status_code in (502, 504)
+    return False
+
+
 def get_http_client(
     token: str | None = None,
     design_instance_id: str | None = None,
@@ -96,7 +104,13 @@ def get_http_client(
     params = {"design_instance_id": design_instance_id} if design_instance_id else None
     header = {"Authorization": token} if token else None
 
-    return httpx.Client(headers=header, auth=httpx_auth, params=params, base_url=BASE_URL)
+    client = httpx.Client(headers=header, auth=httpx_auth, params=params, base_url=BASE_URL)
+    client.send = retry(
+        retry=retry_if_result(is_gaetway_error),
+        wait=wait_random_exponential(multiplier=1, max=60),
+        stop=stop_after_delay(10),
+    )(client.send)
+    return client
 
 
 def process_response(response) -> dict:
