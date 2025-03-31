@@ -525,7 +525,7 @@ def get_concept(client: httpx.Client, design_instance_id: str) -> dict:
 
     concept["requirements"] = get(client, f"/concepts/{design_instance_id}/requirements")
 
-    concept["architecture"] = get(client, f"/concepts/{design_instance_id}/architecture")
+    concept["architecture"] = get(client, f"/concepts/{design_instance_id}/architecture")[0]
     return concept
 
 
