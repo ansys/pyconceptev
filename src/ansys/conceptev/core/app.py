@@ -198,7 +198,7 @@ def create_new_project(
     project_goal: str = "Created from the CLI",
 ) -> dict:
     """Create a project."""
-    token = client.headers["Authorization"]
+    token = get_token(client)
     project_data = {
         "accountId": account_id,
         "hpcId": hpc_id,
