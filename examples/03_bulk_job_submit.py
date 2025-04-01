@@ -89,7 +89,7 @@ def update_architecture(components, combo, base_architecture):
 # Use API client for the Ansys ConceptEV service
 with app.get_http_client() as client:
     client.timeout = 200  # Extend timeout for uploading files.
-    token = client.headers["Authorization"]
+    token = app.get_token(client)
     accounts = app.get_account_ids(token)
     account_id = accounts["conceptev_saas@ansys.com"]
     hpc_id = app.get_default_hpc(token, account_id)
@@ -167,6 +167,7 @@ assert (
 # Create and submit a job using the new concept (with the new architecture).
 
 with app.get_http_client() as client:
+    token = app.get_token(client)
     created_designs = []
     # Submit jobs for each combination
     for combo in combinations:
@@ -228,7 +229,6 @@ all_results.to_excel("created_designs.xlsx")
 #    Only needed for keep test environment clean.
 
 with app.get_http_client() as client:
-    token = client.headers["Authorization"]
     for concept in created_designs:
         client.params = client.params.set("design_instance_id", concept["Design Instance Id"])
         app.delete(client, "concepts", id=concept["Concept_ID"])

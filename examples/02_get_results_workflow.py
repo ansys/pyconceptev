@@ -78,6 +78,7 @@ output_filename = "results.xlsx"  # Output filename for results.
 
 
 def generate_and_run_templates(client, account_id, hpc_id):
+    token = app.get_token(client)
     project_id = app.create_new_project(
         client, account_id, hpc_id, f"New Project {datetime.datetime.now()}"
     )
@@ -107,7 +108,7 @@ def generate_and_run_templates(client, account_id, hpc_id):
 
 
 with app.get_http_client() as client:
-    token = client.auth.header["Authorization"]
+    token = app.get_token(client)
     account_id = app.get_account_id(token)
     hpc_id = app.get_default_hpc(token, account_id)
     design_instance_ids = generate_and_run_templates(client, account_id, hpc_id)
@@ -124,7 +125,7 @@ def get_project_results(client, design_instance_id):
 
     Assumes the first results only.
     """
-    token = client.auth.header["Authorization"]
+    token = app.get_token(client)
     client.params = {"design_instance_id": design_instance_id}
     concept = app.get(client, "/concepts", id=design_instance_id)
 

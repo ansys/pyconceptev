@@ -40,6 +40,7 @@ from ansys.conceptev.core.exceptions import (
     ProjectError,
     ResponseError,
     ResultsError,
+    TokenError,
     UserDetailsError,
 )
 from ansys.conceptev.core.progress import check_status, monitor_job_progress
@@ -498,6 +499,13 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     processed_response = process_response(response)
     projects = processed_response["projects"]
     return {project["projectTitle"]: project["projectId"] for project in projects}
+
+
+def get_token(client: httpx.Client) -> str:
+    """Get the token from the client."""
+    if client.auth.app is not None:
+        return auth.get_ansyId_token(client.auth.app)
+    raise TokenError("App not found in client.")
 
 
 def delete_project(project_id, token):

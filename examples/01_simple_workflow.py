@@ -112,7 +112,7 @@ motor_data = {"name": "e9", "component_type": "MotorLabID", "inverter_losses_inc
 with app.get_http_client() as client:
     health = app.get(client, "/health")
     print(f"API is healthy: {health}\n")
-
+    token = app.get_token(client)
     account_id = app.get_account_id(token)
 
     hpc_id = app.get_default_hpc(token, account_id)
