@@ -512,8 +512,10 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
 
 def get_token(client: httpx.Client) -> str:
     """Get the token from the client."""
-    if client.auth.app is not None:
+    if client.auth is not None and client.auth.app is not None:
         return auth.get_ansyId_token(client.auth.app)
+    elif client.headers is not None and "Authorization" in client.headers:
+        return client.headers["Authorization"]
     raise TokenError("App not found in client.")
 
 
