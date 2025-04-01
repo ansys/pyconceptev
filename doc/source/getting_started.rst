@@ -24,7 +24,7 @@ Then, install PyConceptEV with this command:
 
    python -m pip install ansys-conceptev-core
 
-Optional Dependencies
+Optional dependencies
 ^^^^^^^^^^^^^^^^^^^^^
 
 To install the optional dependencies to run the examples script:

@@ -11,7 +11,7 @@ Create a client
 Create a client that can access and talk to the Ansys ConceptEV API. You can use
 the health check endpoint to check your connection.
 The token is cached within a file called `token_cache.bin` you can configure the cache location with
-an argument to the get_http_client function `cache_filepath`.
+an argument to the `get_http_client` function `cache_filepath`.
 
 .. code-block:: python
 
