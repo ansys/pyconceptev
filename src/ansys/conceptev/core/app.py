@@ -242,7 +242,7 @@ def create_new_concept(
     if title is None:
         title = f"CLI concept {datetime.datetime.now()}"
 
-    token = client.headers["Authorization"]
+    token = get_token(client)
     if product_id is None:
         product_id = get_product_id(token)
 
@@ -386,7 +386,7 @@ def read_results(
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]
-    token = client.headers["Authorization"]
+    token = get_token(client)
     user_id = get_user_id(token)
     initial_status = get_status(job_info, token)
     if check_status(initial_status):  # Job already completed
