@@ -5,31 +5,21 @@ User guide
 
 This section explains how to use PyConceptEV.
 
-Get a token using AnsysID
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Get a token by creating a MSAL (Microsoft Authentication Library) app to communicate with the AnsysID system.
-Use this app to create a token.
-The token is cached within a file called `token_cache.bin`.
-
-.. code-block:: python
-
-    from ansys.pyconcceptev.core import auth
-
-    app = auth.create_msal_app()
-    token = auth.get_ansyId_token(app)
-
 Create a client
 ^^^^^^^^^^^^^^^
 
 Create a client that can access and talk to the Ansys ConceptEV API. You can use
 the health check endpoint to check your connection.
+The token is cached within a file called `token_cache.bin` you can configure the cache location with
+an argument to the get_http_client function `cache_filepath`.
 
 .. code-block:: python
 
    import ansys.conceptev.core.main as pyconceptev
 
-   with pyconceptev.get_http_client(token, concept_id) as client:
+   with pyconceptev.get_http_client(
+       concept_id, cache_filepath="token_cache.bin"
+   ) as client:
        health = get(client, "/health")
        print(health)
 

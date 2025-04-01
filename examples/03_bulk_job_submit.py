@@ -85,11 +85,11 @@ def update_architecture(components, combo, base_architecture):
 # Get the component IDs for the new concept.
 # Get the architecture for the new concept.
 
-msal_app = app.auth.create_msal_app()
-token = app.auth.get_ansyId_token(msal_app)
+
 # Use API client for the Ansys ConceptEV service
-with app.get_http_client(token) as client:
+with app.get_http_client() as client:
     client.timeout = 200  # Extend timeout for uploading files.
+    token = client.headers["Authorization"]
     accounts = app.get_account_ids(token)
     account_id = accounts["conceptev_saas@ansys.com"]
     hpc_id = app.get_default_hpc(token, account_id)
@@ -166,7 +166,7 @@ assert (
 # Update the local concept instance with the new architecture id.
 # Create and submit a job using the new concept (with the new architecture).
 
-with app.get_http_client(token) as client:
+with app.get_http_client() as client:
     created_designs = []
     # Submit jobs for each combination
     for combo in combinations:
@@ -227,7 +227,8 @@ all_results.to_excel("created_designs.xlsx")
 #    This will delete the project and all its contents.
 #    Only needed for keep test environment clean.
 
-with app.get_http_client(token) as client:
+with app.get_http_client() as client:
+    token = client.headers["Authorization"]
     for concept in created_designs:
         client.params = client.params.set("design_instance_id", concept["Design Instance Id"])
         app.delete(client, "concepts", id=concept["Concept_ID"])

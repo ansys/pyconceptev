@@ -46,7 +46,7 @@ import time
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ansys.conceptev.core import app, auth
+from ansys.conceptev.core import app
 from ansys.conceptev.core.settings import settings
 
 OCM_URL = settings.ocm_url
@@ -100,17 +100,14 @@ def generate_and_run_templates(client, account_id, hpc_id):
 
 
 # %%
-# Create a token and set up projects.
+# Create a client and set up projects.
 # -----------------------------------
-# This code creates a token.
-# Creates a client with the token
 # Gets the account_id and hpc_id
 # Generates and runs templates
 
-msal_app = auth.create_msal_app()
-token = auth.get_ansyId_token(msal_app)
 
-with app.get_http_client(token) as client:
+with app.get_http_client() as client:
+    token = client.auth.header["Authorization"]
     account_id = app.get_account_id(token)
     hpc_id = app.get_default_hpc(token, account_id)
     design_instance_ids = generate_and_run_templates(client, account_id, hpc_id)
@@ -122,11 +119,12 @@ with app.get_http_client(token) as client:
 # This code gets the project results from the ConceptEV API.
 
 
-def get_project_results(client, design_instance_id, token):
+def get_project_results(client, design_instance_id):
     """Get the project results from ConceptEV API.
 
     Assumes the first results only.
     """
+    token = client.auth.header["Authorization"]
     client.params = {"design_instance_id": design_instance_id}
     concept = app.get(client, "/concepts", id=design_instance_id)
 
@@ -157,13 +155,11 @@ def get_project_results(client, design_instance_id, token):
 
 def get_results(design_instance_ids):
     """Get results from a list of design instance ids."""
-    msal_app = auth.create_msal_app()
-    token = auth.get_ansyId_token(msal_app)
 
-    with app.get_http_client(token) as client:
+    with app.get_http_client() as client:
         client.timeout = 2000
         project_results = [
-            get_project_results(client, design_instance_id, token)
+            get_project_results(client, design_instance_id)
             for design_instance_id in design_instance_ids
         ]
     return project_results
@@ -202,7 +198,7 @@ def get_drive_cycle_result(project_result, name):
 
 if get_results_off_server:
     time.sleep(20)  # Wait for the server to process the results.
-    project_results = get_results(design_instance_ids)  # move to api? or file export mode?
+    project_results = get_results(design_instance_ids)
     with open("project_results.json", "w") as f:
         json.dump(project_results, f)
 else:
