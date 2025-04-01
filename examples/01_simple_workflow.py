@@ -146,7 +146,7 @@ with app.get_http_client() as client:
 
 design_instance_id = concept["design_instance_id"]
 
-with app.get_http_client(design_instance_id) as client:
+with app.get_http_client(design_instance_id=design_instance_id) as client:
 
     # Create configurations
     created_aero = app.post(client, "/configurations", data=AERO_1)
