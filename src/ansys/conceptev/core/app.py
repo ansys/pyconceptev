@@ -460,6 +460,15 @@ def get_job_info(token, job_id):
     return job_info
 
 
+def get_design_of_job(token, job_id):
+    """Get the job info from the OnScale Cloud Manager."""
+    response = httpx.post(
+        url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
+    )
+    response = process_response(response)
+    return response["designInstanceId"]
+
+
 def get_design_title(token, design_instance_id):
     """Get the design Title from the OnScale Cloud Manager."""
     response = httpx.post(
