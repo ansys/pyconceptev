@@ -101,8 +101,8 @@ def generate_and_run_templates(client, account_id, hpc_id):
 
 
 # %%
-# Create a client and set up projects.
-# -----------------------------------
+# Create a client and set up projects
+# ------------------------------------
 # Gets the account_id and hpc_id
 # Generates and runs templates
 
