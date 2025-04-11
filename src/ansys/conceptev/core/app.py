@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 """Simple API client for the Ansys ConceptEV service."""
+from collections import defaultdict
 import datetime
 import json
 from json import JSONDecodeError
@@ -221,9 +222,9 @@ def get_or_create_project(client: httpx.Client, account_id: str, hpc_id: str, ti
     for search_string in options:
         try:
             projects = get_project_ids(search_string, account_id, client.headers["Authorization"])
-            project_id = projects[title]
+            project_id = projects[title][0]
             return project_id
-        except (ProjectError, KeyError) as err:
+        except (ProjectError, KeyError, IndexError) as err:
             stored_errors.append(err)
 
     project = create_new_project(client, account_id, hpc_id, title)
@@ -507,7 +508,10 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     )
     processed_response = process_response(response)
     projects = processed_response["projects"]
-    return {project["projectTitle"]: project["projectId"] for project in projects}
+    project_dict = defaultdict(list)
+    for project in projects:
+        project_dict[project["projectTitle"]].append(project["projectId"])
+    return project_dict
 
 
 def get_token(client: httpx.Client) -> str:
