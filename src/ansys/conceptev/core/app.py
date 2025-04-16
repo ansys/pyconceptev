@@ -514,6 +514,16 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     return project_dict
 
 
+def get_project_id(name: str, account_id: str, token: str) -> str:
+    """Get project ID."""
+    projects = get_project_ids(name, account_id, token)
+    if not projects:
+        raise ProjectError(f"Project with name {name} not found.")
+    if len(projects) > 1:
+        raise ProjectError(f"Multiple projects found with name {name}.")
+    return projects[name][0]
+
+
 def get_token(client: httpx.Client) -> str:
     """Get the token from the client."""
     if client.auth is not None and client.auth.app is not None:

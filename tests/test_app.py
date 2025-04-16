@@ -316,6 +316,8 @@ def test_get_project_id(httpx_mock: HTTPXMock):
     )
     result = app.get_project_ids(name, account_id, token)
     assert result == {name: [project_id]}
+    result = app.get_project_id(name, account_id, token)
+    assert result == project_id
 
 
 def test_read_file(mocker):
