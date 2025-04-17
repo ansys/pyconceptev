@@ -28,6 +28,7 @@ import ssl
 import sys
 
 import certifi
+from msal import PublicClientApplication
 from websockets.asyncio.client import connect
 
 from ansys.conceptev.core.settings import settings
@@ -82,32 +83,40 @@ def get_values(message: str, job_id: str) -> dict:
             return calculated_values
 
 
-async def get_job_messages(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
+async def get_job_messages(
+    job_id: str, user_id: str, token: str, app: PublicClientApplication, timeout=JOB_TIMEOUT
+):
     """Get job messages and error on timeout."""
     try:
         async with async_timeout.timeout(timeout):
-            websocket_client = connect_to_ocm(user_id, token)
-            async with websocket_client as websocket:
-                print("Connected to OCM Websockets.")
-                async for message in websocket:
-                    yield message
+            while True:
+                websocket_client = connect_to_ocm(user_id, token)
+                async with websocket_client as websocket:
+                    print("Connected to OCM Websockets.")
+                    async for message in websocket:
+                        yield message
+                token = get_ansyId_token(app)
     except TimeoutError as err:
         raise Exception(
             f"Timeout Error: Job ({job_id}) is taking too long to complete (>{timeout} seconds)."
         ) from err
 
 
-async def monitor_job_messages(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
+async def monitor_job_messages(
+    job_id: str, user_id: str, token: str, app: PublicClientApplication, timeout=JOB_TIMEOUT
+):
     """Monitor job messages and return the status when complete."""
-    async for message in get_job_messages(job_id, user_id, token, timeout):
+    async for message in get_job_messages(job_id, user_id, token, app, timeout):
         status = get_status(message, job_id)
         if check_status(status):
             return status
 
 
-async def get_calculated_values(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
+async def get_calculated_values(
+    job_id: str, user_id: str, token: str, app: PublicClientApplication, timeout=JOB_TIMEOUT
+):
     """Get Calculated Values."""
-    async for message in get_job_messages(job_id, user_id, token, timeout):
+    async for message in get_job_messages(job_id, user_id, token, app, timeout):
         values = get_values(message, job_id)
         if values is not None:
             return values
@@ -123,9 +132,11 @@ def check_status(status: str):
         return False
 
 
-def monitor_job_progress(job_id: str, user_id: str, token: str, timeout=JOB_TIMEOUT):
+def monitor_job_progress(
+    job_id: str, user_id: str, token: str, app: PublicClientApplication, timeout=JOB_TIMEOUT
+):
     """Monitor job progress and return the status when complete."""
-    result = asyncio.run(monitor_job_messages(job_id, user_id, token, timeout))
+    result = asyncio.run(monitor_job_messages(job_id, user_id, token, app, timeout))
     return result
 
 
@@ -138,4 +149,4 @@ if __name__ == "__main__":
     msal_app = create_msal_app()
     token = get_ansyId_token(msal_app)
     user_id = get_user_id(token)
-    monitor_job_progress(job_id, user_id, token, timeout=1)
+    monitor_job_progress(job_id, user_id, token, msal_app, timeout=1)

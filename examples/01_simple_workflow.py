@@ -39,7 +39,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-from ansys.conceptev.core import app, auth
+from ansys.conceptev.core import app
 
 # %%
 # Define example data
@@ -99,14 +99,6 @@ BATTERY = {
 motor_data = {"name": "e9", "component_type": "MotorLabID", "inverter_losses_included": False}
 
 # %%
-# Get a token from Ansys ID
-# -------------------------
-# Get a token from Ansys ID to authenticate with the Ansys ConceptEV service.
-
-msal_app = auth.create_msal_app()
-token = auth.get_ansyId_token(msal_app)
-
-# %%
 # Use API client for the Ansys ConceptEV service
 # ----------------------------------------------
 # Use the API client to perform basic operations on the Ansys ConceptEV service.
@@ -117,10 +109,10 @@ token = auth.get_ansyId_token(msal_app)
 # - Create a new concept within that project.
 
 
-with app.get_http_client(token) as client:
+with app.get_http_client() as client:
     health = app.get(client, "/health")
     print(f"API is healthy: {health}\n")
-
+    token = app.get_token(client)
     account_id = app.get_account_id(token)
 
     hpc_id = app.get_default_hpc(token, account_id)
@@ -154,7 +146,7 @@ with app.get_http_client(token) as client:
 
 design_instance_id = concept["design_instance_id"]
 
-with app.get_http_client(token, design_instance_id) as client:
+with app.get_http_client(design_instance_id=design_instance_id) as client:
 
     # Create configurations
     created_aero = app.post(client, "/configurations", data=AERO_1)
@@ -272,7 +264,7 @@ with app.get_http_client(token, design_instance_id) as client:
 #    This will delete the project and all its contents.
 #    Only needed for keep test environment clean.
 
-with app.get_http_client(token) as client:
+with app.get_http_client() as client:
 
     client.params = client.params.set("design_instance_id", concept["design_instance_id"])
     app.delete(client, "concepts", id=concept["id"])

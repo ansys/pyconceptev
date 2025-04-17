@@ -24,6 +24,7 @@
 
 import logging
 
+import httpx
 from msal import PublicClientApplication
 from msal_extensions import FilePersistence, build_encrypted_persistence, token_cache
 
@@ -56,11 +57,11 @@ def build_persistence(location, fallback_to_plaintext=True):
     return FilePersistence(location)
 
 
-def get_ansyId_token(app) -> str:
+def get_ansyId_token(app, force=False) -> str:
     """Get token from AnsysID."""
     result = None
     accounts = app.get_accounts()
-    if accounts:
+    if accounts and not force:
         # Assuming the end user chose this one
         chosen = accounts[0]
         # Now let's try to find a token in cache for this account
@@ -81,3 +82,21 @@ def get_ansyId_token(app) -> str:
     error_description = result.get("error_description")
     correlation_id = result.get("error_description")
     raise Exception(f"Failed to get token {error}, {error_description}, {correlation_id}.")
+
+
+class AnsysIDAuth(httpx.Auth):
+    """Custom Auth implementation for httpx.
+
+    This class is used to authenticate requests to AnsysID using MSAL.
+    """
+
+    def __init__(self, cache_filepath="token_cache.bin"):
+        """Initialize the AnsysIDAuth class."""
+        app = create_msal_app(cache_filepath=cache_filepath)
+        self.app = app
+
+    def auth_flow(self, request):
+        """Send the request, with a custom `Authentication` header."""
+        token = get_ansyId_token(self.app)
+        request.headers["Authorization"] = token
+        yield request
