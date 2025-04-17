@@ -9,6 +9,35 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.9.3 <https://github.com/ansys/pyconceptev/releases/tag/v0.9.3>`_ - April 17, 2025
+====================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Added
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Feature/better client connection
+          - `#213 <https://github.com/ansys/pyconceptev/pull/213>`_
+
+        * - update actions to v9 and change python release values
+          - `#218 <https://github.com/ansys/pyconceptev/pull/218>`_
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - chore: update CHANGELOG for v0.9.2
+          - `#210 <https://github.com/ansys/pyconceptev/pull/210>`_
+
+
 `0.9.2 <https://github.com/ansys/pyconceptev/releases/tag/v0.9.2>`_ - March 24, 2025
 ====================================================================================
 
