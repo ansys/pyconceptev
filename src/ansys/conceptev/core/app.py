@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 """Simple API client for the Ansys ConceptEV service."""
+from collections import defaultdict
 import datetime
 import json
 from json import JSONDecodeError
@@ -28,6 +29,7 @@ import re
 from typing import Literal
 
 import httpx
+from tenacity import retry, retry_if_result, stop_after_delay, wait_random_exponential
 
 from ansys.conceptev.core import auth
 from ansys.conceptev.core.exceptions import (
@@ -39,6 +41,7 @@ from ansys.conceptev.core.exceptions import (
     ProjectError,
     ResponseError,
     ResultsError,
+    TokenError,
     UserDetailsError,
 )
 from ansys.conceptev.core.progress import check_status, monitor_job_progress
@@ -82,16 +85,34 @@ ACCOUNT_NAME = settings.account_name
 app = auth.create_msal_app()
 
 
-def get_http_client(token: str, design_instance_id: str | None = None) -> httpx.Client:
+def is_gaetway_error(response) -> bool:
+    """Check if the response is a gateway error."""
+    if isinstance(response, httpx.Response):
+        return response.status_code in (502, 504)
+    return False
+
+
+def get_http_client(
+    token: str | None = None,
+    design_instance_id: str | None = None,
+    cache_filepath: str = "token_cache.bin",
+) -> httpx.Client:
     """Get an HTTP client.
 
     The HTTP client creates and maintains the connection, which is more performant than
     re-creating this connection for each call.
     """
-    params = None
-    if design_instance_id:
-        params = {"design_instance_id": design_instance_id}
-    return httpx.Client(headers={"Authorization": token}, params=params, base_url=BASE_URL)
+    httpx_auth = auth.AnsysIDAuth(cache_filepath=cache_filepath) if token is None else None
+    params = {"design_instance_id": design_instance_id} if design_instance_id else None
+    header = {"Authorization": token} if token else None
+
+    client = httpx.Client(headers=header, auth=httpx_auth, params=params, base_url=BASE_URL)
+    client.send = retry(
+        retry=retry_if_result(is_gaetway_error),
+        wait=wait_random_exponential(multiplier=1, max=60),
+        stop=stop_after_delay(10),
+    )(client.send)
+    return client
 
 
 def process_response(response) -> dict:
@@ -178,7 +199,7 @@ def create_new_project(
     project_goal: str = "Created from the CLI",
 ) -> dict:
     """Create a project."""
-    token = client.headers["Authorization"]
+    token = get_token(client)
     project_data = {
         "accountId": account_id,
         "hpcId": hpc_id,
@@ -201,9 +222,9 @@ def get_or_create_project(client: httpx.Client, account_id: str, hpc_id: str, ti
     for search_string in options:
         try:
             projects = get_project_ids(search_string, account_id, client.headers["Authorization"])
-            project_id = projects[title]
+            project_id = projects[title][0]
             return project_id
-        except (ProjectError, KeyError) as err:
+        except (ProjectError, KeyError, IndexError) as err:
             stored_errors.append(err)
 
     project = create_new_project(client, account_id, hpc_id, title)
@@ -222,7 +243,7 @@ def create_new_concept(
     if title is None:
         title = f"CLI concept {datetime.datetime.now()}"
 
-    token = client.headers["Authorization"]
+    token = get_token(client)
     if product_id is None:
         product_id = get_product_id(token)
 
@@ -366,15 +387,16 @@ def read_results(
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]
-    token = client.headers["Authorization"]
+    token = get_token(client)
     user_id = get_user_id(token)
     initial_status = get_status(job_info, token)
     if check_status(initial_status):  # Job already completed
         return get_results(client, job_info, calculate_units, filtered)
     else:  # Job is still running
-        monitor_job_progress(job_id, user_id, token, timeout)  # Wait for completion
         if msal_app is None:
             msal_app = auth.create_msal_app()
+        monitor_job_progress(job_id, user_id, token, msal_app, timeout)  # Wait for completion
+
         token = auth.get_ansyId_token(msal_app)
         client.headers["Authorization"] = token  # Update the token
         return get_results(client, job_info, calculate_units, filtered)
@@ -439,6 +461,15 @@ def get_job_info(token, job_id):
     return job_info
 
 
+def get_design_of_job(token, job_id):
+    """Get the job info from the OnScale Cloud Manager."""
+    response = httpx.post(
+        url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
+    )
+    response = process_response(response)
+    return response["designInstanceId"]
+
+
 def get_design_title(token, design_instance_id):
     """Get the design Title from the OnScale Cloud Manager."""
     response = httpx.post(
@@ -477,7 +508,29 @@ def get_project_ids(name: str, account_id: str, token: str) -> dict:
     )
     processed_response = process_response(response)
     projects = processed_response["projects"]
-    return {project["projectTitle"]: project["projectId"] for project in projects}
+    project_dict = defaultdict(list)
+    for project in projects:
+        project_dict[project["projectTitle"]].append(project["projectId"])
+    return project_dict
+
+
+def get_project_id(name: str, account_id: str, token: str) -> str:
+    """Get project ID."""
+    projects = get_project_ids(name, account_id, token)
+    if not projects:
+        raise ProjectError(f"Project with name {name} not found.")
+    if len(projects) > 1:
+        raise ProjectError(f"Multiple projects found with name {name}.")
+    return projects[name][0]
+
+
+def get_token(client: httpx.Client) -> str:
+    """Get the token from the client."""
+    if client.auth is not None and client.auth.app is not None:
+        return auth.get_ansyId_token(client.auth.app)
+    elif client.headers is not None and "Authorization" in client.headers:
+        return client.headers["Authorization"]
+    raise TokenError("App not found in client.")
 
 
 def delete_project(project_id, token):

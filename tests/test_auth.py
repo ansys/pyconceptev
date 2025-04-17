@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import httpx
 from msal_extensions import (
     FilePersistence,
     FilePersistenceWithDataProtection,
@@ -27,6 +27,7 @@ from msal_extensions import (
     LibsecretPersistence,
 )
 import pytest
+from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
 from ansys.conceptev.core import auth
@@ -105,3 +106,20 @@ def test_create_msal_app_password(mockPublcClientCreation, mocker) -> None:
     assert isinstance(app, MockApp)
     token = auth.get_ansyId_token(app)
     assert token == "mock_token_password"
+
+
+def test_auth_initialization_creates_msal_app(mocker):
+    mock_create_msal_app = mocker.patch("ansys.conceptev.core.auth.create_msal_app")
+    auth_instance = auth.AnsysIDAuth()
+    assert auth_instance.app == mock_create_msal_app.return_value
+
+
+def test_auth_flow_adds_authorization_header(mocker, httpx_mock: HTTPXMock):
+    mock_get_ansyId_token = mocker.patch(
+        "ansys.conceptev.core.auth.get_ansyId_token", return_value="auth_class_token"
+    )
+    auth_instance = auth.AnsysIDAuth()
+    httpx_mock.add_response(url=f"http://example.com")
+    client = httpx.Client(auth=auth_instance)
+    response = client.get("http://example.com")
+    assert response.request.headers["Authorization"] == "auth_class_token"

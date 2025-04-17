@@ -23,6 +23,7 @@
 import json
 from unittest.mock import AsyncMock, patch
 
+from msal import PublicClientApplication
 import pytest
 
 from ansys.conceptev.core.progress import (
@@ -95,13 +96,14 @@ async def test_monitor_job_messages():
     job_id = "test_job"
     user_id = "test_user"
     token = "test_token"
+    app = PublicClientApplication("123")
     status_message = json.dumps(
         {"jobId": job_id, "messagetype": "status", "status": STATUS_COMPLETE}
     )
 
     with patch("ansys.conceptev.core.progress.connect_to_ocm") as mock_connect:
         mock_connect.return_value = AsyncContextManager([status_message])
-        result = await monitor_job_messages(job_id, user_id, token)
+        result = await monitor_job_messages(job_id, user_id, token, app)
         assert result == STATUS_COMPLETE
 
 
@@ -117,11 +119,11 @@ def test_monitor_job_progress():
     job_id = "test_job"
     user_id = "test_user"
     token = "test_token"
-
+    app = PublicClientApplication("123")
     with patch(
         "ansys.conceptev.core.progress.monitor_job_messages", new_callable=AsyncMock
     ) as mock_monitor:
         mock_monitor.return_value = STATUS_COMPLETE
-        result = monitor_job_progress(job_id, user_id, token)
-        mock_monitor.assert_called_with(job_id, user_id, token, 3600)
+        result = monitor_job_progress(job_id, user_id, token, app)
+        mock_monitor.assert_called_with(job_id, user_id, token, app, 3600)
         assert result == STATUS_COMPLETE
