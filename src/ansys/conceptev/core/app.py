@@ -28,6 +28,7 @@ import httpx
 from tenacity import retry, retry_if_result, stop_after_delay, wait_random_exponential
 
 from ansys.conceptev.core import auth
+from ansys.conceptev.core.auth import get_token
 from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError, ResultsError
 from ansys.conceptev.core.ocm import (
     create_design_instance,
@@ -68,6 +69,7 @@ __all__ = [
     get_project_ids,
     get_project_id,
     delete_project,
+    get_token,
 ]
 
 Router = Literal[
