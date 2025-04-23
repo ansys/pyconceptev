@@ -28,12 +28,7 @@ import httpx
 from tenacity import retry, retry_if_result, stop_after_delay, wait_random_exponential
 
 from ansys.conceptev.core import auth
-from ansys.conceptev.core.exceptions import (
-    DeleteError,
-    ProductAccessError,
-    ResultsError,
-    TokenError,
-)
+from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError, ResultsError
 from ansys.conceptev.core.ocm import (
     create_design_instance,
     create_new_project,
@@ -209,7 +204,7 @@ def create_new_concept(
     if title is None:
         title = f"CLI concept {datetime.datetime.now()}"
 
-    token = get_token(client)
+    token = auth.get_token(client)
     if product_id is None:
         product_id = get_product_id(token)
 
@@ -264,7 +259,7 @@ def read_results(
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]
-    token = get_token(client)
+    token = auth.get_token(client)
     user_id = get_user_id(token)
     initial_status = get_status(job_info, token)
     if check_status(initial_status):  # Job already completed
@@ -277,15 +272,6 @@ def read_results(
         token = auth.get_ansyId_token(msal_app)
         client.headers["Authorization"] = token  # Update the token
         return get_results(client, job_info, calculate_units, filtered)
-
-
-def get_token(client: httpx.Client) -> str:
-    """Get the token from the client."""
-    if client.auth is not None and client.auth.app is not None:
-        return auth.get_ansyId_token(client.auth.app)
-    elif client.headers is not None and "Authorization" in client.headers:
-        return client.headers["Authorization"]
-    raise TokenError("App not found in client.")
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:

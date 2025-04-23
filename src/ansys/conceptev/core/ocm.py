@@ -29,6 +29,7 @@ import re
 
 import httpx
 
+import ansys.conceptev.core.auth as auth
 from ansys.conceptev.core.exceptions import (
     AccountsError,
     DesignError,
@@ -104,7 +105,7 @@ def create_new_project(
     project_goal: str = "Created from the CLI",
 ) -> dict:
     """Create a project."""
-    token = client.headers["Authorization"]
+    token = auth.get_token(client)
     project_data = {
         "accountId": account_id,
         "hpcId": hpc_id,
