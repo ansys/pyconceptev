@@ -38,7 +38,7 @@ if sys.version_info >= (3, 11):
 else:
     import async_timeout
 
-STATUS_COMPLETE = "complete"
+STATUS_COMPLETE = "COMPLETED"
 STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "failed"
 OCM_SOCKET_URL = settings.ocm_socket_url

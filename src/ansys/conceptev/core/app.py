@@ -451,7 +451,9 @@ def get_job_info(token, job_id):
     response = httpx.post(
         url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
     )
+    print(f"1 Response: {response.json()}")
     response = process_response(response)
+    print(f"2 Processed Response: {response}")
     job_info = {
         "job_id": job_id,
         "simulation_id": response["simulations"][0]["simulationId"],
@@ -495,7 +497,12 @@ def get_status(job_info: dict, token: str) -> str:
         headers={"Authorization": token},
     )
     processed_response = process_response(response)
-    initial_status = processed_response["jobStatus"][-1]["jobStatus"]
+    if "finalStatus" in processed_response:
+        initial_status = processed_response["finalStatus"].upper()
+    elif "lastStatus" in processed_response:
+        initial_status = processed_response["lastStatus"].upper()
+    else:
+        raise ResponseError(f"Failed to get job status {processed_response}.")
     return initial_status
 
 

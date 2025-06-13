@@ -352,7 +352,9 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         url=ocm_url + "/user/details", method="post", json={"userId": "user_123"}
     )
     httpx_mock.add_response(
-        url=ocm_url + "/job/load", method="post", json={"jobStatus": [{"jobStatus": "complete"}]}
+        url=ocm_url + "/job/load",
+        method="post",
+        json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
     )
     results = app.read_results(client, example_job_info)
     assert example_results == results
@@ -451,3 +453,46 @@ def test_get_job_file(httpx_mock: HTTPXMock):
     )
     results = app.get_job_file(token, job_id, file_name)
     assert results == {"json": "1"}
+
+
+def test_returns_final_status_when_present(mocker):
+    job_info = {"job_id": "123"}
+    token = "token"
+    mock_response = mocker.Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"finalStatus": "COMPLETED"}
+    mocker.patch("httpx.post", return_value=mock_response)
+    mocker.patch(
+        "ansys.conceptev.core.app.process_response", return_value={"finalStatus": "COMPLETED"}
+    )
+    result = app.get_status(job_info, token)
+    assert result == "COMPLETED"
+
+
+def test_returns_last_status_when_final_status_missing(mocker):
+    job_info = {"job_id": "123"}
+    token = "token"
+    mock_response = mocker.Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"lastStatus": "RUNNING"}
+    mocker.patch("httpx.post", return_value=mock_response)
+    mocker.patch(
+        "ansys.conceptev.core.app.process_response", return_value={"lastStatus": "RUNNING"}
+    )
+    result = app.get_status(job_info, token)
+    assert result == "RUNNING"
+
+
+def test_raises_error_when_no_status_fields(mocker):
+    job_info = {"job_id": "123"}
+    token = "token"
+    mock_response = mocker.Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"unexpected": "value"}
+    mocker.patch("httpx.post", return_value=mock_response)
+    mocker.patch("ansys.conceptev.core.app.process_response", return_value={"unexpected": "value"})
+    import pytest
+
+    with pytest.raises(app.ResponseError) as exc:
+        app.get_status(job_info, token)
+    assert "Failed to get job status" in str(exc.value)
