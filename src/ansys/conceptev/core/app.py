@@ -451,9 +451,7 @@ def get_job_info(token, job_id):
     response = httpx.post(
         url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
     )
-    print(f"1 Response: {response.json()}")
     response = process_response(response)
-    print(f"2 Processed Response: {response}")
     job_info = {
         "job_id": job_id,
         "simulation_id": response["simulations"][0]["simulationId"],

@@ -40,7 +40,7 @@ else:
 
 STATUS_COMPLETE = "COMPLETED"
 STATUS_FINISHED = "FINISHED"
-STATUS_ERROR = "failed"
+STATUS_ERROR = "FAILED"
 OCM_SOCKET_URL = settings.ocm_socket_url
 JOB_TIMEOUT = settings.job_timeout
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
@@ -62,7 +62,7 @@ def get_status(message: str, job_id: str):
         if message_type == "status":
             status = message_data.get("status", None)
             print(f"Status:{status}")
-            return status
+            return status.upper()
         elif message_type == "progress":
             progress = message_data.get("progress", None)
             print(f"Progress:{progress}")

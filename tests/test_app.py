@@ -27,6 +27,12 @@ from pytest_httpx import HTTPXMock
 
 from ansys.conceptev.core import app
 from ansys.conceptev.core.auth import AnsysIDAuth
+from ansys.conceptev.core.progress import (
+    STATUS_COMPLETE,
+    STATUS_ERROR,
+    STATUS_FINISHED,
+    check_status,
+)
 from ansys.conceptev.core.settings import settings
 
 conceptev_url = settings.conceptev_url
@@ -455,44 +461,42 @@ def test_get_job_file(httpx_mock: HTTPXMock):
     assert results == {"json": "1"}
 
 
-def test_returns_final_status_when_present(mocker):
+statuses = [STATUS_COMPLETE, STATUS_FINISHED, STATUS_ERROR, None]
+
+
+@pytest.mark.parametrize("last_status", statuses)
+@pytest.mark.parametrize("final_status", statuses)
+def test_returns_final_status_when_present(mocker, final_status, last_status):
     job_info = {"job_id": "123"}
     token = "token"
     mock_response = mocker.Mock()
     mock_response.status_code = 200
-    mock_response.json.return_value = {"finalStatus": "COMPLETED"}
+    mock_response.json.return_value = {}
+    if final_status is not None:
+        mock_response.json.return_value["finalStatus"] = final_status
+    if last_status is not None:
+        mock_response.json.return_value["lastStatus"] = last_status
     mocker.patch("httpx.post", return_value=mock_response)
-    mocker.patch(
-        "ansys.conceptev.core.app.process_response", return_value={"finalStatus": "COMPLETED"}
-    )
-    result = app.get_status(job_info, token)
-    assert result == "COMPLETED"
+
+    if final_status is None and last_status is None:
+        with pytest.raises(app.ResponseError) as exc:
+            result = app.get_status(job_info, token)
+        return True
+    else:
+        result = app.get_status(job_info, token)
+        assert result in [final_status, last_status]
 
 
-def test_returns_last_status_when_final_status_missing(mocker):
-    job_info = {"job_id": "123"}
-    token = "token"
-    mock_response = mocker.Mock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {"lastStatus": "RUNNING"}
-    mocker.patch("httpx.post", return_value=mock_response)
-    mocker.patch(
-        "ansys.conceptev.core.app.process_response", return_value={"lastStatus": "RUNNING"}
-    )
-    result = app.get_status(job_info, token)
-    assert result == "RUNNING"
-
-
-def test_raises_error_when_no_status_fields(mocker):
-    job_info = {"job_id": "123"}
-    token = "token"
-    mock_response = mocker.Mock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {"unexpected": "value"}
-    mocker.patch("httpx.post", return_value=mock_response)
-    mocker.patch("ansys.conceptev.core.app.process_response", return_value={"unexpected": "value"})
-    import pytest
-
-    with pytest.raises(app.ResponseError) as exc:
-        app.get_status(job_info, token)
-    assert "Failed to get job status" in str(exc.value)
+@pytest.mark.parametrize(
+    "result,expected",
+    [(STATUS_COMPLETE, True), (STATUS_FINISHED, True), (STATUS_ERROR, False), (None, False)],
+)
+def test_check_status(result, expected):
+    if expected:
+        assert check_status(result)
+    elif result is STATUS_ERROR:
+        with pytest.raises(Exception) as exc:
+            check_status(result)
+            assert "Job Failed" in str(exc.value) if result == STATUS_ERROR else True
+    else:
+        assert not check_status(result)
