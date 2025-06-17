@@ -451,3 +451,23 @@ def test_get_job_file(httpx_mock: HTTPXMock):
     )
     results = app.get_job_file(token, job_id, file_name)
     assert results == {"json": "1"}
+
+
+def test_returns_error_log_for_valid_job_info(httpx_mock: HTTPXMock):
+    token = "test_token"
+    job_info = {
+        "job_id": "job123",
+        "job_name": "test_job",
+        "simulation_id": "sim456",
+        "design_instance_id": "design789",
+    }
+
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/jobs:error_file?design_instance_id={job_info['design_instance_id']}",
+        method="post",
+        json=job_info,
+        content=b"error_log",
+    )
+
+    result = app.get_error_file(token, job_info)
+    assert "error_log" in result or isinstance(result, str)

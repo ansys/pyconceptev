@@ -624,3 +624,16 @@ def get_component_id_map(client, design_instance_id):
     components = process_response(components)
     components.append({"name": "N/A", "id": None})
     return {component["name"]: component["id"] for component in components}
+
+
+def get_error_file(token: str, job_info: dict) -> str:
+    """Retrieve the error log from ConceptEV."""
+    data = {
+        "docker_tag": "default",
+        "job_id": job_info["job_id"],
+        "job_name": job_info["job_name"],
+        "simulation_id": job_info["simulation_id"],
+    }
+    with get_http_client(token, job_info["design_instance_id"]) as client:
+        log = str(post(client, "/jobs:error_file", data=data))
+    return log
