@@ -90,6 +90,7 @@ jobs:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
+          whitelist-license-check: "zipp,typing-inspection"
 
   smoke-tests-workaround:
     name: Build and Smoke tests
