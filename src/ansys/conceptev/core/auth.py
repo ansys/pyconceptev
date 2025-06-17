@@ -78,6 +78,8 @@ def get_ansyId_token(app, force=False) -> str:
 
     if "access_token" in result:
         return result["access_token"]
+    if "id_token" in result:
+        return result["id_token"]
     error = result.get("error")
     error_description = result.get("error_description")
     correlation_id = result.get("error_description")
