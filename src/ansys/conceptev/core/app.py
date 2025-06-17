@@ -49,7 +49,7 @@ from ansys.conceptev.core.ocm import (
     get_user_id,
 )
 from ansys.conceptev.core.progress import check_status, monitor_job_progress
-from ansys.conceptev.core.response import is_gateway_error, process_response
+from ansys.conceptev.core.responses import is_gateway_error, process_response
 from ansys.conceptev.core.settings import settings
 
 __all__ = [
