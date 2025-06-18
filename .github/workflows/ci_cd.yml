@@ -90,6 +90,7 @@ jobs:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
+          whitelist-license-check: "zipp,typing-inspection"
 
   smoke-tests-workaround:
     name: Build and Smoke tests
@@ -101,13 +102,13 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         python-version: [ "3.9" ]
     steps:
-      - name: Build wheelhouse and perform smoke test
+      - name: Build wheelhouse and perform smoke test v3.9
         uses: ansys/actions/build-wheelhouse@v8
         with:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
-          whitelist-license-check: "pillow,urllib3"
+          whitelist-license-check: "zipp,typing-inspection,urllib3"
 
   tests:
     name: Tests and coverage
