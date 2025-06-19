@@ -252,7 +252,12 @@ def get_status(job_info: dict, token: str) -> str:
         headers={"Authorization": token},
     )
     processed_response = process_response(response)
-    initial_status = processed_response["jobStatus"][-1]["jobStatus"]
+    if "finalStatus" in processed_response:
+        initial_status = processed_response["finalStatus"].upper()
+    elif "lastStatus" in processed_response:
+        initial_status = processed_response["lastStatus"].upper()
+    else:
+        raise ResponseError(f"Failed to get job status {processed_response}.")
     return initial_status
 
 
