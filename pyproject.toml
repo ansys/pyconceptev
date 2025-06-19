@@ -43,7 +43,7 @@ websockets = ">=13.0.1"
 async-timeout = { version = ">=4", python = "<3.11" }
 pydantic-settings = "^2.7.1"
 email-validator = "^2.2.0"
-tenacity = "^8.2.3"
+tenacity = ">=8.2.3,<10.0.0"
 [tool.poetry.group.dev.dependencies] # Common packages for test and examples
 plotly = "^5.18.0"
 tox = "^4.15.1"
