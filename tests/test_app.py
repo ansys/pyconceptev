@@ -461,6 +461,48 @@ def test_get_job_file(httpx_mock: HTTPXMock):
     assert results == {"json": "1"}
 
 
+def test_get_concept(httpx_mock: HTTPXMock, client: httpx.Client):
+    design_instance_id = "123"
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/concepts/{design_instance_id}"
+        f"?design_instance_id={design_instance_id}&populated=false",
+        method="get",
+        json={"name": "concept"},
+    )
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/concepts/{design_instance_id}/configurations"
+        f"?design_instance_id={design_instance_id}",
+        method="get",
+        json=[{"name": "configurations"}],
+    )
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/concepts/{design_instance_id}/components"
+        f"?design_instance_id={design_instance_id}",
+        method="get",
+        json=[{"name": "components"}],
+    )
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/concepts/{design_instance_id}/requirements"
+        f"?design_instance_id={design_instance_id}",
+        method="get",
+        json=[{"name": "reequirements"}],
+    )
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/concepts/{design_instance_id}/architecture"
+        f"?design_instance_id={design_instance_id}",
+        method="get",
+        json={"name": "architecture"},
+    )
+    response = app.get_concept(client, design_instance_id)
+    assert response == {
+        "name": "concept",
+        "configurations": [{"name": "configurations"}],
+        "components": [{"name": "components"}],
+        "requirements": [{"name": "reequirements"}],
+        "architecture": {"name": "architecture"},
+    }
+
+
 statuses = [STATUS_COMPLETE, STATUS_FINISHED, STATUS_ERROR, None]
 
 
