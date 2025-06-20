@@ -103,7 +103,7 @@ jobs:
         python-version: [ "3.9" ]
     steps:
       - name: Build wheelhouse and perform smoke test v3.9
-        uses: ansys/actions/build-wheelhouse@v10
+        uses: ansys/actions/build-wheelhouse@v8
         with:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
