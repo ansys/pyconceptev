@@ -29,7 +29,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: ansys/actions/doc-deploy-changelog@v9
+      - uses: ansys/actions/doc-deploy-changelog@v10
         with:
           token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
           bot-user: ${{ secrets.PYANSYS_CI_BOT_USERNAME }}
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: PyAnsys code style checks
-        uses: ansys/actions/code-style@v9
+        uses: ansys/actions/code-style@v10
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: PyAnsys documentation style checks
-        uses: ansys/actions/doc-style@v9
+        uses: ansys/actions/doc-style@v10
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -85,7 +85,7 @@ jobs:
         python-version: [ "3.10", "3.11", "3.12", "3.13"]
     steps:
       - name: Build wheelhouse and perform smoke test
-        uses: ansys/actions/build-wheelhouse@v9
+        uses: ansys/actions/build-wheelhouse@v10
         with:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
@@ -120,7 +120,7 @@ jobs:
        python-version: ["3.9","3.10","3.11", "3.12", "3.13"]
       fail-fast: false
     steps:
-      - uses: ansys/actions/tests-pytest@v9
+      - uses: ansys/actions/tests-pytest@v10
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
@@ -147,7 +147,7 @@ jobs:
     runs-on: ubuntu-latest
     needs : [tests]
     steps:
-      - uses: ansys/actions/tests-pytest@v9
+      - uses: ansys/actions/tests-pytest@v10
         env:
           PYCONCEPTEV_SETTINGS: "tests/config.toml"
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
@@ -171,7 +171,7 @@ jobs:
         run: pandoc --version
 
       - name: Build documentation
-        uses: ansys/actions/doc-build@v9
+        uses: ansys/actions/doc-build@v10
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           check-links: false
@@ -183,7 +183,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build library source and wheel artifacts
-        uses: ansys/actions/build-library@v9
+        uses: ansys/actions/build-library@v10
         with:
           library-name: ${{ env.PACKAGE_NAME }}
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
@@ -195,7 +195,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy the latest documentation
-        uses: ansys/actions/doc-deploy-dev@v9
+        uses: ansys/actions/doc-deploy-dev@v10
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -209,7 +209,7 @@ jobs:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     steps:
       - name: Deploy the stable documentation
-        uses: ansys/actions/doc-deploy-stable@v9
+        uses: ansys/actions/doc-deploy-stable@v10
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -242,6 +242,6 @@ jobs:
           skip-existing: false
 
       - name: Release to GitHub
-        uses: ansys/actions/release-github@v9
+        uses: ansys/actions/release-github@v10
         with:
           library-name: ${{ env.PACKAGE_NAME }}
