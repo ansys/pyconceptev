@@ -9,6 +9,48 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.9.4 <https://github.com/ansys/pyconceptev/releases/tag/v0.9.4>`_ - May 06, 2025
+==================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Fixed
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - matplotlib as an optional
+          - `#228 <https://github.com/ansys/pyconceptev/pull/228>`_
+
+
+  .. tab-item:: Dependencies
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE: Bump jupyterlab from 4.3.5 to 4.3.6
+          - `#205 <https://github.com/ansys/pyconceptev/pull/205>`_
+
+        * - CHORE: Bump pytest-cov from 5.0.0 to 6.1.1
+          - `#216 <https://github.com/ansys/pyconceptev/pull/216>`_
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - docs: Update ``CONTRIBUTORS.md`` with the latest contributors
+          - `#215 <https://github.com/ansys/pyconceptev/pull/215>`_
+
+        * - chore: update CHANGELOG for v0.9.3
+          - `#219 <https://github.com/ansys/pyconceptev/pull/219>`_
+
+
 `0.9.3 <https://github.com/ansys/pyconceptev/releases/tag/v0.9.3>`_ - April 17, 2025
 ====================================================================================
 
