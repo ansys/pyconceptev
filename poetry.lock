@@ -45,14 +45,14 @@ files = [
 
 [[package]]
 name = "ansys-optislang-core"
-version = "0.10.0"
+version = "1.0.0"
 description = "A Python wrapper for Ansys optiSLang application."
 optional = false
 python-versions = "<4,>=3.9"
 groups = ["tests"]
 files = [
-    {file = "ansys_optislang_core-0.10.0-py3-none-any.whl", hash = "sha256:0d468d2e6745c225a5a92b8dcac17d46162973661a902eb35ac776882c263b3d"},
-    {file = "ansys_optislang_core-0.10.0.tar.gz", hash = "sha256:55059784074ab87569277854012f50944a2eb200a4917c9f2317c74ec0bcb0ef"},
+    {file = "ansys_optislang_core-1.0.0-py3-none-any.whl", hash = "sha256:6db4e806a1f203c70247c35a0787621a2fd0ff9078c4724ffd4aa0b3626de38f"},
+    {file = "ansys_optislang_core-1.0.0.tar.gz", hash = "sha256:d6f5d7a503fab4ca53bcac0e1fc4abe541b397a5ff5506e9eed662d320ab6a58"},
 ]
 
 [package.dependencies]
@@ -62,7 +62,7 @@ psutil = ">=5.9"
 [package.extras]
 build = ["build (>=0.8.0)", "twine (>=4.0.1)"]
 doc = ["Sphinx (==8.2.3)", "ansys-sphinx-theme (==1.3.2)", "matplotlib (==3.10.1)", "numpydoc (==1.8.0)", "pypandoc (==1.15)", "sphinx-copybutton (==0.5.2)", "sphinx-gallery (==0.19.0)", "sphinxcontrib-images (==0.9.4)"]
-tests = ["matplotlib (>=3.5.3)", "pytest (==8.3.5)", "pytest-cov (==6.0.0)"]
+tests = ["matplotlib (>=3.5.3)", "pytest (==8.3.5)", "pytest-cov (==6.1.1)"]
 
 [[package]]
 name = "ansys-sphinx-theme"
@@ -5282,4 +5282,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4.0"
-content-hash = "7506ee7335b703e768c822d0cc7d14179caee64cc1dea6bcdd723a076fb3ac3e"
+content-hash = "c019e170f77e148a78ed9521daaf4563e1ad4f7a40de9af647e5b05b7c7f2bfd"
