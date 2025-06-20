@@ -28,6 +28,7 @@ import httpx
 from msal import PublicClientApplication
 from msal_extensions import FilePersistence, build_encrypted_persistence, token_cache
 
+from ansys.conceptev.core.exceptions import TokenError
 from ansys.conceptev.core.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -102,3 +103,12 @@ class AnsysIDAuth(httpx.Auth):
         token = get_ansyId_token(self.app)
         request.headers["Authorization"] = token
         yield request
+
+
+def get_token(client: httpx.Client) -> str:
+    """Get the token from the client."""
+    if client.auth is not None and client.auth.app is not None:
+        return get_ansyId_token(client.auth.app)
+    elif client.headers is not None and "Authorization" in client.headers:
+        return client.headers["Authorization"]
+    raise TokenError("App not found in client.")
