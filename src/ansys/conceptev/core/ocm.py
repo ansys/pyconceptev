@@ -252,9 +252,9 @@ def get_status(job_info: dict, token: str) -> str:
         headers={"Authorization": token},
     )
     processed_response = process_response(response)
-    if "finalStatus" in processed_response:
+    if "finalStatus" in processed_response and processed_response["finalStatus"] is not None:
         initial_status = processed_response["finalStatus"].upper()
-    elif "lastStatus" in processed_response:
+    elif "lastStatus" in processed_response and processed_response["lastStatus"] is not None:
         initial_status = processed_response["lastStatus"].upper()
     else:
         raise ResponseError(f"Failed to get job status {processed_response}.")
