@@ -27,6 +27,7 @@ from pytest_httpx import HTTPXMock
 
 from ansys.conceptev.core import app
 from ansys.conceptev.core.auth import AnsysIDAuth
+from ansys.conceptev.core.exceptions import ResponseError
 from ansys.conceptev.core.progress import (
     STATUS_COMPLETE,
     STATUS_ERROR,
@@ -521,7 +522,7 @@ def test_returns_final_status_when_present(mocker, final_status, last_status):
     mocker.patch("httpx.post", return_value=mock_response)
 
     if final_status is None and last_status is None:
-        with pytest.raises(app.ResponseError) as exc:
+        with pytest.raises(ResponseError) as exc:
             result = app.get_status(job_info, token)
         return True
     else:
