@@ -27,6 +27,13 @@ from pytest_httpx import HTTPXMock
 
 from ansys.conceptev.core import app
 from ansys.conceptev.core.auth import AnsysIDAuth
+from ansys.conceptev.core.exceptions import ResponseError
+from ansys.conceptev.core.progress import (
+    STATUS_COMPLETE,
+    STATUS_ERROR,
+    STATUS_FINISHED,
+    check_status,
+)
 from ansys.conceptev.core.settings import settings
 
 conceptev_url = settings.conceptev_url
@@ -352,7 +359,9 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         url=ocm_url + "/user/details", method="post", json={"userId": "user_123"}
     )
     httpx_mock.add_response(
-        url=ocm_url + "/job/load", method="post", json={"jobStatus": [{"jobStatus": "complete"}]}
+        url=ocm_url + "/job/load",
+        method="post",
+        json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
     )
     results = app.read_results(client, example_job_info)
     assert example_results == results
@@ -493,3 +502,44 @@ def test_get_concept(httpx_mock: HTTPXMock, client: httpx.Client):
         "requirements": [{"name": "reequirements"}],
         "architecture": {"name": "architecture"},
     }
+
+
+statuses = [STATUS_COMPLETE, STATUS_FINISHED, STATUS_ERROR, None]
+
+
+@pytest.mark.parametrize("last_status", statuses)
+@pytest.mark.parametrize("final_status", statuses)
+def test_returns_final_status_when_present(mocker, final_status, last_status):
+    job_info = {"job_id": "123"}
+    token = "token"
+    mock_response = mocker.Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {}
+    if final_status is not None:
+        mock_response.json.return_value["finalStatus"] = final_status
+    if last_status is not None:
+        mock_response.json.return_value["lastStatus"] = last_status
+    mocker.patch("httpx.post", return_value=mock_response)
+
+    if final_status is None and last_status is None:
+        with pytest.raises(ResponseError) as exc:
+            result = app.get_status(job_info, token)
+        return True
+    else:
+        result = app.get_status(job_info, token)
+        assert result in [final_status, last_status]
+
+
+@pytest.mark.parametrize(
+    "result,expected",
+    [(STATUS_COMPLETE, True), (STATUS_FINISHED, True), (STATUS_ERROR, False), (None, False)],
+)
+def test_check_status(result, expected):
+    if expected:
+        assert check_status(result)
+    elif result is STATUS_ERROR:
+        with pytest.raises(Exception) as exc:
+            check_status(result)
+            assert "Job Failed" in str(exc.value) if result == STATUS_ERROR else True
+    else:
+        assert not check_status(result)
