@@ -45,7 +45,7 @@ pydantic-settings = "^2.7.1"
 email-validator = "^2.2.0"
 tenacity = ">=8.2.3,<10.0.0"
 [tool.poetry.group.dev.dependencies] # Common packages for test and examples
-plotly = "^5.18.0"
+plotly = ">=5.18,<7.0"
 tox = "^4.15.1"
 pytest-cov = ">=5,<7"
 pre-commit = ">=3.7.1,<5.0.0"
