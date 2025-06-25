@@ -20,22 +20,68 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Get optislang version and integration (wrong way round) so special python
-# version and inject my code into it.
-# Or inject optislang into my code. For the e2e it has to be the first one.
-# Therefore lets do the same here.
+# Optislang Integration Test
+# A poor mans integration test for the optislang integration.
+# Looks at conceptev/utils/api_helper.py to see pyconceptev usage within ConceptEV integration.
 
-# USE OPTISLANG PYTHON
-import sys
-
-sys.path.append("C:\\Program Files\\ANSYS Inc\\v251\\optiSLang\\lib\\python-modules")
-sys.path.append("C:\\Program Files\\ANSYS Inc\\v251\\optiSLang\\scripting\\integrations")
-
-print(sys.path)
-import conceptev_ci as conceptev_ci
+from ansys.conceptev.core import auth, exceptions
 
 
-def test_pass():
+def test_exceptions():
+    """Example Exception Usage in api_helper"""
+    try:
+        raise exceptions.ResponseError("This is a test error")
+    except exceptions.ResponseError as e:
+        assert e.args[0].lower()
+
+
+def test_auth_app():
     """Test that the optislang integration works."""
-    print(dir(conceptev_ci))
-    assert True
+    msal_app = auth.create_msal_app()
+    token = auth.get_ansyId_token(msal_app)
+
+
+# def test_app():
+#    app.get_http_client(token, design_instance_id)
+#     client = app.get_http_client(token)
+#     concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": False})
+#     concept["configurations"] = app.get(client, f"/concepts/{design_instance_id}/configurations")
+#     concept["components"] = app.get(client, f"/concepts/{design_instance_id}/components")
+#     concept["requirements"] = app.get(client, f"/concepts/{design_instance_id}/requirements")
+#     arch_id = concept['architecture_id']
+#     concept["architecture"] = app.get(
+#         client,
+#         f"/architectures/{arch_id}",
+#         params={"design_instance_id": design_instance_id}
+#     )
+#     concept_data = app.get_concept(client, design_instance_id)
+#     data_types ?????
+#     posted_data = app.post(client, f"/{data_type}", data=data)
+#     accounts = app.get_account_ids(token)
+#     hpc_id = app.get_default_hpc(token, account_id)
+#     job_info = app.create_submit_job(
+#         client,
+#         concept_data,
+#         account_id,
+#         hpc_id,
+#         job_name
+#     )
+#     job_results = app.read_results(
+#         client,
+#         job_info,
+#         calculate_units=calculate_units,
+#         filtered=filtered_results,
+#     )
+#     app.post(client, "/jobs:error_file", data=data)
+#     health = app.get(client, "/health")
+#     app.create_new_project(
+#         client, account_id, hpc_id, f"{project_name}"
+#     )
+#     concept_data = app.create_new_concept(
+#         client,
+#         project_id,
+#         title=title,
+#     )
+#     accounts = app.get_account_ids(token)
+#     app.get_project_ids(re.escape(project_name), account_id, token)
+#     created_component = app.post_component_file(client, str(filepath), component_type)
