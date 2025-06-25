@@ -77,6 +77,8 @@ def get_ansyId_token(app, force=False) -> str:
         logger.info("Trying to acquire token interactively")
         result = app.acquire_token_interactive(scopes=[scope])
 
+    if "id_token" in result:
+        return result["id_token"]
     if "access_token" in result:
         return result["access_token"]
     error = result.get("error")
