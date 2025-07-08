@@ -131,7 +131,6 @@ def project_name():
 
 @pytest.fixture
 def created_project(client, account_id, hpc_id, token, project_name):
-
     created_project = app.create_new_project(client, account_id, hpc_id, f"{project_name}")
     yield created_project
     app.delete_project(created_project["projectId"], token)
@@ -253,7 +252,6 @@ def test_accounts(accounts, token):
 
 
 def test_hpc_endpoint(hpc_id):
-
     assert isinstance(hpc_id, str)
     assert len(hpc_id) > 0, "HPC ID should not be empty"
 
@@ -306,7 +304,125 @@ def test_project_ids(project_ids, project_id, project_name):
     assert project_id in project_ids[project_name]
 
 
-#     data_types ?????
-#     posted_data = app.post(client, f"/{data_type}", data=data)
+@pytest.fixture
+def transmission_loss_coefficients(client_with_design_instance):
+    """Fixture to provide transmission loss coefficients."""
+    transmission = {
+        "component_type": "TransmissionLossCoefficients",
+    }
+    return app.post(client_with_design_instance, "/components", data=transmission)
 
-#     created_component = app.post_component_file(client, str(filepath), component_type)
+
+@pytest.fixture
+def aero(client_with_design_instance):
+    """Fixture to provide aero configuration."""
+    aero = {
+        "config_type": "aero",
+    }
+    return app.post(client_with_design_instance, "/configurations", data=aero)
+
+
+@pytest.fixture
+def mass(client_with_design_instance):
+    """Fixture to provide mass configuration."""
+    mass = {
+        "config_type": "mass",
+    }
+    return app.post(client_with_design_instance, "/configurations", data=mass)
+
+
+@pytest.fixture
+def wheel(client_with_design_instance):
+    """Fixture to provide wheel configuration."""
+    wheel = {
+        "config_type": "wheel",
+    }
+    return app.post(client_with_design_instance, "/configurations", data=wheel)
+
+
+@pytest.fixture
+def requirement(client_with_design_instance, aero, mass, wheel):
+    requirement = {
+        "requirement_type": "static_acceleration",
+        "speed": 10,
+        "mass_id": mass["id"],
+        "aero_id": aero["id"],
+        "wheel_id": wheel["id"],
+        "state_of_charge": 0.75,
+        "acceleration": 0.5,
+    }
+    requirement = app.post(client_with_design_instance, "/requirements", data=requirement)
+    return requirement
+
+
+@pytest.fixture
+def motor_file(client_with_design_instance):
+    """Fixture to provide a motor configuration."""
+    motor_filename = "./e9.lab"
+    return app.post_component_file(
+        client_with_design_instance, motor_filename, component_file_type="motor_lab_file"
+    )
+
+
+@pytest.fixture
+def motor(client_with_design_instance):
+    """Fixture to provide a battery configuration."""
+    motor = {
+        "component_type": "MotorCTCP",
+        "name": "Test Motor",
+        "rated_power": 150000,
+        "stall_torque": 300,
+        "max_speed": 300,
+        "voltage": 400,
+    }
+    return app.post(client_with_design_instance, "/components", data=motor)
+
+
+@pytest.fixture
+def battery(client_with_design_instance):
+    """Fixture to provide a battery configuration."""
+    battery = {"component_type": "BatteryFixedVoltages"}
+    return app.post(client_with_design_instance, "/components", data=battery)
+
+
+@pytest.fixture
+def architecture(client_with_design_instance, transmission_loss_coefficients, motor, battery):
+    architecture = {
+        "number_of_front_motors": 1,
+        "number_of_front_wheels": 2,
+        "number_of_rear_motors": 0,
+        "number_of_rear_wheels": 2,
+        "front_transmission_id": transmission_loss_coefficients["id"],
+        "front_motor_id": motor["id"],
+        "battery_id": battery["id"],
+    }
+    architecture = app.post(client_with_design_instance, "/architectures", data=architecture)
+    return architecture
+
+
+def test_configuration(aero):
+    """Test creating an aero configuration."""
+    assert aero
+    assert aero["config_type"] == "aero"
+    assert "id" in aero
+
+
+def test_component(transmission_loss_coefficients):
+    assert transmission_loss_coefficients
+    assert "id" in transmission_loss_coefficients
+
+
+def test_create_requirement(requirement):
+    assert requirement
+    assert "id" in requirement
+
+
+def test_architecture(architecture):
+    """Test creating an architecture."""
+    assert architecture
+    assert "id" in architecture
+
+
+def test_create_from_file(motor_file):
+    assert isinstance(motor_file, list)
+    assert len(motor_file) == 2
