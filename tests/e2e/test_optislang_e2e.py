@@ -140,7 +140,7 @@ def test_optislang_connection() -> None:
     # created concept
     # configure environment
     design_instance_id = "7a906ce3-76ad-49ce-b707-ac38e4efdcbd"  # Need a completed job?
-    osl = Optislang(loglevel="DEBUG", project_path=osl_project_path)
+    osl = Optislang(project_path=osl_project_path)
     print(osl)
     osl.osl_server.timeouts_register.default_value = 180
     std_handler, err_handler = prepare_logging_facilities(osl, working_dir)
@@ -171,20 +171,20 @@ def test_optislang_connection() -> None:
     register_parameter(cev_node, "rear_motor")
 
     register_response(cev_node, "_00__capability_curve__torque_vs_speed")
-    register_response(cev_node, "_01__summary__cost")
-    register_response(cev_node, "_01__summary__mass")
-    register_response(cev_node, "_01__summary__constraints_fulfilled")
-    register_response(cev_node, "_01__summary__n_constraints_fulfilled")
+    register_response(cev_node, "_02__summary__cost")
+    register_response(cev_node, "_02__summary__mass")
+    register_response(cev_node, "_02__summary__constraints_fulfilled")
+    register_response(cev_node, "_02__summary__n_constraints_fulfilled")
 
     sensitivity.criteria_manager.add_criterion(
         ObjectiveCriterion(
-            name="obj_cost", expression="_01__summary__cost", criterion=ComparisonType.MIN
+            name="obj_cost", expression="_02__summary__cost", criterion=ComparisonType.MIN
         )
     )
     sensitivity.criteria_manager.add_criterion(
         ConstraintCriterion(
             name="constraints_fulfilled",
-            expression="_01__summary__n_constraints_fulfilled",
+            expression="_02__summary__n_constraints_fulfilled",
             criterion=ComparisonType.GREATEREQUAL,
             limit_expression="1",
         )
