@@ -400,6 +400,7 @@ def architecture(client_with_design_instance, transmission_loss_coefficients, mo
     return architecture
 
 
+@pytest.mark.integration
 def test_configuration(aero):
     """Test creating an aero configuration."""
     assert aero
@@ -407,22 +408,26 @@ def test_configuration(aero):
     assert "id" in aero
 
 
+@pytest.mark.integration
 def test_component(transmission_loss_coefficients):
     assert transmission_loss_coefficients
     assert "id" in transmission_loss_coefficients
 
 
+@pytest.mark.integration
 def test_create_requirement(requirement):
     assert requirement
     assert "id" in requirement
 
 
+@pytest.mark.integration
 def test_architecture(architecture):
     """Test creating an architecture."""
     assert architecture
     assert "id" in architecture
 
 
+@pytest.mark.integration
 def test_create_from_file(motor_file):
     assert isinstance(motor_file, list)
     assert len(motor_file) == 2

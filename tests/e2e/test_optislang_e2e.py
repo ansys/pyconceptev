@@ -24,11 +24,6 @@ import logging
 import os
 import shutil
 
-# from ansys.optislang.core import Optislang
-# from ansys.optislang.core import examples
-# from ansys.optislang.core import Optislang
-# from ansys.optislang.core.nodes import DesignFlow
-# import ansys.optislang.core.node_types as node_types
 from ansys.optislang.core import Optislang
 import ansys.optislang.core.node_types as node_types
 from ansys.optislang.core.nodes import DesignFlow
@@ -37,6 +32,7 @@ from ansys.optislang.core.project_parametric import (
     ConstraintCriterion,
     ObjectiveCriterion,
 )
+import pytest
 
 
 class QueryHandler(logging.Handler):
@@ -126,6 +122,7 @@ def remove_non_empty_dir(path):
         shutil.rmtree(path, ignore_errors=False, onerror=None)
 
 
+@pytest.mark.e2e
 def test_optislang_connection() -> None:
     # create fresh working directory
     # this is logging in interactively and connecting to prod server at the moment
