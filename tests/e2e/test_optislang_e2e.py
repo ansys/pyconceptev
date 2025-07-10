@@ -136,7 +136,7 @@ def test_optislang_connection() -> None:
 
     # created concept
     # configure environment
-    design_instance_id = "7a906ce3-76ad-49ce-b707-ac38e4efdcbd"  # Need a completed job?
+    design_instance_id = "121222c8-f2e8-4fa2-84fb-69336bbdc548"
     osl = Optislang(project_path=osl_project_path)
     print(osl)
     osl.osl_server.timeouts_register.default_value = 180
@@ -156,7 +156,7 @@ def test_optislang_connection() -> None:
         design_flow=DesignFlow.RECEIVE_SEND,
     )
     non_modifying_settings = cev_node.get_property("NonModifyingSettings")
-    non_modifying_settings["cev_account_name"] = "conceptev_saas@ansys.com"
+    non_modifying_settings["cev_account_name"] = "ConceptEv Test Account"
     cev_node.set_property("NonModifyingSettings", non_modifying_settings)
     modifying_settings = cev_node.get_property("ModifyingSettings")
     modifying_settings["cev_concept_id"] = design_instance_id

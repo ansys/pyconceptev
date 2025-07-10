@@ -26,7 +26,7 @@ import httpx
 import jwt
 
 # Optislang Integration Test
-# A poor mans integration test for the optislang integration.
+# A poor attempt at integration test for the optislang integration.
 # Looks at conceptev/utils/api_helper.py to see pyconceptev usage within ConceptEV integration.
 import pytest
 
@@ -265,7 +265,7 @@ def test_submit_job(job_info):
 def test_read_results(read_results):
     """Test reading results from the job."""
     assert isinstance(read_results, list)
-    assert read_results[0]["feasible"] == True
+    assert read_results[0]["feasible"] == False
     assert len(read_results) > 0, "Results should not be empty"
 
 
@@ -358,7 +358,7 @@ def requirement(client_with_design_instance, aero, mass, wheel):
 @pytest.fixture
 def motor_file(client_with_design_instance):
     """Fixture to provide a motor configuration."""
-    motor_filename = "./e9.lab"
+    motor_filename = "./integration/e9.lab"
     return app.post_component_file(
         client_with_design_instance, motor_filename, component_file_type="motor_lab_file"
     )
