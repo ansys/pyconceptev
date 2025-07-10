@@ -125,8 +125,7 @@ jobs:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
-          path: "tests"
-          pytest-extra-args: "unit --cov=ansys --cov-report=term --cov-report=html:.cov/html"
+          pytest-extra-args: "tests/unit --cov=ansys --cov-report=term --cov-report=html:.cov/html"
 
       - name: Upload coverage results
         uses: actions/upload-artifact@v4
@@ -154,9 +153,8 @@ jobs:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
-          path: "tests"
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
-          pytest-extra-args: "integration"
+          pytest-extra-args: "tests/integration"
   tests-e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
@@ -173,9 +171,8 @@ jobs:
           ANSYSLMD_LICENSE_FILE: ${{ format('1055@{0}', secrets.LICENSE_SERVER) }}
         uses: ansys/actions/tests-pytest@v10
         with:
-          path: "tests"
           python-version: "3.13"
-          pytest-extra-args: "e2e"
+          pytest-extra-args: "tests/e2e"
           use-python-cache: false
   doc-build:
     name: Build documentation
