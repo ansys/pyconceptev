@@ -24,6 +24,11 @@ import logging
 import os
 import shutil
 
+# from ansys.optislang.core import Optislang
+# from ansys.optislang.core import examples
+# from ansys.optislang.core import Optislang
+# from ansys.optislang.core.nodes import DesignFlow
+# import ansys.optislang.core.node_types as node_types
 from ansys.optislang.core import Optislang
 import ansys.optislang.core.node_types as node_types
 from ansys.optislang.core.nodes import DesignFlow
@@ -32,7 +37,6 @@ from ansys.optislang.core.project_parametric import (
     ConstraintCriterion,
     ObjectiveCriterion,
 )
-import pytest
 
 
 class QueryHandler(logging.Handler):
@@ -122,7 +126,6 @@ def remove_non_empty_dir(path):
         shutil.rmtree(path, ignore_errors=False, onerror=None)
 
 
-@pytest.mark.e2e
 def test_optislang_connection() -> None:
     # create fresh working directory
     # this is logging in interactively and connecting to prod server at the moment
@@ -136,7 +139,7 @@ def test_optislang_connection() -> None:
 
     # created concept
     # configure environment
-    design_instance_id = "121222c8-f2e8-4fa2-84fb-69336bbdc548"
+    design_instance_id = "7a906ce3-76ad-49ce-b707-ac38e4efdcbd"  # Need a completed job?
     osl = Optislang(project_path=osl_project_path)
     print(osl)
     osl.osl_server.timeouts_register.default_value = 180
@@ -156,7 +159,7 @@ def test_optislang_connection() -> None:
         design_flow=DesignFlow.RECEIVE_SEND,
     )
     non_modifying_settings = cev_node.get_property("NonModifyingSettings")
-    non_modifying_settings["cev_account_name"] = "ConceptEv Test Account"
+    non_modifying_settings["cev_account_name"] = "conceptev_saas@ansys.com"
     cev_node.set_property("NonModifyingSettings", non_modifying_settings)
     modifying_settings = cev_node.get_property("ModifyingSettings")
     modifying_settings["cev_concept_id"] = design_instance_id
