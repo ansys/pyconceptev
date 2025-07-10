@@ -252,8 +252,13 @@ def get_status(job_info: dict, token: str) -> str:
         headers={"Authorization": token},
     )
     processed_response = process_response(response)
-    initial_status = processed_response["jobStatus"][-1]["jobStatus"]
-    return initial_status
+    if "finalStatus" in processed_response and processed_response["finalStatus"] is not None:
+        status = processed_response["finalStatus"].upper()
+    elif "lastStatus" in processed_response and processed_response["lastStatus"] is not None:
+        status = processed_response["lastStatus"].upper()
+    else:
+        raise ResponseError(f"Failed to get job status {processed_response}.")
+    return status
 
 
 def get_project_ids(name: str, account_id: str, token: str) -> dict:
