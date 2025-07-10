@@ -28,7 +28,7 @@ from ansys.conceptev.core.settings import Settings
 
 def test_settings():
     os.environ["ACCOUNT_NAME"] = "borked"
-    os.chdir(Path(__file__))
+    os.chdir(Path(__file__).parent)
     settings = Settings()
     assert settings.job_timeout == 3600  # from resources
     assert settings.ocm_url == "https://dev.portal.onscale.com/api"  # from working directory
