@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from pathlib import Path
 import re
 
 import httpx
@@ -31,6 +32,8 @@ import jwt
 import pytest
 
 from ansys.conceptev.core import app, auth, exceptions
+
+DATA_DIR = Path(__file__).parent
 
 
 @pytest.fixture
@@ -358,7 +361,7 @@ def requirement(client_with_design_instance, aero, mass, wheel):
 @pytest.fixture
 def motor_file(client_with_design_instance):
     """Fixture to provide a motor configuration."""
-    motor_filename = "./integration/e9.lab"
+    motor_filename = DATA_DIR / "e9.lab"
     return app.post_component_file(
         client_with_design_instance, motor_filename, component_file_type="motor_lab_file"
     )
@@ -400,7 +403,6 @@ def architecture(client_with_design_instance, transmission_loss_coefficients, mo
     return architecture
 
 
-@pytest.mark.integration
 def test_configuration(aero):
     """Test creating an aero configuration."""
     assert aero
@@ -408,26 +410,22 @@ def test_configuration(aero):
     assert "id" in aero
 
 
-@pytest.mark.integration
 def test_component(transmission_loss_coefficients):
     assert transmission_loss_coefficients
     assert "id" in transmission_loss_coefficients
 
 
-@pytest.mark.integration
 def test_create_requirement(requirement):
     assert requirement
     assert "id" in requirement
 
 
-@pytest.mark.integration
 def test_architecture(architecture):
     """Test creating an architecture."""
     assert architecture
     assert "id" in architecture
 
 
-@pytest.mark.integration
 def test_create_from_file(motor_file):
     assert isinstance(motor_file, list)
     assert len(motor_file) == 2

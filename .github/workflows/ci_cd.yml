@@ -174,9 +174,8 @@ jobs:
           PYCONCEPTEV_SETTINGS: "tests/e2e/config.toml"
         uses: ansys/actions/tests-pytest@v10
         with:
-          python-version: "3.13"
+          python-version: ${{ env.MAIN_PYTHON_VERSION }}
           pytest-extra-args: "tests/e2e"
-          use-python-cache: false
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
