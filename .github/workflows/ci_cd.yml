@@ -149,7 +149,7 @@ jobs:
     steps:
       - uses: ansys/actions/tests-pytest@v10
         env:
-          PYCONCEPTEV_SETTINGS: "tests/config.toml"
+          PYCONCEPTEV_SETTINGS: "tests/integration/config.toml"
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
@@ -169,6 +169,9 @@ jobs:
         env:
           PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT: true
           ANSYSLMD_LICENSE_FILE: ${{ format('1055@{0}', secrets.LICENSE_SERVER) }}
+          POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
+          CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
+          PYCONCEPTEV_SETTINGS: "tests/e2e/config.toml"
         uses: ansys/actions/tests-pytest@v10
         with:
           python-version: "3.13"
