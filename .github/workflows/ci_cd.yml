@@ -171,7 +171,7 @@ jobs:
           ANSYSLMD_LICENSE_FILE: ${{ format('1055@{0}', secrets.LICENSE_SERVER) }}
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           PYCONCEPTEV_SETTINGS: "tests/e2e/config.toml"
-        uses: ansys/actions/tests-pytest@v9
+        uses: ansys/actions/tests-pytest@v10
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           pytest-extra-args: "tests/e2e"
