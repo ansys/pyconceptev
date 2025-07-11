@@ -157,7 +157,7 @@ jobs:
           pytest-extra-args: "tests/integration"
   tests-e2e:
     name: E2E Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [ tests ]
     container:
       image: ${{ format('ghcr.io/ansys/optislang:{0}-jammy', '25.2.0') }}
