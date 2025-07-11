@@ -165,6 +165,8 @@ jobs:
         username: ansys-bot
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: Install pip for Python 3.13
+        run: python -m ensurepip --upgrade
       - name: "Pytest"
         env:
           PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT: true
