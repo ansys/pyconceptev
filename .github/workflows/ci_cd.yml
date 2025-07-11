@@ -159,17 +159,16 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [ tests ]
-#    container:
-#      image: ${{ format('ghcr.io/ansys/optislang:{0}-jammy', '25.2.0') }}
-#      credentials:
-#        username: ansys-bot
-#        password: ${{ secrets.GITHUB_TOKEN }}
+    container:
+      image: ${{ format('ghcr.io/ansys/optislang:{0}-jammy', '25.2.0') }}
+      credentials:
+        username: ansys-bot
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: "Pytest"
         env:
           PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT: true
           ANSYSLMD_LICENSE_FILE: ${{ format('1055@{0}', secrets.LICENSE_SERVER) }}
-          POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           PYCONCEPTEV_SETTINGS: "tests/e2e/config.toml"
         uses: ansys/actions/tests-pytest@v10
