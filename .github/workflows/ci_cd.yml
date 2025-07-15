@@ -158,7 +158,7 @@ jobs:
   tests-e2e:
     name: E2E Tests
     runs-on: ubuntu-22.04
-    needs: [ tests ]
+#    needs: [ tests ]
     container:
       image: ${{ format('ghcr.io/ansys/optislang:{0}-jammy', '25.2.0') }}
       credentials:
