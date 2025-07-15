@@ -165,13 +165,18 @@ jobs:
         username: ansys-bot
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: "Install Poetry"
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
       - name: "Pytest"
         env:
           PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT: true
           ANSYSLMD_LICENSE_FILE: ${{ format('1055@{0}', secrets.LICENSE_SERVER) }}
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           PYCONCEPTEV_SETTINGS: "tests/e2e/config.toml"
-          POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         uses: ansys/actions/tests-pytest@v10
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
