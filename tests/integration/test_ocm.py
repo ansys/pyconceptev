@@ -41,21 +41,18 @@ def token():
     return token
 
 
-@pytest.mark.integration
 def test_product_id(token):
     """Test product id from OCM."""
     product_id = ocm.get_product_id(token)
     assert product_id == "SAAS000040"
 
 
-@pytest.mark.integration
 def test_get_user_id(token):
     """Test user id from OCM."""
     user_id = ocm.get_user_id(token)
     assert user_id == "95bb6bf9-0afd-4426-b736-7e1c8abd5a78"
 
 
-@pytest.mark.integration
 def test_get_account_ids(token):
     """Test account ids from OCM."""
     account_ids = ocm.get_account_ids(token)
@@ -65,14 +62,12 @@ def test_get_account_ids(token):
     }
 
 
-@pytest.mark.integration
 def test_get_account_id(token):
     """Test account ids from OCM."""
     account_id = ocm.get_account_id(token)
     assert account_id == "2a566ece-938d-4658-bae5-ffa387ac0547"
 
 
-@pytest.mark.integration
 def test_get_default_hpc(token):
     """Test default HPC from OCM."""
     account_id = "2a566ece-938d-4658-bae5-ffa387ac0547"
@@ -80,7 +75,6 @@ def test_get_default_hpc(token):
     assert hpc_id == "3ded64e3-5a83-24a8-b6e4-9fc30f97a654"
 
 
-@pytest.mark.integration
 def test_get_project_ids(token):
     """Test projects from OCM."""
     project_name = "New Project (with brackets)"
@@ -91,7 +85,6 @@ def test_get_project_ids(token):
     assert "00932037-a633-464c-8d05-28353d9bfc49" in project_ids[project_name]
 
 
-@pytest.mark.integration
 def test_create_new_project(token):
     """Test create new project from OCM."""
     account_id = "2a566ece-938d-4658-bae5-ffa387ac0547"
@@ -105,7 +98,6 @@ def test_create_new_project(token):
     assert seconds_ago < 10
 
 
-@pytest.mark.integration
 def test_create_new_design(token):
     """Test create new project from OCM."""
 

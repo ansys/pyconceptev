@@ -125,7 +125,7 @@ jobs:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
-          pytest-extra-args: "-m 'not integration' --cov=ansys --cov-report=term --cov-report=html:.cov/html"
+          pytest-extra-args: "tests/unit --cov=ansys --cov-report=term --cov-report=html:.cov/html"
 
       - name: Upload coverage results
         uses: actions/upload-artifact@v4
@@ -149,12 +149,39 @@ jobs:
     steps:
       - uses: ansys/actions/tests-pytest@v10
         env:
-          PYCONCEPTEV_SETTINGS: "tests/config.toml"
+          PYCONCEPTEV_SETTINGS: "tests/integration/config.toml"
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
-          pytest-extra-args: "-s -m integration --log-cli-level=INFO"
+          pytest-extra-args: "tests/integration"
+  tests-e2e:
+    name: E2E Tests
+    runs-on: ubuntu-22.04
+    timeout-minutes: 2160
+    #    needs: [ tests ]
+    container:
+      image: ${{ format('ghcr.io/ansys/optislang:{0}-jammy', '25.2.0') }}
+      credentials:
+        username: ansys-bot
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: "Install Poetry"
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+      - name: "Pytest"
+        env:
+          PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT: true
+          ANSYSLMD_LICENSE_FILE: ${{ format('1055@{0}', secrets.LICENSE_SERVER) }}
+          CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
+          PYCONCEPTEV_SETTINGS: "tests/e2e/config.toml"
+        uses: ansys/actions/tests-pytest@v10
+        with:
+          python-version: ${{ env.MAIN_PYTHON_VERSION }}
+          pytest-extra-args: "tests/e2e"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
