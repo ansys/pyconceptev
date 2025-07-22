@@ -324,6 +324,8 @@ def create_submit_job(
     account_id: str,
     hpc_id: str,
     job_name: str | None = None,
+    docker_tag: str = "default",
+    extra_memory: bool = False,
 ) -> dict:
     """Create and then submit a job."""
     if job_name is None:
@@ -341,6 +343,8 @@ def create_submit_job(
         "uploaded_file": uploaded_file,
         "account_id": account_id,
         "hpc_id": hpc_id,
+        "docker_tag": docker_tag,
+        "extra_memory": extra_memory,
     }
     job_info = post(client, "/jobs:start", data=job_start, account_id=account_id)
     return job_info
