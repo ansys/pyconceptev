@@ -279,6 +279,8 @@ def test_create_submit_job(httpx_mock: HTTPXMock, client: httpx.Client):
         "uploaded_file": mocked_job[1],
         "account_id": account_id,
         "hpc_id": hpc_id,
+        "docker_tag": "default",
+        "extra_memory": False,
     }
     httpx_mock.add_response(
         url=f"{conceptev_url}/jobs:start?design_instance_id=123&account_id={account_id}",
