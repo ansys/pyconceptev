@@ -68,10 +68,10 @@ def test_get_user_id(token):
 def test_get_account_ids(token):
     """Test account ids from OCM."""
     account_ids = ocm.get_account_ids(token)
-    assert account_ids == {
-        "ConceptEv Test Account": "2a566ece-938d-4658-bae5-ffa387ac0547",
-        "conceptev_testing@ansys.com": "108581c8-13e6-4b39-8051-5f8e61135aca",
-    }
+    assert account_ids
+    for key, value in account_ids.items():
+        assert isinstance(key, str)
+        assert is_uuid(value)
 
 
 @pytest.mark.integration

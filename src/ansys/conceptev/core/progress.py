@@ -27,6 +27,7 @@ import json
 import ssl
 import sys
 
+import certifi
 from msal import PublicClientApplication
 from websockets.asyncio.client import connect
 
@@ -44,11 +45,23 @@ OCM_SOCKET_URL = settings.ocm_socket_url
 JOB_TIMEOUT = settings.job_timeout
 
 
-def generate_ssl_context():
+def generate_ssl_context() -> ssl.SSLContext:
     """Generate SSL context for secure websocket connection."""
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-    ssl_context.load_verify_locations(settings.ssl_cert_file)
-    return ssl_context
+    # Try using truststore for system certificates if available
+    if not settings.ssl_cert_file:
+        try:
+            import truststore
+
+            return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        except ImportError:
+            pass
+
+    # Use configured cert file or fall back to certifi's default bundle
+    cert_file = settings.ssl_cert_file or certifi.where()
+
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    context.load_verify_locations(cert_file)
+    return context
 
 
 ssl_context = generate_ssl_context()
