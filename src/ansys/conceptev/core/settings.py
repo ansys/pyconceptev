@@ -24,6 +24,8 @@ import os
 from pathlib import Path
 from typing import Annotated
 
+import certifi
+
 try:
     import tomllib
 except ModuleNotFoundError:
@@ -50,6 +52,7 @@ class Settings(BaseSettings):
     authority: HttpUrlString
     scope: HttpUrlString
     job_timeout: int
+    ssl_cert_file: str | None = certifi.where()
     conceptev_username: EmailStr | None = None  # Only works in testing environment
     conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None

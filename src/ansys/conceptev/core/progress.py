@@ -27,7 +27,6 @@ import json
 import ssl
 import sys
 
-import certifi
 from msal import PublicClientApplication
 from websockets.asyncio.client import connect
 
@@ -43,8 +42,16 @@ STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "FAILED"
 OCM_SOCKET_URL = settings.ocm_socket_url
 JOB_TIMEOUT = settings.job_timeout
-ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-ssl_context.load_verify_locations(certifi.where())
+
+
+def generate_ssl_context():
+    """Generate SSL context for secure websocket connection."""
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    ssl_context.load_verify_locations(settings.ssl_cert_file)
+    return ssl_context
+
+
+ssl_context = generate_ssl_context()
 
 
 def connect_to_ocm(user_id: str, token: str):

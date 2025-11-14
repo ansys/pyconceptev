@@ -48,7 +48,7 @@ from ansys.conceptev.core.ocm import (
     get_status,
     get_user_id,
 )
-from ansys.conceptev.core.progress import check_status, monitor_job_progress
+from ansys.conceptev.core.progress import check_status, generate_ssl_context, monitor_job_progress
 from ansys.conceptev.core.responses import is_gateway_error, process_response
 from ansys.conceptev.core.settings import settings
 
@@ -124,7 +124,13 @@ def get_http_client(
     params = {"design_instance_id": design_instance_id} if design_instance_id else None
     header = {"Authorization": token} if token else None
 
-    client = httpx.Client(headers=header, auth=httpx_auth, params=params, base_url=BASE_URL)
+    client = httpx.Client(
+        headers=header,
+        auth=httpx_auth,
+        params=params,
+        base_url=BASE_URL,
+        verify=generate_ssl_context(),
+    )
     client.send = retry(
         retry=retry_if_result(is_gateway_error),
         wait=wait_random_exponential(multiplier=1, max=60),
