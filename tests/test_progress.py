@@ -144,8 +144,9 @@ def test_ssl_cert_custom():
         with open(certifi.where(), "r") as certifi_file:
             temp_cert.write(certifi_file.read())
         temp_cert_path = temp_cert.name
-    with patch("ansys.conceptev.core.progress.settings") as mock_settings:
-        mock_settings.ssl_cert_file = temp_cert_path
-        ssl_context = generate_ssl_context()
-        assert ssl_context is not None
-        assert ssl_context.verify_mode == ssl.CERT_REQUIRED
+
+        with patch("ansys.conceptev.core.progress.settings") as mock_settings:
+            mock_settings.ssl_cert_file = temp_cert_path
+            ssl_context = generate_ssl_context()
+            assert ssl_context is not None
+            assert ssl_context.verify_mode == ssl.CERT_REQUIRED
