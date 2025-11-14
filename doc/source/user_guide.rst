@@ -74,6 +74,6 @@ If your company provides a custom CA certificate, you may need to combine it wit
 
 Then set the `SSL_CERT_FILE` environment variable or `ssl_cert_file` config option to point to your `custom-bundle.pem` file.
 
-**Note**: If no custom SSL certificate is configured, PyConceptEV will use the default certificate bundle provided by the `certifi` package.
+**Note**: If no custom SSL certificate is configured, PyConceptEV uses the default certificate bundle provided by the `certifi` package.
 
 

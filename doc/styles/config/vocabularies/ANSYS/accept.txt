@@ -13,3 +13,6 @@ account_name
 account name
 get_http_client
 cache_filepath
+ssl_cert_file
+config
+certifi
