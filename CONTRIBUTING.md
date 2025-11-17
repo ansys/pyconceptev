@@ -1,16 +1,12 @@
-# Contributing
+# Contribute
 
-We welcome any code contributions and hope that this
-guide facilitate an understanding of the PyConceptEV code.
-It is important to note that while PyConceptEV
-is maintained by Ansys and any submissions are reviewed
-thoroughly before merging, we still seek to foster a community that can
-support user questions and develop new features to make this library
-useful to all. As such, we welcome and encourage any
-questions or submissions to this repository.
+Overall guidance on contributing to a PyAnsys library appears in the
+[Contributing] topic in the *PyAnsys developer's guide*. Ensure that you
+are thoroughly familiar with this guide before attempting to contribute to
+{project-name}.
 
-For information on contributing to a PyAnsys library, see the [PyAnsys developer's guide].
-For information specific to contributing to PyConceptEV, see [Contribute].
+The following contribution information is specific to {project-name}.
 
-[PyAnsys developer's guide]: https://dev.docs.pyansys.com/index.html
-[Contribute]: https://conceptev.docs.pyansys.com/dev/contributing.html
+[Contributing]: https://dev.docs.pyansys.com/how-to/contributing.html
+
+<!-- Begin content specific to your library here. -->
