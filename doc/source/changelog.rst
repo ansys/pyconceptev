@@ -10,7 +10,6 @@ This document contains the release notes for the project.
 .. towncrier release notes start
 
 `0.10.1 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.1>`_ - November 17, 2025
-=========================================================================================
 
 .. tab-set::
 
