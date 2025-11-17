@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     authority: HttpUrlString
     scope: HttpUrlString
     job_timeout: int
+    ssl_cert_file: str | None = None
     conceptev_username: EmailStr | None = None  # Only works in testing environment
     conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None

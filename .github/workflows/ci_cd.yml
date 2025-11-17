@@ -175,6 +175,8 @@ jobs:
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           check-links: false
+          optional-dependencies-name: ""
+          group-dependencies-name: "doc"
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
 
