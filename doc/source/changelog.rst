@@ -9,6 +9,21 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.10.1 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.1>`_ - November 17, 2025
+
+.. tab-set::
+
+
+  .. tab-item:: Miscellaneous
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE: Bump pypa/gh-action-pypi-publish from 1.12.4 to 1.13.0
+          - `#281 <https://github.com/ansys/pyconceptev/pull/281>`_
+
+
 `0.10.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.0>`_ - November 17, 2025
 =========================================================================================
 
