@@ -110,7 +110,7 @@ jobs:
           pytest-extra-args: "-m 'not integration' --cov=ansys --cov-report=term --cov-report=html:.cov/html"
 
       - name: Upload coverage results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: env.MAIN_PYTHON_VERSION == matrix.python-version
         with:
           name: coverage-tests-${{ matrix.os }}
@@ -118,7 +118,7 @@ jobs:
           retention-days: 7
 
       - name: Upload coverage results (as .coverage)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: env.MAIN_PYTHON_VERSION == matrix.python-version
         with:
           name: coverage-file-tests-${{ matrix.os }}
