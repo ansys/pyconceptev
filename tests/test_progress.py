@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -21,8 +21,11 @@
 # SOFTWARE.
 
 import json
+import ssl
+import tempfile
 from unittest.mock import AsyncMock, patch
 
+import certifi
 from msal import PublicClientApplication
 import pytest
 
@@ -33,6 +36,7 @@ from ansys.conceptev.core.progress import (
     STATUS_FINISHED,
     check_status,
     connect_to_ocm,
+    generate_ssl_context,
     get_status,
     monitor_job_messages,
     monitor_job_progress,
@@ -127,3 +131,22 @@ def test_monitor_job_progress():
         result = monitor_job_progress(job_id, user_id, token, app)
         mock_monitor.assert_called_with(job_id, user_id, token, app, 3600)
         assert result == STATUS_COMPLETE
+
+
+def test_ssl_cert_default():
+    ssl_context = generate_ssl_context()
+    assert ssl_context is not None
+    assert ssl_context.verify_mode == ssl.CERT_REQUIRED
+
+
+def test_ssl_cert_custom():
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".pem", delete=False) as temp_cert:
+        with open(certifi.where(), "r") as certifi_file:
+            temp_cert.write(certifi_file.read())
+        temp_cert_path = temp_cert.name
+
+        with patch("ansys.conceptev.core.progress.settings") as mock_settings:
+            mock_settings.ssl_cert_file = temp_cert_path
+            ssl_context = generate_ssl_context()
+            assert ssl_context is not None
+            assert ssl_context.verify_mode == ssl.CERT_REQUIRED

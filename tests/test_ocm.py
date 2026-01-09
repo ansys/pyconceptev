@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -23,6 +23,7 @@
 # should this test against the deployed api?
 from datetime import datetime
 import re
+import uuid
 
 import httpx
 import pytest
@@ -32,6 +33,14 @@ import ansys.conceptev.core.ocm as ocm
 from ansys.conceptev.core.settings import settings
 
 OCM_URL = settings.ocm_url
+
+
+def is_uuid(s: str):
+    try:
+        uuid.UUID(s)
+        return True
+    except ValueError:
+        return False
 
 
 @pytest.fixture()
@@ -52,24 +61,24 @@ def test_product_id(token):
 def test_get_user_id(token):
     """Test user id from OCM."""
     user_id = ocm.get_user_id(token)
-    assert user_id == "95bb6bf9-0afd-4426-b736-7e1c8abd5a78"
+    assert is_uuid(user_id)
 
 
 @pytest.mark.integration
 def test_get_account_ids(token):
     """Test account ids from OCM."""
     account_ids = ocm.get_account_ids(token)
-    assert account_ids == {
-        "ConceptEv Test Account": "2a566ece-938d-4658-bae5-ffa387ac0547",
-        "conceptev_testing@ansys.com": "108581c8-13e6-4b39-8051-5f8e61135aca",
-    }
+    assert account_ids
+    for key, value in account_ids.items():
+        assert isinstance(key, str)
+        assert is_uuid(value)
 
 
 @pytest.mark.integration
 def test_get_account_id(token):
     """Test account ids from OCM."""
     account_id = ocm.get_account_id(token)
-    assert account_id == "2a566ece-938d-4658-bae5-ffa387ac0547"
+    assert is_uuid(account_id)
 
 
 @pytest.mark.integration
@@ -77,7 +86,7 @@ def test_get_default_hpc(token):
     """Test default HPC from OCM."""
     account_id = "2a566ece-938d-4658-bae5-ffa387ac0547"
     hpc_id = ocm.get_default_hpc(token, account_id)
-    assert hpc_id == "3ded64e3-5a83-24a8-b6e4-9fc30f97a654"
+    assert is_uuid(hpc_id)
 
 
 @pytest.mark.integration

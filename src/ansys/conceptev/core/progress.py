@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -43,8 +43,28 @@ STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "FAILED"
 OCM_SOCKET_URL = settings.ocm_socket_url
 JOB_TIMEOUT = settings.job_timeout
-ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-ssl_context.load_verify_locations(certifi.where())
+
+
+def generate_ssl_context() -> ssl.SSLContext:
+    """Generate SSL context for secure websocket connection."""
+    # Try using truststore for system certificates if available
+    if not settings.ssl_cert_file:
+        try:
+            import truststore
+
+            return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        except ImportError:
+            pass
+
+    # Use configured cert file or fall back to certifi's default bundle
+    cert_file = settings.ssl_cert_file or certifi.where()
+
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    context.load_verify_locations(cert_file)
+    return context
+
+
+ssl_context = generate_ssl_context()
 
 
 def connect_to_ocm(user_id: str, token: str):

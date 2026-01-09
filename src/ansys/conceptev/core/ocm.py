@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -38,6 +38,7 @@ from ansys.conceptev.core.exceptions import (
     ResponseError,
     UserDetailsError,
 )
+from ansys.conceptev.core.progress import generate_ssl_context
 from ansys.conceptev.core.responses import process_response
 from ansys.conceptev.core.settings import settings
 
@@ -45,12 +46,23 @@ OCM_URL = settings.ocm_url
 ACCOUNT_NAME = settings.account_name
 
 
+def create_ocm_client(token) -> httpx.Client:
+    """Create an OCM client."""
+    client = httpx.Client(
+        base_url=OCM_URL,
+        verify=generate_ssl_context(),
+        headers={
+            "Authorization": token,
+        },
+    )
+    return client
+
+
 def get_product_id(token: str) -> str:
     """Get the product ID."""
-    products = httpx.get(OCM_URL + "/product/list", headers={"Authorization": token})
+    products = create_ocm_client(token).get("/product/list")
     if products.status_code != 200:
         raise ProductIdsError(f"Failed to get product id.")
-
     product_id = [
         product["productId"] for product in products.json() if product["productName"] == "CONCEPTEV"
     ][0]
@@ -59,7 +71,7 @@ def get_product_id(token: str) -> str:
 
 def get_user_id(token):
     """Get the user ID."""
-    user_details = httpx.post(OCM_URL + "/user/details", headers={"Authorization": token})
+    user_details = create_ocm_client(token).post("/user/details")
     if user_details.status_code not in (200, 204):
         raise UserDetailsError(f"Failed to get a user details on OCM {user_details}.")
     user_id = user_details.json()["userId"]
@@ -68,7 +80,7 @@ def get_user_id(token):
 
 def get_account_ids(token: str) -> dict:
     """Get account IDs."""
-    response = httpx.post(url=OCM_URL + "/account/list", headers={"authorization": token})
+    response = create_ocm_client(token).post("/account/list")
     if response.status_code != 200:
         raise AccountsError(f"Failed to get accounts {response}.")
     accounts = {
@@ -87,10 +99,9 @@ def get_account_id(token: str) -> str:
 
 def get_default_hpc(token: str, account_id: str) -> dict:
     """Get the default HPC ID."""
-    response = httpx.post(
-        url=OCM_URL + "/account/hpc/default",
+    response = create_ocm_client(token).post(
+        "/account/hpc/default",
         json={"accountId": account_id},
-        headers={"authorization": token},
     )
     if response.status_code != 200:
         raise AccountsError(f"Failed to get accounts {response}.")
@@ -112,9 +123,7 @@ def create_new_project(
         "projectTitle": title,
         "projectGoal": project_goal,
     }
-    created_project = httpx.post(
-        OCM_URL + "/project/create", headers={"Authorization": token}, json=project_data
-    )
+    created_project = create_ocm_client(token).post("/project/create", json=project_data)
     if created_project.status_code != 200 and created_project.status_code != 204:
         raise ProjectError(f"Failed to create a project {created_project}.")
 
@@ -137,9 +146,7 @@ def create_new_design(
         "productId": product_id,
         "designTitle": title,
     }
-    created_design = httpx.post(
-        OCM_URL + "/design/create", headers={"Authorization": token}, json=design_data
-    )
+    created_design = create_ocm_client(token).post("/design/create", json=design_data)
 
     if created_design.status_code not in (200, 204):
         raise DesignError(f"Failed to create a design on OCM {created_design.content}.")
@@ -174,9 +181,7 @@ def create_design_instance(project_id, title, token, product_id=None, return_des
         "productId": product_id,
         "designTitle": title,
     }
-    created_design = httpx.post(
-        OCM_URL + "/design/create", headers={"Authorization": token}, json=design_data
-    )
+    created_design = create_ocm_client(token).post("/design/create", json=design_data)
 
     if created_design.status_code not in (200, 204):
         raise Exception(f"Failed to create a design on OCM {created_design.content}.")
@@ -191,11 +196,11 @@ def get_job_file(token, job_id, filename, simulation_id=None, encrypted=False):
     """Get the job file from the OnScale Cloud Manager."""
     encrypted_part = "decrypted/" if encrypted else ""
     if simulation_id is not None:
-        path = f"{OCM_URL}/job/files/{encrypted_part}{job_id}/{simulation_id}/{filename}"
+        path = f"/job/files/{encrypted_part}{job_id}/{simulation_id}/{filename}"
     else:
-        path = f"{OCM_URL}/job/files/{encrypted_part}{job_id}/{filename}"
-    response = httpx.get(
-        url=path, headers={"authorization": token, "accept": "application/octet-stream"}
+        path = f"/job/files/{encrypted_part}{job_id}/{filename}"
+    response = create_ocm_client(token).get(
+        url=path, headers={"accept": "application/octet-stream"}
     )
     if response.status_code != 200:
         raise ResponseError(f"Failed to get file {response}.")
@@ -205,9 +210,7 @@ def get_job_file(token, job_id, filename, simulation_id=None, encrypted=False):
 
 def get_job_info(token, job_id):
     """Get the job info from the OnScale Cloud Manager."""
-    response = httpx.post(
-        url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
-    )
+    response = create_ocm_client(token).post(url=f"/job/load", json={"jobId": job_id})
     response = process_response(response)
     job_info = {
         "job_id": job_id,
@@ -220,24 +223,20 @@ def get_job_info(token, job_id):
 
 def get_design_of_job(token, job_id):
     """Get the job info from the OnScale Cloud Manager."""
-    response = httpx.post(
-        url=f"{OCM_URL}/job/load", headers={"authorization": token}, json={"jobId": job_id}
-    )
+    response = create_ocm_client(token).post(url="/job/load", json={"jobId": job_id})
     response = process_response(response)
     return response["designInstanceId"]
 
 
 def get_design_title(token, design_instance_id):
     """Get the design Title from the OnScale Cloud Manager."""
-    response = httpx.post(
-        url=f"{OCM_URL}/design/instance/load",
-        headers={"authorization": token},
+    response = create_ocm_client(token).post(
+        url="/design/instance/load",
         json={"designInstanceId": design_instance_id},
     )
     response = process_response(response)
-    design = httpx.post(
-        url=f"{OCM_URL}/design/load",
-        headers={"authorization": token},
+    design = create_ocm_client(token).post(
+        url="/design/load",
         json={"designId": response["designId"]},
     )
     design = process_response(design)
@@ -246,10 +245,9 @@ def get_design_title(token, design_instance_id):
 
 def get_status(job_info: dict, token: str) -> str:
     """Get the status of the job."""
-    response = httpx.post(
-        url=OCM_URL + "/job/load",
+    response = create_ocm_client(token).post(
+        url="/job/load",
         json={"jobId": job_info["job_id"]},
-        headers={"Authorization": token},
     )
     processed_response = process_response(response)
     if "finalStatus" in processed_response and processed_response["finalStatus"] is not None:
@@ -263,10 +261,9 @@ def get_status(job_info: dict, token: str) -> str:
 
 def get_project_ids(name: str, account_id: str, token: str) -> dict:
     """Get projects."""
-    response = httpx.post(
-        url=OCM_URL + "/project/list/page",
+    response = create_ocm_client(token).post(
+        url="/project/list/page",
         json={"accountId": account_id, "filterByName": name, "pageNumber": 0, "pageSize": 1000},
-        headers={"Authorization": token},
     )
     processed_response = process_response(response)
     projects = processed_response["projects"]
@@ -288,18 +285,16 @@ def get_project_id(name: str, account_id: str, token: str) -> str:
 
 def delete_project(project_id, token):
     """Delete a project."""
-    ocm_delete_init = httpx.request(
+    ocm_delete_init = create_ocm_client(token).request(
         method="DELETE",
-        url=OCM_URL + "/project/delete/init",
-        headers={"Authorization": token},
+        url="/project/delete/init",
         json={"projectId": project_id},
         timeout=20,
     )
     ocm_delete_init = process_response(ocm_delete_init)
-    ocm_delete = httpx.request(
+    ocm_delete = create_ocm_client(token).request(
         method="DELETE",
-        url=OCM_URL + "/project/delete/execute",
-        headers={"Authorization": token},
+        url="/project/delete/execute",
         json={"projectId": project_id, "hash": ocm_delete_init["hash"]},
         timeout=20,
     )

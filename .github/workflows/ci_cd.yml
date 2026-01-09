@@ -92,24 +92,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           whitelist-license-check: "zipp,typing-inspection"
 
-  smoke-tests-workaround:
-    name: Build and Smoke tests
-    runs-on: ${{ matrix.os }}
-    needs: [code-style]
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-latest, windows-latest ]
-        python-version: [ "3.9" ]
-    steps:
-      - name: Build wheelhouse and perform smoke test v3.9
-        uses: ansys/actions/build-wheelhouse@v8
-        with:
-          library-name: ${{ env.PACKAGE_NAME }}
-          operating-system: ${{ matrix.os }}
-          python-version: ${{ matrix.python-version }}
-          whitelist-license-check: "zipp,typing-inspection,urllib3"
-
   tests:
     name: Tests and coverage
     runs-on: ${{ matrix.os }}
@@ -117,7 +99,7 @@ jobs:
     strategy:
       matrix:
        os: [ubuntu-latest, windows-latest]
-       python-version: ["3.9","3.10","3.11", "3.12", "3.13"]
+       python-version: ["3.10","3.11", "3.12", "3.13"]
       fail-fast: false
     steps:
       - uses: ansys/actions/tests-pytest@v10
@@ -175,6 +157,8 @@ jobs:
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           check-links: false
+          optional-dependencies-name: ""
+          group-dependencies-name: "doc"
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
 
@@ -234,7 +218,7 @@ jobs:
           path: ${{ env.PACKAGE_NAME }}-artifacts
 
       - name: "Upload artifacts to PyPI using trusted publisher"
-        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
           repository-url: "https://upload.pypi.org/legacy/"
           print-hash: true

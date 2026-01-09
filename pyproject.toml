@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 # Check https://python-poetry.org/docs/pyproject/ for all available sections
 name = "ansys-conceptev-core"
 description = "A Python wrapper for Ansys Conceptev core"
-version = "0.9.dev0"
+version = "0.10.dev0"
 license = "MIT"
 authors = ["ANSYS, Inc. <pyansys.core@ansys.com>"]
 maintainers = ["ANSYS, Inc. <pyansys.core@ansys.com>"]
@@ -24,7 +24,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
@@ -33,7 +32,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.10,<4.0"
 python-dotenv = ">=1.0.0"
 httpx = ">=0.26.0"
 msal = ">=1.29.0"
@@ -44,6 +43,7 @@ async-timeout = { version = ">=4", python = "<3.11" }
 pydantic-settings = "^2.7.1"
 email-validator = "^2.2.0"
 tenacity = ">=8.2.3,<10.0.0"
+truststore = {version = "^0.10.4", python = ">=3.10,<4.0"}
 [tool.poetry.group.dev.dependencies] # Common packages for test and examples
 plotly = ">=5.18,<7.0"
 tox = "^4.15.1"
@@ -73,7 +73,8 @@ sphinx-copybutton = "^0.5.1"
 sphinx-design = "^0.6.0"
 pypandoc-binary = "^1.13"
 sphinx-gallery = ">=0.18,<0.20"
-matplotlib = "~3.9"
+matplotlib = "^3.10.8"
+fonttools = ">=4.61.0"
 pandas = {extras = ["excel"], version = "^2.2.3"}
 
 [tool.poetry.group.tests] # Optional testing dependencies

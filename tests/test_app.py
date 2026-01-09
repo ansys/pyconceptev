@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -511,17 +511,14 @@ statuses = [STATUS_COMPLETE, STATUS_FINISHED, STATUS_ERROR, None]
 
 @pytest.mark.parametrize("last_status", statuses)
 @pytest.mark.parametrize("final_status", statuses)
-def test_returns_final_status_when_present(mocker, final_status, last_status):
+def test_returns_final_status_when_present(httpx_mock, final_status, last_status):
     job_info = {"job_id": "123"}
     token = "token"
-    mock_response = mocker.Mock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {}
-    if final_status is not None:
-        mock_response.json.return_value["finalStatus"] = final_status
-    if last_status is not None:
-        mock_response.json.return_value["lastStatus"] = last_status
-    mocker.patch("httpx.post", return_value=mock_response)
+    httpx_mock.add_response(
+        url=f"{ocm_url}/job/load",
+        method="post",
+        json={"finalStatus": final_status, "lastStatus": last_status},
+    )
 
     if final_status is None and last_status is None:
         with pytest.raises(ResponseError) as exc:
