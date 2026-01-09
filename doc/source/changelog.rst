@@ -9,6 +9,25 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.10.2 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.2>`_ - January 08, 2026
+========================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Miscellaneous
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Chore: update CHANGELOG for v0.10.1
+          - `#299 <https://github.com/ansys/pyconceptev/pull/299>`_
+
+        * - Security update for fonttools
+          - `#301 <https://github.com/ansys/pyconceptev/pull/301>`_
+
+
 `0.10.1 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.1>`_ - November 17, 2025
 =========================================================================================
 
