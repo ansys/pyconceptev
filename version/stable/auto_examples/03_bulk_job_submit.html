@@ -1,0 +1,991 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Bulk Job Submit. &#8212; pyconceptev</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/ansys_sphinx_theme.css?v=d2ac875c" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://www.nerdfonts.com/assets/css/webfont.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=93f552be" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+ 
+<link href="../_static/css/breadcrumbs.css" rel="stylesheet" />
+
+    <script src="../_static/documentation_options.js?v=f7a520e2"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/table.js?v=b64f5182"></script>
+    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/03_bulk_job_submit';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://conceptev.docs.pyansys.com/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.10';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contribute" href="../contributing.html" />
+    <link rel="prev" title="Get Results workflow" href="02_get_results_workflow.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <link rel="canonical" href="https://conceptev.docs.pyansys.com/version/stable/auto_examples/03_bulk_job_submit.html" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container"><!-- Debugging: html_theme_options =  -->
+
+  <!-- If there is no MeiliSearch enabled, use the PyData search -->
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+   
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pyansys_logo_transparent_black.png" class="logo__image only-light" alt="pyconceptev - Home"/>
+    <script>document.write(`<img src="../_static/pyansys_logo_transparent_white.png" class="logo__image only-dark" alt="pyconceptev - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api_ref.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contribute
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../changelog.html">
+    Release notes
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/pyconceptev" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+    <div id="announcement_msg"></div>
+<script>
+  fetch("announcement.html")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(
+      (text) => (document.getElementById("announcement_msg").innerHTML = text),
+    )
+    .catch((error) => console.error(`Fetch problem: ${error.message}`));
+</script>  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api_ref.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contribute
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changelog.html">
+    Release notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/pyconceptev" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_simple_workflow.html">Simple workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_get_results_workflow.html">Get Results workflow</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Bulk Job Submit.</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+         
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="https://docs.pyansys.com/" class="nav-link">PyAnsys</a>
+    </li>
+     
+    <li class="breadcrumb-item">
+      <a
+        href="../index.html"
+        class="nav-link"
+        aria-label="Home"
+      >
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+     
+    <li class="breadcrumb-item">
+      <a href="index.html" class="nav-link">Examples</a>
+    </li>
+      
+    <li class="breadcrumb-item active" aria-current="page">Bulk Job Submit.</li>
+    
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-03-bulk-job-submit-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="bulk-job-submit">
+<span id="sphx-glr-auto-examples-03-bulk-job-submit-py"></span><h1>Bulk Job Submit.<a class="headerlink" href="#bulk-job-submit" title="Link to this heading">#</a></h1>
+<p>Example Script to bulk submit jobs to the ConceptEV API.
+This example copies the template into a project and runs a number of jobs with different
+combinations of components.
+The combinations of components are specified in a CSV file format.</p>
+<section id="perform-required-imports">
+<h2>Perform Required imports<a class="headerlink" href="#perform-required-imports" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ansys.conceptev.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ansys.conceptev.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <a href="https://docs.python.org/3/library/exceptions.html#Exception" title="builtins.Exception" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-exception"><span class="n">ResponseError</span></a>
+</pre></div>
+</div>
+</section>
+<section id="set-up-inputs">
+<h2>Set up inputs.<a class="headerlink" href="#set-up-inputs" title="Link to this heading">#</a></h2>
+<p>Change the following variables to match your data.
+The current filename for combinations can be used as an example.
+The current base_concept_id is a template concept that will be copied.
+Component Order is dictionary that maps the column names in the combinations file to the
+component names in the API.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <span class="s2">&quot;resources/combinations.csv&quot;</span>  <span class="c1"># See example file for format.</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept_id</span></a> <span class="o">=</span> <span class="s2">&quot;2465235f-ad2e-4923-9125-e2e69ccf5816&quot;</span>  <span class="c1"># Truck template.</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_order</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;front_transmission_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Front Transmission&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;front_motor_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Front Motor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;front_inverter_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Front Inverter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rear_transmission_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Rear Transmission&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rear_motor_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Rear Motor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rear_inverter_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Rear Inverter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;battery_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Battery&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;front_clutch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Front Clutch&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rear_clutch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Rear Clutch&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">update_architecture</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">components</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_architecture</span></a><span class="p">):</span>
+    <span class="c1"># Update Architecture to match the new combinations.</span>
+    <span class="n">arch</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">components</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a><span class="p">[</span><span class="n">value</span><span class="p">]]</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_order</span></a><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">arch</span><span class="p">[</span><span class="s2">&quot;number_of_front_wheels&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_architecture</span></a><span class="p">[</span><span class="s2">&quot;number_of_front_wheels&quot;</span><span class="p">]</span>
+    <span class="n">arch</span><span class="p">[</span><span class="s2">&quot;number_of_front_motors&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_architecture</span></a><span class="p">[</span><span class="s2">&quot;number_of_front_motors&quot;</span><span class="p">]</span>
+    <span class="n">arch</span><span class="p">[</span><span class="s2">&quot;number_of_rear_wheels&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_architecture</span></a><span class="p">[</span><span class="s2">&quot;number_of_rear_wheels&quot;</span><span class="p">]</span>
+    <span class="n">arch</span><span class="p">[</span><span class="s2">&quot;number_of_rear_motors&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_architecture</span></a><span class="p">[</span><span class="s2">&quot;number_of_rear_motors&quot;</span><span class="p">]</span>
+    <span class="n">arch</span><span class="p">[</span><span class="s2">&quot;wheelbase&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_architecture</span></a><span class="p">[</span><span class="s2">&quot;wheelbase&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">arch</span>
+</pre></div>
+</div>
+</section>
+<section id="create-a-client-and-create-a-new-project-from-template">
+<h2>Create a client and create a new project from template.<a class="headerlink" href="#create-a-client-and-create-a-new-project-from-template" title="Link to this heading">#</a></h2>
+<p>Authenticate and get a token
+Create an API client.
+Get the account ID and HPC ID.
+Copy the template into a new project.
+Add a clutch to the concept.
+Get the component IDs for the new concept.
+Get the architecture for the new concept.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use API client for the Ansys ConceptEV service</span>
+<span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">get_http_client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># Extend timeout for uploading files.</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">token</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get_token</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">accounts</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get_account_ids</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">token</span></a><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">account_id</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">accounts</span></a><span class="p">[</span><span class="s2">&quot;conceptev_saas@ansys.com&quot;</span><span class="p">]</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hpc_id</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get_default_hpc</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">token</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">account_id</span></a><span class="p">)</span>
+
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">project</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">create_new_project</span><span class="p">(</span>
+        <span class="n">client</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">account_id</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hpc_id</span></a><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;New Project </span><span class="si">{</span><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="datetime.datetime.now" class="sphx-glr-backref-module-datetime-datetime sphx-glr-backref-type-py-method"><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span></a><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">project_id</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">project</span></a><span class="p">[</span><span class="s2">&quot;projectId&quot;</span><span class="p">]</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">design_instance_id</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">create_design_instance</span><span class="p">(</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">project_id</span></a><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;New Concept </span><span class="si">{</span><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="datetime.datetime.now" class="sphx-glr-backref-module-datetime-datetime sphx-glr-backref-type-py-method"><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span></a><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">token</span></a>
+    <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">copy_concept</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept_id</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">design_instance_id</span></a><span class="p">,</span> <span class="n">client</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept_id</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">design_instance_id</span></a>
+    <span class="n">app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="n">client</span><span class="p">,</span>
+        <span class="s2">&quot;/components&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;item_type&quot;</span><span class="p">:</span> <span class="s2">&quot;component&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Disconnect Clutch&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;moment_of_inertia&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;cost&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;component_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ClutchInput&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;efficiency&quot;</span><span class="p">:</span> <span class="s2">&quot;95&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;switch_energy&quot;</span><span class="p">:</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;engaged_power&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">},</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="o">=</span><span class="p">{</span><span class="s2">&quot;design_instance_id&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept_id</span></a><span class="p">},</span>
+    <span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_components</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get_component_id_map</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept_id</span></a><span class="p">)</span>
+
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/concepts/</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept_id</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_architecture</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">client</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;/architectures/</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept</span></a><span class="p">[</span><span class="s1">&#39;architecture_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="o">=</span><span class="p">{</span><span class="s2">&quot;design_instance_id&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept_id</span></a><span class="p">},</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Encryption unavailable. Opting in to plain text.
+Traceback (most recent call last):
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/libsecret.py&quot;, line 18, in &lt;module&gt;
+    import gi  # https://github.com/AzureAD/microsoft-authentication-extensions-for-python/wiki/Encryption-on-Linux  # pylint: disable=line-too-long
+    ^^^^^^^^^
+ModuleNotFoundError: No module named &#39;gi&#39;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/src/ansys/conceptev/core/auth.py&quot;, line 53, in build_persistence
+    return build_encrypted_persistence(location)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/persistence.py&quot;, line 98, in build_encrypted_persistence
+    return LibsecretPersistence(location)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/persistence.py&quot;, line 314, in __init__
+    from .libsecret import (  # This uncertain import is deferred till runtime
+        LibSecretAgent, trial_run)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/libsecret.py&quot;, line 20, in &lt;module&gt;
+        raise ImportError(&quot;&quot;&quot;Unable to import module &#39;gi&#39;
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...&lt;5 lines&gt;...
+    &quot;&quot;&quot;)  # Message via exception rather than log
+    ^^^^
+ImportError: Unable to import module &#39;gi&#39;
+Runtime dependency of PyGObject is missing.
+Depends on your Linux distro, you could install it system-wide by something like:
+    sudo apt install python3-gi python3-gi-cairo gir1.2-secret-1
+If necessary, please refer to PyGObject&#39;s doc:
+https://pygobject.readthedocs.io/en/latest/getting_started.html
+</pre></div>
+</div>
+</section>
+<section id="read-combinations-from-a-csv-file-and-check-they-match-the-combinations-file">
+<h2>Read combinations from a csv file and check they match the combinations file.<a class="headerlink" href="#read-combinations-from-a-csv-file-and-check-they-match-the-combinations-file" title="Link to this heading">#</a></h2>
+<p>Read combinations from a csv file.
+Get the component types from the component_order dictionary.
+Turn them into set.
+Check that the component types are in the combinations file.
+Get the component names from the combinations.
+Check the component names are in the base components.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combinations</span></a> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">,</span> <span class="n">na_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combinations</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combinations</span><span class="o">.</span><span class="n">to_dict</span></a><span class="p">(</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
+
+<span class="c1"># Check the component types are in the header of the combinations file.</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_types</span></a> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_order</span></a><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_types_from_combo_header</span></a> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combinations</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="k">assert</span> <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_types</span></a> <span class="o">&lt;=</span> <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_types_from_combo_header</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_types</span></a><span class="o">.</span><span class="n">difference</span><span class="p">(</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_types_from_combo_header</span></a>
+<span class="p">)</span>
+<span class="c1"># Check the component names in the combinations file are in the base components.</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_names_from_combo</span></a> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">value</span> <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combinations</span></a> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_names_from_base</span></a> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_components</span></a><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_names_from_combo</span></a> <span class="o">&lt;=</span> <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_names_from_base</span></a>
+<span class="p">),</span> <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_names_from_combo</span></a><span class="o">.</span><span class="n">difference</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">component_names_from_base</span></a><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="submit-jobs-for-each-combination">
+<h2>Submit jobs for each combination.<a class="headerlink" href="#submit-jobs-for-each-combination" title="Link to this heading">#</a></h2>
+<p>Create a new design instance with title.
+Create an output list to store the created designs.
+Copy the base Concept into that new design instance.
+Get the component IDs for the new design instance as they change when copied.
+Change the base concept to use the new components.
+Update the architecture on the server.
+Update the local concept instance with the new architecture id.
+Create and submit a job using the new concept (with the new architecture).</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">get_http_client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">token</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get_token</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">created_designs</span></a> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Submit jobs for each combination</span>
+    <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combinations</span></a><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Create a new design instance with title.</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">title</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;F_</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a><span class="p">[</span><span class="s1">&#39;Front Motor&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_R_</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a><span class="p">[</span><span class="s1">&#39;Rear Motor&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="datetime.datetime.now" class="sphx-glr-backref-module-datetime-datetime sphx-glr-backref-type-py-method"><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span></a><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">design_instance_id</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">create_design_instance</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">project_id</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">title</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">title</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">token</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">token</span></a><span class="p">)</span>
+
+            <span class="c1"># Copy base Concept into that new design instance.</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">concept</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">copy_concept</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_concept_id</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">design_instance_id</span></a><span class="p">,</span> <span class="n">client</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ID of the cloned concept: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">concept</span></a><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Save that in output list.</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">created_designs</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;Project Name&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">title</span></a><span class="p">,</span>
+                    <span class="s2">&quot;Design Instance Id&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">design_instance_id</span></a><span class="p">,</span>
+                    <span class="s2">&quot;Concept_ID&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">concept</span></a><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="c1"># Get the component IDs for the new design instance as they change when copied.</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;design_instance_id&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">design_instance_id</span></a><span class="p">}</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">components</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get_component_id_map</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">design_instance_id</span></a><span class="p">)</span>
+            <span class="c1"># Change the base concept to use the new components.</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">updated_architecture</span></a> <span class="o">=</span> <span class="n">update_architecture</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">components</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_architecture</span></a><span class="p">)</span>
+            <span class="c1"># Update the architecture on the server.</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">created_arch</span></a> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="s2">&quot;/architectures&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">updated_architecture</span></a><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created architecture: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">created_arch</span></a><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Update the local concept instance with the new architecture id.</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">concept</span></a><span class="p">[</span><span class="s2">&quot;architecture_id&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">created_arch</span></a><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Create and submit a job using the new concept (with the new architecture)</span>
+            <span class="n">job_info</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">create_submit_job</span><span class="p">(</span>
+                <span class="n">client</span><span class="p">,</span>
+                <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">concept</span></a><span class="p">,</span>
+                <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">account_id</span></a><span class="p">,</span>
+                <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hpc_id</span></a><span class="p">,</span>
+                <span class="n">job_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;cli_job: </span><span class="si">{</span><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="datetime.datetime.now" class="sphx-glr-backref-module-datetime-datetime sphx-glr-backref-type-py-method"><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span></a><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted job for combination </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">job_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <a href="https://docs.python.org/3/library/exceptions.html#Exception" title="builtins.Exception" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-exception"><span class="n">ResponseError</span></a> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to submit job for combination </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">combo</span></a><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>  <span class="c1"># If one job fails to submit keep trying the other jobs.</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Encryption unavailable. Opting in to plain text.
+Traceback (most recent call last):
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/libsecret.py&quot;, line 18, in &lt;module&gt;
+    import gi  # https://github.com/AzureAD/microsoft-authentication-extensions-for-python/wiki/Encryption-on-Linux  # pylint: disable=line-too-long
+    ^^^^^^^^^
+ModuleNotFoundError: No module named &#39;gi&#39;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/src/ansys/conceptev/core/auth.py&quot;, line 53, in build_persistence
+    return build_encrypted_persistence(location)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/persistence.py&quot;, line 98, in build_encrypted_persistence
+    return LibsecretPersistence(location)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/persistence.py&quot;, line 314, in __init__
+    from .libsecret import (  # This uncertain import is deferred till runtime
+        LibSecretAgent, trial_run)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/libsecret.py&quot;, line 20, in &lt;module&gt;
+        raise ImportError(&quot;&quot;&quot;Unable to import module &#39;gi&#39;
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...&lt;5 lines&gt;...
+    &quot;&quot;&quot;)  # Message via exception rather than log
+    ^^^^
+ImportError: Unable to import module &#39;gi&#39;
+Runtime dependency of PyGObject is missing.
+Depends on your Linux distro, you could install it system-wide by something like:
+    sudo apt install python3-gi python3-gi-cairo gir1.2-secret-1
+If necessary, please refer to PyGObject&#39;s doc:
+https://pygobject.readthedocs.io/en/latest/getting_started.html
+
+ID of the cloned concept: 695f992d624bc030b5f4190d
+Created architecture: {&#39;id&#39;: &#39;695f9930624bc030b5f4192b&#39;, &#39;wheelbase&#39;: None, &#39;components_cost&#39;: 15820.0, &#39;components_mass&#39;: 561.0, &#39;max_wheel_speed&#39;: 1071.4285714285716, &#39;number_of_front_wheels&#39;: 2, &#39;number_of_front_motors&#39;: 1, &#39;front_clutch_id&#39;: &#39;695f992e624bc030b5f4191a&#39;, &#39;front_transmission_id&#39;: &#39;695f992e624bc030b5f41919&#39;, &#39;front_motor_id&#39;: &#39;695f992d624bc030b5f41911&#39;, &#39;front_inverter_id&#39;: &#39;695f992d624bc030b5f41912&#39;, &#39;number_of_rear_wheels&#39;: 2, &#39;number_of_rear_motors&#39;: 1, &#39;rear_clutch_id&#39;: None, &#39;rear_transmission_id&#39;: &#39;695f992e624bc030b5f41917&#39;, &#39;rear_motor_id&#39;: &#39;695f992d624bc030b5f41914&#39;, &#39;rear_inverter_id&#39;: &#39;695f992e624bc030b5f41918&#39;, &#39;battery_id&#39;: &#39;695f992d624bc030b5f4190f&#39;}
+
+Failed to submit job for combination {&#39;Front Transmission&#39;: &#39;Single Speed 10:1&#39;, &#39;Front Motor&#39;: &#39;IM_300kW_20kRPM_800V_50Bars36Slots_500A&#39;, &#39;Front Inverter&#39;: &#39;MOSFET Inverter Model&#39;, &#39;Rear Transmission&#39;: &#39;Single Speed 14:1&#39;, &#39;Rear Motor&#39;: &#39;IPM_345kW_15kRPM_800V_8Poles48Slots_460A_LABupTo15krpm&#39;, &#39;Rear Inverter&#39;: &#39;IGBT Inverter Model&#39;, &#39;Battery&#39;: &#39;CellA_800Vdc_100kWh&#39;, &#39;Front Clutch&#39;: &#39;Disconnect Clutch&#39;, &#39;Rear Clutch&#39;: &#39;N/A&#39;}: Response Failed:b&#39;{&quot;message&quot;:&quot;Job Submit Failed: b\&#39;{\\&quot;code\\&quot;:403,\\&quot;errorCode\\&quot;:\\&quot;3072000\\&quot;,\\&quot;errorType\\&quot;:\\&quot;ForbiddenException\\&quot;,\\&quot;messageTag\\&quot;:\\&quot;job.no.access\\&quot;,\\&quot;apiName\\&quot;:\\&quot;job/submit\\&quot;,\\&quot;traceId\\&quot;:\\&quot;695f9932000000001ae803d54dcb4f4f\\&quot;,\\&quot;logType\\&quot;:\\&quot;OCM\\&quot;,\\&quot;messageType\\&quot;:\\&quot;ERROR\\&quot;,\\&quot;message\\&quot;:\\&quot;com.onscale.lib.exception.ForbiddenException: You do not have access to the job User does not have license to access job submission for this product. for job: 9c13ca76-1e43-445b-b1ac-64dbe528f2a0.\\&quot;}\&#39;&quot;}&#39;
+ID of the cloned concept: 695f9935e7ab65d0704a83b4
+Created architecture: {&#39;id&#39;: &#39;695f993a624bc030b5f4192d&#39;, &#39;wheelbase&#39;: None, &#39;components_cost&#39;: 15820.0, &#39;components_mass&#39;: 563.0, &#39;max_wheel_speed&#39;: 1071.4285714285716, &#39;number_of_front_wheels&#39;: 2, &#39;number_of_front_motors&#39;: 1, &#39;front_clutch_id&#39;: &#39;695f9936e7ab65d0704a83c1&#39;, &#39;front_transmission_id&#39;: &#39;695f9936e7ab65d0704a83c0&#39;, &#39;front_motor_id&#39;: &#39;695f9936e7ab65d0704a83bd&#39;, &#39;front_inverter_id&#39;: &#39;695f9936e7ab65d0704a83b7&#39;, &#39;number_of_rear_wheels&#39;: 2, &#39;number_of_rear_motors&#39;: 1, &#39;rear_clutch_id&#39;: None, &#39;rear_transmission_id&#39;: &#39;695f9936e7ab65d0704a83be&#39;, &#39;rear_motor_id&#39;: &#39;695f9936e7ab65d0704a83bb&#39;, &#39;rear_inverter_id&#39;: &#39;695f9936e7ab65d0704a83bf&#39;, &#39;battery_id&#39;: &#39;695f9936e7ab65d0704a83b9&#39;}
+
+Failed to submit job for combination {&#39;Front Transmission&#39;: &#39;Single Speed 10:1&#39;, &#39;Front Motor&#39;: &#39;WRSM_330kW_15kRPM_800V_8Poles48Slots_500A_LABupTo15krpm&#39;, &#39;Front Inverter&#39;: &#39;MOSFET Inverter Model&#39;, &#39;Rear Transmission&#39;: &#39;Single Speed 14:1&#39;, &#39;Rear Motor&#39;: &#39;IPM_345kW_15kRPM_800V_8Poles48Slots_460A_LABupTo15krpm&#39;, &#39;Rear Inverter&#39;: &#39;IGBT Inverter Model&#39;, &#39;Battery&#39;: &#39;CellA_800Vdc_100kWh&#39;, &#39;Front Clutch&#39;: &#39;Disconnect Clutch&#39;, &#39;Rear Clutch&#39;: &#39;N/A&#39;}: Response Failed:b&#39;{&quot;message&quot;:&quot;Job Submit Failed: b\&#39;{\\&quot;code\\&quot;:403,\\&quot;errorCode\\&quot;:\\&quot;3072000\\&quot;,\\&quot;errorType\\&quot;:\\&quot;ForbiddenException\\&quot;,\\&quot;messageTag\\&quot;:\\&quot;job.no.access\\&quot;,\\&quot;apiName\\&quot;:\\&quot;job/submit\\&quot;,\\&quot;traceId\\&quot;:\\&quot;695f993b000000002744d3f3225de9e2\\&quot;,\\&quot;logType\\&quot;:\\&quot;OCM\\&quot;,\\&quot;messageType\\&quot;:\\&quot;ERROR\\&quot;,\\&quot;message\\&quot;:\\&quot;com.onscale.lib.exception.ForbiddenException: You do not have access to the job User does not have license to access job submission for this product. for job: 74ec80f7-493f-463d-8de5-c5af43a3ccba.\\&quot;}\&#39;&quot;}&#39;
+</pre></div>
+</div>
+</section>
+<section id="save-the-list-of-created-designs-to-a-file">
+<h2>Save the list of created designs to a file.<a class="headerlink" href="#save-the-list-of-created-designs-to-a-file" title="Link to this heading">#</a></h2>
+<p>Create a pandas dataframe.
+Export to Excel.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">all_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">created_designs</span></a><span class="p">)</span>
+<span class="n">all_results</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s2">&quot;created_designs.xlsx&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="delete-the-extra-project-on-the-server">
+<h2>Delete the extra project on the server.<a class="headerlink" href="#delete-the-extra-project-on-the-server" title="Link to this heading">#</a></h2>
+<p>Delete the project on the server.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This will delete the project and all its contents.
+Only needed for keep test environment clean.</p>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">get_http_client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">concept</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">created_designs</span></a><span class="p">:</span>
+        <span class="n">client</span><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;design_instance_id&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">concept</span></a><span class="p">[</span><span class="s2">&quot;Design Instance Id&quot;</span><span class="p">])</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="s2">&quot;concepts&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">concept</span></a><span class="p">[</span><span class="s2">&quot;Concept_ID&quot;</span><span class="p">])</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">delete_project</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">project_id</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">token</span></a><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleted project </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">project_id</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Encryption unavailable. Opting in to plain text.
+Traceback (most recent call last):
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/libsecret.py&quot;, line 18, in &lt;module&gt;
+    import gi  # https://github.com/AzureAD/microsoft-authentication-extensions-for-python/wiki/Encryption-on-Linux  # pylint: disable=line-too-long
+    ^^^^^^^^^
+ModuleNotFoundError: No module named &#39;gi&#39;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/src/ansys/conceptev/core/auth.py&quot;, line 53, in build_persistence
+    return build_encrypted_persistence(location)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/persistence.py&quot;, line 98, in build_encrypted_persistence
+    return LibsecretPersistence(location)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/persistence.py&quot;, line 314, in __init__
+    from .libsecret import (  # This uncertain import is deferred till runtime
+        LibSecretAgent, trial_run)
+  File &quot;/home/runner/work/pyconceptev/pyconceptev/.venv/lib/python3.13/site-packages/msal_extensions/libsecret.py&quot;, line 20, in &lt;module&gt;
+        raise ImportError(&quot;&quot;&quot;Unable to import module &#39;gi&#39;
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...&lt;5 lines&gt;...
+    &quot;&quot;&quot;)  # Message via exception rather than log
+    ^^^^
+ImportError: Unable to import module &#39;gi&#39;
+Runtime dependency of PyGObject is missing.
+Depends on your Linux distro, you could install it system-wide by something like:
+    sudo apt install python3-gi python3-gi-cairo gir1.2-secret-1
+If necessary, please refer to PyGObject&#39;s doc:
+https://pygobject.readthedocs.io/en/latest/getting_started.html
+
+Deleted project 2995151c-8e19-43a0-899d-ead789644939
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 31.373 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-03-bulk-job-submit-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/93413b57b0831a286f1eceec7dbef309/03_bulk_job_submit.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">03_bulk_job_submit.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/1f6d2158997714f55b33ee129fcd6123/03_bulk_job_submit.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">03_bulk_job_submit.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/bb565e99fea0b1bdfc6f939e72583ae7/03_bulk_job_submit.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">03_bulk_job_submit.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-required-imports">Perform Required imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-inputs">Set up inputs.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-client-and-create-a-new-project-from-template">Create a client and create a new project from template.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-combinations-from-a-csv-file-and-check-they-match-the-combinations-file">Read combinations from a csv file and check they match the combinations file.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submit-jobs-for-each-combination">Submit jobs for each combination.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#save-the-list-of-created-designs-to-a-file">Save the list of created designs to a file.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#delete-the-extra-project-on-the-server">Delete the extra project on the server.</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item"> 
+<div class="tocsection editthispage">
+  <a href="https://github.com/ansys/pyconceptev/edit/main/doc/source/auto_examples/03_bulk_job_submit.rst">
+    <i class="fa-solid fa-pencil"></i>
+       Edit
+    on GitHub  
+  </a>
+</div>
+
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/auto_examples/03_bulk_job_submit.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright (c) 2023-2026 ANSYS, Inc. and/or its affiliates..
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the
+  <a href="https://sphinxdocs.ansys.com/version/stable/index.html"
+    >Ansys Sphinx Theme</a
+  >
+  1.0.11. <br />Last updated on
+  <span id="date"></span>
+</p>
+<script>
+  var options = { day: "numeric", month: "long", year: "numeric" };
+  var lastModifiedDate = new Date(document.lastModified);
+  var date = lastModifiedDate.toLocaleDateString("en-US", options);
+  document.getElementById("date").innerHTML = date;
+</script></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
