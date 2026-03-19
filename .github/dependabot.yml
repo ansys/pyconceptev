@@ -16,6 +16,10 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     labels:
       - "maintenance"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
