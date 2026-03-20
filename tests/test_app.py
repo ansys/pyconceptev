@@ -529,6 +529,23 @@ def test_returns_final_status_when_present(httpx_mock, final_status, last_status
         assert result in [final_status, last_status]
 
 
+def test_get_status_falls_back_to_job_status_list_when_last_and_final_are_none(httpx_mock):
+    """When lastStatus and finalStatus are None (job just created), fall back to jobStatus list."""
+    job_info = {"job_id": "123"}
+    token = "token"
+    httpx_mock.add_response(
+        url=f"{ocm_url}/job/load",
+        method="post",
+        json={
+            "finalStatus": None,
+            "lastStatus": None,
+            "jobStatus": [{"jobStatus": "CREATED"}],
+        },
+    )
+    result = app.get_status(job_info, token)
+    assert result == "CREATED"
+
+
 @pytest.mark.parametrize(
     "result,expected",
     [(STATUS_COMPLETE, True), (STATUS_FINISHED, True), (STATUS_ERROR, False), (None, False)],

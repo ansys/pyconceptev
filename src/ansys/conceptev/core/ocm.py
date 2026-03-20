@@ -254,6 +254,10 @@ def get_status(job_info: dict, token: str) -> str:
         status = processed_response["finalStatus"].upper()
     elif "lastStatus" in processed_response and processed_response["lastStatus"] is not None:
         status = processed_response["lastStatus"].upper()
+    elif processed_response.get("jobStatus"):
+        # Job is newly created — lastStatus/finalStatus not yet populated by OCM.
+        # Fall back to the most recent entry in the jobStatus history list.
+        status = processed_response["jobStatus"][-1]["jobStatus"].upper()
     else:
         raise ResponseError(f"Failed to get job status {processed_response}.")
     return status
