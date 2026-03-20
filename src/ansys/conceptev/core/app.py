@@ -29,7 +29,7 @@ from tenacity import retry, retry_if_result, stop_after_delay, wait_random_expon
 
 from ansys.conceptev.core import auth
 from ansys.conceptev.core.auth import get_token
-from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError, ResultsError
+from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError
 from ansys.conceptev.core.ocm import (
     create_design_instance,
     create_new_project,

@@ -210,7 +210,8 @@ def get_job_file_signed_url(token, job_id, filename):
     job_files = list_response.json()
     # fileName in the list is "simulationId/filename" or just "filename"
     matched = [
-        f for f in job_files
+        f
+        for f in job_files
         if f.get("fileName", "").endswith(filename) and not f.get("directory", False)
     ]
     if not matched:
