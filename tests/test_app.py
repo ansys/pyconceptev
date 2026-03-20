@@ -344,17 +344,28 @@ def mock_job_results(mocker):
 
 def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
     example_job_info = {"job": "mocked_job", "job_id": "123"}
-    example_results = {"results": "returned"}
+    example_results = [{"requirement": {"name": "test"}, "capability_curve": {}}]
+    signed_url = "https://s3.example.com/bucket/output_file_v3.json?signed=token"
     httpx_mock.add_response(
         url=f"{conceptev_url}/utilities:data_format_version?design_instance_id=123",
         method="get",
         json=3,
     )
     httpx_mock.add_response(
-        url=f"{conceptev_url}/jobs:result?design_instance_id=123&"
-        f"results_file_name=output_file_v3.json&calculate_units=true",
-        method="post",
-        match_json=example_job_info,
+        url=f"{ocm_url}/job/files/list/123",
+        method="get",
+        json=[
+            {
+                "jobId": "123",
+                "fileName": "sim-id/output_file_v3.json",
+                "directory": False,
+                "downloadRequest": {"method": "GET", "uri": signed_url, "headers": {}},
+            }
+        ],
+    )
+    httpx_mock.add_response(
+        url=signed_url,
+        method="get",
         json=example_results,
     )
     httpx_mock.add_response(

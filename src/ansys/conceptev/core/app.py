@@ -40,6 +40,7 @@ from ansys.conceptev.core.ocm import (
     get_design_of_job,
     get_design_title,
     get_job_file,
+    get_job_file_signed_url,
     get_job_info,
     get_or_create_project,
     get_product_id,
@@ -62,6 +63,7 @@ __all__ = [
     get_account_ids,
     get_default_hpc,
     get_job_file,
+    get_job_file_signed_url,
     get_job_info,
     get_design_of_job,
     get_design_title,
@@ -362,26 +364,20 @@ def get_results(
     calculate_units: bool = True,
     filtered: bool = False,
 ):
-    """Get the results."""
+    """Get the results directly from S3 via the OCM signed download URL.
+
+    Fetches the raw result file using the signed URL from the OCM
+    ``/job/files/list/{jobId}`` endpoint, bypassing the API server's
+    ``/jobs:result`` endpoint. This avoids solver-version Pydantic
+    validation failures on the server and mirrors the frontend workflow.
+    """
     version_number = get(client, "/utilities:data_format_version")
     if filtered:
         filename = f"filtered_output_v{version_number}.json"
     else:
         filename = f"output_file_v{version_number}.json"
-    response = client.post(
-        url="/jobs:result",
-        json=job_info,
-        params={
-            "results_file_name": filename,
-            "calculate_units": calculate_units,
-        },
-    )
-    if response.status_code == 502 or response.status_code == 504:
-        raise ResultsError(
-            f"Request timed out {response}. "
-            f"Please try using either calculate_units=False or filtered=True."
-        )
-    return process_response(response)
+    token = auth.get_token(client)
+    return get_job_file_signed_url(token, job_info["job_id"], filename)
 
 
 def get_component_id_map(client, design_instance_id):

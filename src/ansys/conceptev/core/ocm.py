@@ -192,6 +192,45 @@ def create_design_instance(project_id, title, token, product_id=None, return_des
     return design_instance_id
 
 
+def get_job_file_signed_url(token, job_id, filename):
+    """Get a file directly from S3 using the signed download URL from the OCM file list.
+
+    Uses the /job/files/list/{jobId} endpoint to obtain a pre-signed S3 download
+    URL (``downloadRequest.uri``) for the given filename, then fetches the file
+    content directly from S3 — the same flow used by the ConceptEV frontend.
+
+    This bypasses the OCM /job/files decryption proxy and avoids any server-side
+    Pydantic validation, so it works with result files produced by any solver version.
+    """
+    client = create_ocm_client(token)
+    list_response = client.get(url=f"/job/files/list/{job_id}")
+    if list_response.status_code != 200:
+        raise ResponseError(f"Failed to list job files: {list_response}.")
+
+    job_files = list_response.json()
+    # fileName in the list is "simulationId/filename" or just "filename"
+    matched = [
+        f for f in job_files
+        if f.get("fileName", "").endswith(filename) and not f.get("directory", False)
+    ]
+    if not matched:
+        raise ResponseError(f"File '{filename}' not found in job {job_id} file list.")
+
+    download_request = matched[0].get("downloadRequest")
+    if not download_request or not download_request.get("uri"):
+        raise ResponseError(f"No signed download URL available for '{filename}'.")
+
+    signed_url = download_request["uri"]
+    method = download_request.get("method", "GET").upper()
+    headers = download_request.get("headers", {})
+
+    s3_response = httpx.request(method, signed_url, headers=headers)
+    if s3_response.status_code != 200:
+        raise ResponseError(f"Failed to download '{filename}' from S3: {s3_response}.")
+
+    return json.loads(s3_response.content)
+
+
 def get_job_file(token, job_id, filename, simulation_id=None, encrypted=False):
     """Get the job file from the OnScale Cloud Manager."""
     encrypted_part = "decrypted/" if encrypted else ""
