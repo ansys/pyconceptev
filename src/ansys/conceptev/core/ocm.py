@@ -243,7 +243,9 @@ def get_job_file_signed_url(token, job_id, filename):
         timeout=20,
     )
     if s3_response.status_code != 200:
-        raise ResponseError(f"Failed to download '{filename}' from S3: {s3_response}.")
+        raise ResponseError(
+            f"Failed to download '{filename}' from S3: status={s3_response.status_code}."
+        )
 
     return json.loads(s3_response.content)
 
