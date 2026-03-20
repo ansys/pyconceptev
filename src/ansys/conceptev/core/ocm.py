@@ -320,17 +320,20 @@ def get_status(job_info: dict, token: str) -> str:
         job_status_history = processed_response.get("jobStatus")
         if not isinstance(job_status_history, list) or not job_status_history:
             raise ResponseError(
-                f"Failed to get job status: 'jobStatus' history is missing or empty in response {processed_response}."
+                "Failed to get job status: 'jobStatus' history is missing or empty"
+                f" in response {processed_response}."
             )
         last_entry = job_status_history[-1]
         if not isinstance(last_entry, dict):
             raise ResponseError(
-                f"Failed to get job status: last 'jobStatus' entry has unexpected type in response {processed_response}."
+                "Failed to get job status: last 'jobStatus' entry has unexpected type"
+                f" in response {processed_response}."
             )
         raw_status = last_entry.get("jobStatus")
         if not raw_status:
             raise ResponseError(
-                f"Failed to get job status: last 'jobStatus' entry is missing 'jobStatus' field in response {processed_response}."
+                "Failed to get job status: last 'jobStatus' entry is missing 'jobStatus'"
+                f" field in response {processed_response}."
             )
         status = raw_status.upper()
     else:
