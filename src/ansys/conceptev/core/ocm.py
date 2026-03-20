@@ -235,7 +235,13 @@ def get_job_file_signed_url(token, job_id, filename):
     method = download_request.get("method", "GET").upper()
     headers = download_request.get("headers", {})
 
-    s3_response = httpx.request(method, signed_url, headers=headers)
+    s3_response = httpx.request(
+        method,
+        signed_url,
+        headers=headers,
+        verify=generate_ssl_context(),
+        timeout=20,
+    )
     if s3_response.status_code != 200:
         raise ResponseError(f"Failed to download '{filename}' from S3: {s3_response}.")
 
