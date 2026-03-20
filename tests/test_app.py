@@ -342,7 +342,8 @@ def mock_job_results(mocker):
     mocker.patch("ansys.conceptev.core.app.job_status")
 
 
-def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
+def test_read_results_without_units(httpx_mock: HTTPXMock, client: httpx.Client):
+    """When calculate_units=False, results are fetched via S3 signed URL."""
     example_job_info = {"job": "mocked_job", "job_id": "123"}
     example_results = [{"requirement": {"name": "test"}, "capability_curve": {}}]
     signed_url = "https://s3.example.com/bucket/output_file_v3.json?signed=token"
@@ -363,9 +364,33 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
             }
         ],
     )
+    httpx_mock.add_response(url=signed_url, method="get", json=example_results)
     httpx_mock.add_response(
-        url=signed_url,
+        url=ocm_url + "/user/details", method="post", json={"userId": "user_123"}
+    )
+    httpx_mock.add_response(
+        url=ocm_url + "/job/load",
+        method="post",
+        json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
+    )
+    results = app.read_results(client, example_job_info, calculate_units=False)
+    assert example_results == results
+
+
+def test_read_results_with_units(httpx_mock: HTTPXMock, client: httpx.Client):
+    """When calculate_units=True (default), results are fetched via /jobs:result."""
+    example_job_info = {"job": "mocked_job", "job_id": "123"}
+    example_results = {"results": "with_units"}
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/utilities:data_format_version?design_instance_id=123",
         method="get",
+        json=3,
+    )
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/jobs:result?design_instance_id=123&"
+        f"results_file_name=output_file_v3.json&calculate_units=true",
+        method="post",
+        match_json=example_job_info,
         json=example_results,
     )
     httpx_mock.add_response(
@@ -376,7 +401,7 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         method="post",
         json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
     )
-    results = app.read_results(client, example_job_info)
+    results = app.read_results(client, example_job_info, calculate_units=True)
     assert example_results == results
 
 

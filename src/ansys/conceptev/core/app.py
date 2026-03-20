@@ -364,18 +364,33 @@ def get_results(
     calculate_units: bool = True,
     filtered: bool = False,
 ):
-    """Get the results directly from S3 via the OCM signed download URL.
+    """Get the results for a completed job.
 
-    Fetches the raw result file using the signed URL from the OCM
-    ``/job/files/list/{jobId}`` endpoint, bypassing the API server's
-    ``/jobs:result`` endpoint. This avoids solver-version Pydantic
-    validation failures on the server and mirrors the frontend workflow.
+    When ``calculate_units=False``, fetches the raw result file directly from S3
+    via the signed URL from the OCM ``/job/files/list/{jobId}`` endpoint — the
+    same flow used by the ConceptEV frontend. This bypasses API server Pydantic
+    validation and works with any solver version.
+
+    When ``calculate_units=True`` (default), falls back to the API server's
+    ``/jobs:result`` endpoint which performs server-side unit calculation.
     """
     version_number = get(client, "/utilities:data_format_version")
     if filtered:
         filename = f"filtered_output_v{version_number}.json"
     else:
         filename = f"output_file_v{version_number}.json"
+
+    if calculate_units:
+        response = client.post(
+            url="/jobs:result",
+            json=job_info,
+            params={
+                "results_file_name": filename,
+                "calculate_units": calculate_units,
+            },
+        )
+        return process_response(response)
+
     token = auth.get_token(client)
     return get_job_file_signed_url(token, job_info["job_id"], filename)
 
