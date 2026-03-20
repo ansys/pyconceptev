@@ -193,14 +193,16 @@ def create_design_instance(project_id, title, token, product_id=None, return_des
 
 
 def get_job_file_signed_url(token, job_id, filename):
-    """Get a file directly from S3 using the signed download URL from the OCM file list.
+    """Fetch JSON content from S3 using the signed download URL from the OCM file list.
 
-    Uses the /job/files/list/{jobId} endpoint to obtain a pre-signed S3 download
-    URL (``downloadRequest.uri``) for the given filename, then fetches the file
-    content directly from S3 — the same flow used by the ConceptEV frontend.
+    Uses the ``/job/files/list/{jobId}`` endpoint to obtain a pre-signed S3
+    download URL (``downloadRequest.uri``) for the given filename, then issues
+    a direct HTTP request to S3 and JSON-decodes the response body.
 
-    This bypasses the OCM /job/files decryption proxy and avoids any server-side
-    Pydantic validation, so it works with result files produced by any solver version.
+    This bypasses the OCM ``/job/files`` decryption proxy and avoids any
+    server-side Pydantic validation, so it works with result files produced by
+    any solver version, as long as the S3 object is JSON-encoded. Returns the
+    parsed JSON content as a Python object.
     """
     client = create_ocm_client(token)
     list_response = client.get(url=f"/job/files/list/{job_id}")
