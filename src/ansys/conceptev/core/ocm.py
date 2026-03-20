@@ -205,7 +205,9 @@ def get_job_file_signed_url(token, job_id, filename):
     client = create_ocm_client(token)
     list_response = client.get(url=f"/job/files/list/{job_id}")
     if list_response.status_code != 200:
-        raise ResponseError(f"Failed to list job files: {list_response}.")
+        raise ResponseError(
+            f"Failed to list job files for job {job_id}: " f"status={list_response.status_code}."
+        )
 
     job_files = list_response.json()
     # fileName in the list is "simulationId/filename" or just "filename"
@@ -215,7 +217,15 @@ def get_job_file_signed_url(token, job_id, filename):
         if f.get("fileName", "").endswith(filename) and not f.get("directory", False)
     ]
     if not matched:
-        raise ResponseError(f"File '{filename}' not found in job {job_id} file list.")
+        available = [
+            {"jobId": f.get("jobId"), "fileName": f.get("fileName")}
+            for f in job_files
+            if not f.get("directory", False)
+        ]
+        raise ResponseError(
+            f"File '{filename}' not found in job {job_id} file list. "
+            f"Available files: {available}."
+        )
 
     download_request = matched[0].get("downloadRequest")
     if not download_request or not download_request.get("uri"):
