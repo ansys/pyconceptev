@@ -110,7 +110,7 @@ jobs:
           pytest-extra-args: "-m 'not integration' --cov=ansys --cov-report=term --cov-report=html:.cov/html"
 
       - name: Upload coverage results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: env.MAIN_PYTHON_VERSION == matrix.python-version
         with:
           name: coverage-tests-${{ matrix.os }}
@@ -118,7 +118,7 @@ jobs:
           retention-days: 7
 
       - name: Upload coverage results (as .coverage)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: env.MAIN_PYTHON_VERSION == matrix.python-version
         with:
           name: coverage-file-tests-${{ matrix.os }}
@@ -212,7 +212,7 @@ jobs:
       contents: write
     steps:
       - name: "Download the library artifacts from build-library step"
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ env.PACKAGE_NAME }}-artifacts
           path: ${{ env.PACKAGE_NAME }}-artifacts
