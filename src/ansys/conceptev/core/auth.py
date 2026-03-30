@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -23,37 +23,20 @@
 """Authentication for AnsysID."""
 
 import logging
-import pathlib
-import sys
 
-try:
-    import tomllib
-except ImportError:
-    import tomli as tomllib
-
+import httpx
 from msal import PublicClientApplication
-from msal_extensions import (
-    FilePersistence,
-    FilePersistenceWithDataProtection,
-    KeychainPersistence,
-    LibsecretPersistence,
-    token_cache,
-)
+from msal_extensions import FilePersistence, build_encrypted_persistence, token_cache
 
-file_directory = pathlib.Path(__file__).parent.resolve()
+from ansys.conceptev.core.exceptions import TokenError
+from ansys.conceptev.core.settings import settings
 
-with open(file_directory.joinpath("resources", "config.toml"), "rb") as f:
-    config = tomllib.load(f)
-try:
-    with open("config.toml", "rb") as f:
-        config2 = tomllib.load(f)
-        config.update(config2)
-except FileNotFoundError:
-    pass  # No local config file.
-
-scope = config["scope"]
-client_id = config["client_id"]
-authority = config["authority"]
+logger = logging.getLogger(__name__)
+scope = settings.scope
+client_id = settings.client_id
+authority = settings.authority
+USERNAME = settings.conceptev_username
+PASSWORD = settings.conceptev_password
 
 
 def create_msal_app(cache_filepath="token_cache.bin") -> PublicClientApplication:
@@ -66,38 +49,64 @@ def create_msal_app(cache_filepath="token_cache.bin") -> PublicClientApplication
 
 def build_persistence(location, fallback_to_plaintext=True):
     """Create Persistent Cache."""
-    if sys.platform.startswith("win"):
-        return FilePersistenceWithDataProtection(location)
-    if sys.platform.startswith("darwin"):
-        return KeychainPersistence(location, "conceptev_cli", "conceptev_cli_account")
-    if sys.platform.startswith("linux"):
-        try:
-            return LibsecretPersistence(
-                location,
-                schema_name="my_schema_name",
-                attributes={"attr1": "hello", "attr2": "world"},
-            )
-        except:
-            if not fallback_to_plaintext:
-                raise
-            logging.exception("Encryption unavailable. Opting in to plain text.")
+    try:
+        return build_encrypted_persistence(location)
+    except:
+        if not fallback_to_plaintext:
+            raise
+        logger.exception("Encryption unavailable. Opting in to plain text.")
     return FilePersistence(location)
 
 
-def get_ansyId_token(app) -> str:
+def get_ansyId_token(app, force=False) -> str:
     """Get token from AnsysID."""
     result = None
     accounts = app.get_accounts()
-    if accounts:
+    if accounts and not force:
         # Assuming the end user chose this one
         chosen = accounts[0]
         # Now let's try to find a token in cache for this account
+        logger.info("Trying to acquire token silently")
         result = app.acquire_token_silent(scopes=[scope], account=chosen)
+    if not result and USERNAME and PASSWORD:
+        logger.info("Trying to acquire token with username and password")
+        result = app.acquire_token_by_username_password(
+            username=USERNAME, password=PASSWORD, scopes=[scope]
+        )
     if not result:
+        logger.info("Trying to acquire token interactively")
         result = app.acquire_token_interactive(scopes=[scope])
+
     if "access_token" in result:
         return result["access_token"]
     error = result.get("error")
     error_description = result.get("error_description")
     correlation_id = result.get("error_description")
     raise Exception(f"Failed to get token {error}, {error_description}, {correlation_id}.")
+
+
+class AnsysIDAuth(httpx.Auth):
+    """Custom Auth implementation for httpx.
+
+    This class is used to authenticate requests to AnsysID using MSAL.
+    """
+
+    def __init__(self, cache_filepath="token_cache.bin"):
+        """Initialize the AnsysIDAuth class."""
+        app = create_msal_app(cache_filepath=cache_filepath)
+        self.app = app
+
+    def auth_flow(self, request):
+        """Send the request, with a custom `Authentication` header."""
+        token = get_ansyId_token(self.app)
+        request.headers["Authorization"] = token
+        yield request
+
+
+def get_token(client: httpx.Client) -> str:
+    """Get the token from the client."""
+    if client.auth is not None and client.auth.app is not None:
+        return get_ansyId_token(client.auth.app)
+    elif client.headers is not None and "Authorization" in client.headers:
+        return client.headers["Authorization"]
+    raise TokenError("App not found in client.")

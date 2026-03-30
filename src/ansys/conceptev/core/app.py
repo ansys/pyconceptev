@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -21,19 +21,58 @@
 # SOFTWARE.
 
 """Simple API client for the Ansys ConceptEV service."""
-
 import datetime
-from json import JSONDecodeError
-import os
 from typing import Literal
 
-import dotenv
 import httpx
+from tenacity import retry, retry_if_result, stop_after_delay, wait_random_exponential
 
 from ansys.conceptev.core import auth
-from ansys.conceptev.core.progress import check_status, monitor_job_progress
+from ansys.conceptev.core.auth import get_token
+from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError
+from ansys.conceptev.core.ocm import (
+    create_design_instance,
+    create_new_project,
+    delete_project,
+    get_account_id,
+    get_account_ids,
+    get_default_hpc,
+    get_design_of_job,
+    get_design_title,
+    get_job_file,
+    get_job_file_signed_url,
+    get_job_info,
+    get_or_create_project,
+    get_product_id,
+    get_project_id,
+    get_project_ids,
+    get_status,
+    get_user_id,
+)
+from ansys.conceptev.core.progress import check_status, generate_ssl_context, monitor_job_progress
+from ansys.conceptev.core.responses import is_gateway_error, process_response
+from ansys.conceptev.core.settings import settings
 
-dotenv.load_dotenv()
+__all__ = [
+    "get_or_create_project",
+    "create_new_project",
+    "create_design_instance",
+    "get_product_id",
+    "get_user_id",
+    "get_account_id",
+    "get_account_ids",
+    "get_default_hpc",
+    "get_job_file",
+    "get_job_file_signed_url",
+    "get_job_info",
+    "get_design_of_job",
+    "get_design_title",
+    "get_status",
+    "get_project_ids",
+    "get_project_id",
+    "delete_project",
+    "get_token",
+]
 
 Router = Literal[
     "/architectures",
@@ -66,47 +105,40 @@ PRODUCT_ACCESS_ROUTES = [
     "/jobs:start",
 ]
 
-JOB_TIMEOUT = auth.config["JOB_TIMEOUT"]
+JOB_TIMEOUT = settings.job_timeout
+OCM_URL = settings.ocm_url
+BASE_URL = settings.conceptev_url
+ACCOUNT_NAME = settings.account_name
 app = auth.create_msal_app()
 
 
-def get_token() -> str:
-    """Get token from OCM."""
-    username = os.environ["CONCEPTEV_USERNAME"]
-    password = os.environ["CONCEPTEV_PASSWORD"]
-    ocm_url = auth.config["OCM_URL"]
-    response = httpx.post(
-        url=ocm_url + "/auth/login/", json={"emailAddress": username, "password": password}
-    )
-    if response.status_code != 200:
-        raise Exception(f"Failed to get token {response.content}")
-    return response.json()["accessToken"]
-
-
-def get_http_client(token: str, design_instance_id: str | None = None) -> httpx.Client:
+def get_http_client(
+    token: str | None = None,
+    design_instance_id: str | None = None,
+    cache_filepath: str = "token_cache.bin",
+) -> httpx.Client:
     """Get an HTTP client.
 
     The HTTP client creates and maintains the connection, which is more performant than
     re-creating this connection for each call.
     """
-    base_url = auth.config["CONCEPTEV_URL"]
-    params = None
-    if design_instance_id:
-        params = {"design_instance_id": design_instance_id}
-    return httpx.Client(headers={"Authorization": token}, params=params, base_url=base_url)
+    httpx_auth = auth.AnsysIDAuth(cache_filepath=cache_filepath) if token is None else None
+    params = {"design_instance_id": design_instance_id} if design_instance_id else None
+    header = {"Authorization": token} if token else None
 
-
-def process_response(response) -> dict:
-    """Process a response.
-
-    Check the value returned from the API and raise an error if the process is not successful.
-    """
-    if response.status_code == 200 or response.status_code == 201:  # Success
-        try:
-            return response.json()
-        except JSONDecodeError:
-            return response.content
-    raise Exception(f"Response Failed:{response.content}")
+    client = httpx.Client(
+        headers=header,
+        auth=httpx_auth,
+        params=params,
+        base_url=BASE_URL,
+        verify=generate_ssl_context(),
+    )
+    client.send = retry(
+        retry=retry_if_result(is_gateway_error),
+        wait=wait_random_exponential(multiplier=1, max=60),
+        stop=stop_after_delay(10),
+    )(client.send)
+    return client
 
 
 def get(
@@ -145,7 +177,7 @@ def check_product_access(router: Router, account_id: str | None, params: dict) -
     """Check account_id is there for product access."""
     if router in PRODUCT_ACCESS_ROUTES:
         if not account_id:
-            raise Exception(f"Account ID is required for {router}.")
+            raise ProductAccessError(f"Account ID is required for {router}.")
         params = params | {"account_id": account_id}
     return params
 
@@ -159,7 +191,7 @@ def delete(client: httpx.Client, router: Router, id: str, account_id: str | None
     path = "/".join([router, id])
     response = client.delete(url=path, params=params)
     if response.status_code != 204:
-        raise Exception(f"Failed to delete from {router} with ID:{id}.")
+        raise DeleteError(f"Failed to delete from {router} with ID:{id}.")
 
 
 def put(client: httpx.Client, router: Router, id: str, data: dict) -> dict:
@@ -172,61 +204,31 @@ def put(client: httpx.Client, router: Router, id: str, data: dict) -> dict:
     return process_response(response)
 
 
-def create_new_project(
-    client: httpx.Client,
-    account_id: str,
-    hpc_id: str,
-    title: str,
-    project_goal: str = "Created from the CLI",
-) -> dict:
-    """Create a project."""
-    osm_url = auth.config["OCM_URL"]
-    token = client.headers["Authorization"]
-    project_data = {
-        "accountId": account_id,
-        "hpcId": hpc_id,
-        "projectTitle": title,
-        "projectGoal": project_goal,
-    }
-    created_project = httpx.post(
-        osm_url + "/project/create", headers={"Authorization": token}, json=project_data
-    )
-    if created_project.status_code != 200 and created_project.status_code != 204:
-        raise Exception(f"Failed to create a project {created_project}.")
-
-    return created_project.json()
-
-
 def create_new_concept(
     client: httpx.Client,
     project_id: str,
-    title: str = f"CLI concept {datetime.datetime.now()}",
+    product_id: str | None = None,
+    title: str | None = None,
 ) -> dict:
     """Create a concept within an existing project."""
-    osm_url = auth.config["OCM_URL"]
-    token = client.headers["Authorization"]
-    product_id = get_product_id(token)
+    if title is None:
+        title = f"CLI concept {datetime.datetime.now()}"
 
-    design_data = {
-        "projectId": project_id,
-        "productId": product_id,
-        "designTitle": title,
-    }
-    created_design = httpx.post(
-        osm_url + "/design/create", headers={"Authorization": token}, json=design_data
+    token = auth.get_token(client)
+    if product_id is None:
+        product_id = get_product_id(token)
+
+    design_instance_id, design_id = create_design_instance(
+        project_id, title, token, product_id, return_design_id=True
     )
-
-    if created_design.status_code not in (200, 204):
-        raise Exception(f"Failed to create a design on OCM {created_design.content}.")
 
     user_id = get_user_id(token)
 
-    design_instance_id = created_design.json()["designInstanceList"][0]["designInstanceId"]
     concept_data = {
         "capabilities_ids": [],
         "components_ids": [],
         "configurations_ids": [],
-        "design_id": created_design.json()["designId"],
+        "design_id": design_id,
         "design_instance_id": design_instance_id,
         "drive_cycles_ids": [],
         "jobs_ids": [],
@@ -237,34 +239,11 @@ def create_new_concept(
     }
 
     query = {
-        "design_instance_id": created_design.json()["designInstanceList"][0]["designInstanceId"],
+        "design_instance_id": design_instance_id,
     }
 
     created_concept = post(client, "/concepts", data=concept_data, params=query)
     return created_concept
-
-
-def get_product_id(token: str) -> str:
-    """Get the product ID."""
-    osm_url = auth.config["OCM_URL"]
-    products = httpx.get(osm_url + "/product/list", headers={"Authorization": token})
-    if products.status_code != 200:
-        raise Exception(f"Failed to get product id.")
-
-    product_id = [
-        product["productId"] for product in products.json() if product["productName"] == "CONCEPTEV"
-    ][0]
-    return product_id
-
-
-def get_user_id(token):
-    """Get the user ID."""
-    osm_url = auth.config["OCM_URL"]
-    user_details = httpx.post(osm_url + "/user/details", headers={"Authorization": token})
-    if user_details.status_code not in (200, 204):
-        raise Exception(f"Failed to get a user details on OCM {user_details}.")
-    user_id = user_details.json()["userId"]
-    return user_id
 
 
 def get_concept_ids(client: httpx.Client) -> dict:
@@ -273,61 +252,9 @@ def get_concept_ids(client: httpx.Client) -> dict:
     return {concept["name"]: concept["id"] for concept in concepts}
 
 
-def get_account_ids(token: str) -> dict:
-    """Get account IDs."""
-    ocm_url = auth.config["OCM_URL"]
-    response = httpx.post(url=ocm_url + "/account/list", headers={"authorization": token})
-    if response.status_code != 200:
-        raise Exception(f"Failed to get accounts {response}.")
-    accounts = {
-        account["account"]["accountName"]: account["account"]["accountId"]
-        for account in response.json()
-    }
-    return accounts
-
-
-def get_default_hpc(token: str, account_id: str) -> dict:
-    """Get the default HPC ID."""
-    ocm_url = auth.config["OCM_URL"]
-    response = httpx.post(
-        url=ocm_url + "/account/hpc/default",
-        json={"accountId": account_id},
-        headers={"authorization": token},
-    )
-    if response.status_code != 200:
-        raise Exception(f"Failed to get accounts {response}.")
-    return response.json()["hpcId"]
-
-
-def create_submit_job(
-    client,
-    concept: dict,
-    account_id: str,
-    hpc_id: str,
-    job_name: str = "cli_job: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
-) -> dict:
-    """Create and then submit a job."""
-    job_input = {
-        "job_name": job_name,
-        "requirement_ids": concept["requirements_ids"],
-        "architecture_id": concept["architecture_id"],
-        "concept_id": concept["id"],
-        "design_instance_id": concept["design_instance_id"],
-    }
-    job, uploaded_file = post(client, "/jobs", data=job_input, account_id=account_id)
-    job_start = {
-        "job": job,
-        "uploaded_file": uploaded_file,
-        "account_id": account_id,
-        "hpc_id": hpc_id,
-    }
-    job_info = post(client, "/jobs:start", data=job_start, account_id=account_id)
-    return job_info
-
-
 def read_file(filename: str) -> str:
     """Read a given file."""
-    with open(filename) as f:
+    with open(filename, "r+b") as f:
         content = f.read()
     return content
 
@@ -337,49 +264,28 @@ def read_results(
     job_info: dict,
     calculate_units: bool = True,
     timeout: int = JOB_TIMEOUT,
+    filtered: bool = False,
     msal_app: auth.PublicClientApplication | None = None,
 ) -> dict:
     """Read job results."""
     job_id = job_info["job_id"]
-    token = client.headers["Authorization"]
+    token = auth.get_token(client)
     user_id = get_user_id(token)
     initial_status = get_status(job_info, token)
     if check_status(initial_status):  # Job already completed
-        return get_results(client, job_info, calculate_units)
+        return get_results(client, job_info, calculate_units, filtered)
     else:  # Job is still running
-        monitor_job_progress(job_id, user_id, token, timeout)  # Wait for completion
         if msal_app is None:
             msal_app = auth.create_msal_app()
+        monitor_job_progress(job_id, user_id, msal_app, timeout)  # Wait for completion
+
         token = auth.get_ansyId_token(msal_app)
         client.headers["Authorization"] = token  # Update the token
         return get_results(client, job_info, calculate_units)
 
-
-def get_results(client, job_info: dict, calculate_units: bool = True):
-    """Get the results."""
-    version_number = get(client, "/utilities:data_format_version")
-    response = client.post(
-        url="/jobs:result",
-        json=job_info,
-        params={
-            "results_file_name": f"output_file_v{version_number}.json",
-            "calculate_units": calculate_units,
-        },
-    )
-    return process_response(response)
-
-
-def get_status(job_info: dict, token: str) -> str:
-    """Get the status of the job."""
-    ocm_url = auth.config["OCM_URL"]
-    response = httpx.post(
-        url=ocm_url + "/job/load",
-        json={"jobId": job_info["job_id"]},
-        headers={"Authorization": token},
-    )
-    processed_response = process_response(response)
-    initial_status = processed_response["jobStatus"][-1]["jobStatus"]
-    return initial_status
+        token = auth.get_ansyId_token(msal_app)
+        client.headers["Authorization"] = token  # Update the token
+        return get_results(client, job_info, calculate_units, filtered)
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
@@ -410,9 +316,93 @@ def get_concept(client: httpx.Client, design_instance_id: str) -> dict:
     return concept
 
 
-if __name__ == "__main__":
-    token = get_token()
+def copy_concept(base_concept_id, design_instance_id, client):
+    """Copy the reference concept to the new design instance."""
+    copy = {
+        "old_design_instance_id": base_concept_id,
+        "new_design_instance_id": design_instance_id,
+        "copy_jobs": False,
+    }
+    # Clone the base concept
+    params = {"design_instance_id": design_instance_id, "populated": False}
+    client.params = params
+    concept = post(client, "/concepts:copy", data=copy)
+    return concept
 
-    with get_http_client(token) as client:  # Create a client to talk to the API
-        health = get(client, "/health")  # Check that the API is healthy
-        print(health)
+
+def create_submit_job(
+    client,
+    concept: dict,
+    account_id: str,
+    hpc_id: str,
+    job_name: str | None = None,
+    docker_tag: str = "default",
+    extra_memory: bool = False,
+) -> dict:
+    """Create and then submit a job."""
+    if job_name is None:
+        job_name = f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}"
+    job_input = {
+        "job_name": job_name,
+        "requirement_ids": concept["requirements_ids"],
+        "architecture_id": concept["architecture_id"],
+        "concept_id": concept["id"],
+        "design_instance_id": concept["design_instance_id"],
+    }
+    job, uploaded_file = post(client, "/jobs", data=job_input, account_id=account_id)
+    job_start = {
+        "job": job,
+        "uploaded_file": uploaded_file,
+        "account_id": account_id,
+        "hpc_id": hpc_id,
+        "docker_tag": docker_tag,
+        "extra_memory": extra_memory,
+    }
+    job_info = post(client, "/jobs:start", data=job_start, account_id=account_id)
+    return job_info
+
+
+def get_results(
+    client,
+    job_info: dict,
+    calculate_units: bool = True,
+    filtered: bool = False,
+):
+    """Get the results for a completed job.
+
+    When ``calculate_units=False``, fetches the raw result file directly from S3
+    via the signed URL from the OCM ``/job/files/list/{jobId}`` endpoint — the
+    same flow used by the ConceptEV frontend. This bypasses API server Pydantic
+    validation and works with any solver version.
+
+    When ``calculate_units=True`` (default), falls back to the API server's
+    ``/jobs:result`` endpoint which performs server-side unit calculation.
+    """
+    version_number = get(client, "/utilities:data_format_version")
+    if filtered:
+        filename = f"filtered_output_v{version_number}.json"
+    else:
+        filename = f"output_file_v{version_number}.json"
+
+    if calculate_units:
+        response = client.post(
+            url="/jobs:result",
+            json=job_info,
+            params={
+                "results_file_name": filename,
+                "calculate_units": calculate_units,
+            },
+        )
+        return process_response(response)
+
+    token = auth.get_token(client)
+    return get_job_file_signed_url(token, job_info["job_id"], filename)
+
+
+def get_component_id_map(client, design_instance_id):
+    """Get a map of component name to component id."""
+    ###TODO move to results file so its self contained.
+    components = client.get(f"/concepts/{design_instance_id}/components")
+    components = process_response(components)
+    components.append({"name": "N/A", "id": None})
+    return {component["name"]: component["id"] for component in components}

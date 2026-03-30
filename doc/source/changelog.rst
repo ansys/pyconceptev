@@ -9,6 +9,413 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.10.1 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.1>`_ - November 17, 2025
+=========================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Miscellaneous
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE: Bump pypa/gh-action-pypi-publish from 1.12.4 to 1.13.0
+          - `#281 <https://github.com/ansys/pyconceptev/pull/281>`_
+
+
+`0.10.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.0>`_ - November 17, 2025
+=========================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Dependencies
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE: Bump sphinx-gallery from 0.18.0 to 0.19.0
+          - `#201 <https://github.com/ansys/pyconceptev/pull/201>`_
+
+        * - CHORE: Bump pygobject from 3.50.0 to 3.52.3
+          - `#206 <https://github.com/ansys/pyconceptev/pull/206>`_
+
+        * - CHORE: Bump pre-commit from 4.1.0 to 4.2.0
+          - `#222 <https://github.com/ansys/pyconceptev/pull/222>`_
+
+        * - CHORE: Bump msal from 1.31.1 to 1.32.3
+          - `#226 <https://github.com/ansys/pyconceptev/pull/226>`_
+
+        * - CHORE: Bump tenacity from 8.2.3 to 9.1.2
+          - `#234 <https://github.com/ansys/pyconceptev/pull/234>`_
+
+
+  .. tab-item:: Miscellaneous
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Chore: bump ansys/actions from 8 to 10
+          - `#231 <https://github.com/ansys/pyconceptev/pull/231>`_, `#239 <https://github.com/ansys/pyconceptev/pull/239>`_, `#251 <https://github.com/ansys/pyconceptev/pull/251>`_
+
+        * - Chore: bump pytest-asyncio from 0.25.3 to 1.0.0
+          - `#232 <https://github.com/ansys/pyconceptev/pull/232>`_
+
+        * - Fix/bug-in-job-status
+          - `#233 <https://github.com/ansys/pyconceptev/pull/233>`_
+
+        * - Chore: bump ansys-optislang-core from 0.10.0 to 1.0.0
+          - `#235 <https://github.com/ansys/pyconceptev/pull/235>`_
+
+        * - Chore: bump jupyterlab from 4.3.6 to 4.4.3
+          - `#236 <https://github.com/ansys/pyconceptev/pull/236>`_
+
+        * - Chore: bump ipywidgets from 8.1.5 to 8.1.7
+          - `#237 <https://github.com/ansys/pyconceptev/pull/237>`_
+
+        * - Feature/new-client-id
+          - `#238 <https://github.com/ansys/pyconceptev/pull/238>`_
+
+        * - Chore: bump msal-extensions from 1.2.0 to 1.3.1
+          - `#240 <https://github.com/ansys/pyconceptev/pull/240>`_
+
+        * - Chore: bump pandas from 2.2.3 to 2.3.0
+          - `#241 <https://github.com/ansys/pyconceptev/pull/241>`_
+
+        * - Chore: bump python-dotenv from 1.0.1 to 1.1.0
+          - `#242 <https://github.com/ansys/pyconceptev/pull/242>`_
+
+        * - Chore: bump tox from 4.24.2 to 4.27.0
+          - `#243 <https://github.com/ansys/pyconceptev/pull/243>`_
+
+        * - Chore: bump jupytext from 1.16.7 to 1.17.2
+          - `#244 <https://github.com/ansys/pyconceptev/pull/244>`_
+
+        * - Group dependencies together
+          - `#245 <https://github.com/ansys/pyconceptev/pull/245>`_
+
+        * - Chore: bump pytest-mock from 3.14.0 to 3.14.1
+          - `#250 <https://github.com/ansys/pyconceptev/pull/250>`_
+
+        * - Chore: bump the production-dependencies group with 2 updates
+          - `#254 <https://github.com/ansys/pyconceptev/pull/254>`_
+
+        * - Chore: bump the development-dependencies group with 5 updates
+          - `#255 <https://github.com/ansys/pyconceptev/pull/255>`_
+
+        * - Chore: bump the development-dependencies group across 1 directory with 2 updates
+          - `#259 <https://github.com/ansys/pyconceptev/pull/259>`_
+
+        * - Chore: update dev version
+          - `#262 <https://github.com/ansys/pyconceptev/pull/262>`_
+
+        * - We need an access token not an id token
+          - `#264 <https://github.com/ansys/pyconceptev/pull/264>`_
+
+        * - Added missing optional arguments for job start/create
+          - `#265 <https://github.com/ansys/pyconceptev/pull/265>`_
+
+        * - CHORE: Bump msal from 1.32.3 to 1.33.0 in the production-dependencies group
+          - `#266 <https://github.com/ansys/pyconceptev/pull/266>`_
+
+        * - CHORE: Bump the development-dependencies group across 1 directory with 4 updates
+          - `#267 <https://github.com/ansys/pyconceptev/pull/267>`_
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE: Bump actions/download-artifact from 4.1.9 to 4.3.0
+          - `#225 <https://github.com/ansys/pyconceptev/pull/225>`_
+
+        * - docs: Update ``CONTRIBUTORS.md`` with the latest contributors
+          - `#227 <https://github.com/ansys/pyconceptev/pull/227>`_
+
+        * - chore: update CHANGELOG for v0.9.4
+          - `#229 <https://github.com/ansys/pyconceptev/pull/229>`_
+
+        * - Update to support custom ssl cert
+          - `#297 <https://github.com/ansys/pyconceptev/pull/297>`_
+
+
+  .. tab-item:: Test
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - refactor for ocm
+          - `#220 <https://github.com/ansys/pyconceptev/pull/220>`_
+
+
+`0.9.4 <https://github.com/ansys/pyconceptev/releases/tag/v0.9.4>`_ - May 06, 2025
+==================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Fixed
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - matplotlib as an optional
+          - `#228 <https://github.com/ansys/pyconceptev/pull/228>`_
+
+
+  .. tab-item:: Dependencies
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE: Bump jupyterlab from 4.3.5 to 4.3.6
+          - `#205 <https://github.com/ansys/pyconceptev/pull/205>`_
+
+        * - CHORE: Bump pytest-cov from 5.0.0 to 6.1.1
+          - `#216 <https://github.com/ansys/pyconceptev/pull/216>`_
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - docs: Update ``CONTRIBUTORS.md`` with the latest contributors
+          - `#215 <https://github.com/ansys/pyconceptev/pull/215>`_
+
+        * - chore: update CHANGELOG for v0.9.3
+          - `#219 <https://github.com/ansys/pyconceptev/pull/219>`_
+
+
+`0.9.3 <https://github.com/ansys/pyconceptev/releases/tag/v0.9.3>`_ - April 17, 2025
+====================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Added
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Feature/better client connection
+          - `#213 <https://github.com/ansys/pyconceptev/pull/213>`_
+
+        * - update actions to v9 and change python release values
+          - `#218 <https://github.com/ansys/pyconceptev/pull/218>`_
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - chore: update CHANGELOG for v0.9.2
+          - `#210 <https://github.com/ansys/pyconceptev/pull/210>`_
+
+
+`0.9.2 <https://github.com/ansys/pyconceptev/releases/tag/v0.9.2>`_ - March 24, 2025
+====================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - chore: update CHANGELOG for v0.9.0
+          - `#198 <https://github.com/ansys/pyconceptev/pull/198>`_
+
+        * - 208-make-optional-dependency
+          - `#209 <https://github.com/ansys/pyconceptev/pull/209>`_
+
+
+`0.9.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.9.0>`_ - March 10, 2025
+====================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Added
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - example script for reading from design instance ids
+          - `#153 <https://github.com/ansys/pyconceptev/pull/153>`_
+
+        * - Feature/improved automated testing
+          - `#168 <https://github.com/ansys/pyconceptev/pull/168>`_
+
+        * - Feature/get project name
+          - `#169 <https://github.com/ansys/pyconceptev/pull/169>`_
+
+        * - feature/get_project_or_create
+          - `#183 <https://github.com/ansys/pyconceptev/pull/183>`_
+
+        * - added function to get any job file for example input file
+          - `#191 <https://github.com/ansys/pyconceptev/pull/191>`_
+
+        * - start for adding support for py3.13
+          - `#193 <https://github.com/ansys/pyconceptev/pull/193>`_
+
+
+  .. tab-item:: Fixed
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - fix: AUTHORS file format
+          - `#160 <https://github.com/ansys/pyconceptev/pull/160>`_
+
+        * - updated account name specification
+          - `#171 <https://github.com/ansys/pyconceptev/pull/171>`_
+
+
+  .. tab-item:: Dependencies
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE: Bump pre-commit from 3.8.0 to 4.0.1
+          - `#144 <https://github.com/ansys/pyconceptev/pull/144>`_
+
+        * - CHORE: Bump pytest from 8.3.3 to 8.3.4
+          - `#161 <https://github.com/ansys/pyconceptev/pull/161>`_
+
+        * - CHORE: Bump jupyterlab from 4.3.1 to 4.3.3
+          - `#164 <https://github.com/ansys/pyconceptev/pull/164>`_
+
+        * - CHORE: Bump pytest-asyncio from 0.24.0 to 0.25.0
+          - `#165 <https://github.com/ansys/pyconceptev/pull/165>`_
+
+        * - CHORE: Bump jupytext from 1.16.4 to 1.16.6
+          - `#166 <https://github.com/ansys/pyconceptev/pull/166>`_
+
+        * - CHORE: Bump jupyterlab from 4.3.3 to 4.3.4
+          - `#167 <https://github.com/ansys/pyconceptev/pull/167>`_
+
+        * - CHORE: Bump twine from 5.1.1 to 6.1.0
+          - `#170 <https://github.com/ansys/pyconceptev/pull/170>`_
+
+        * - CHORE: Bump pytest-asyncio from 0.25.0 to 0.25.2
+          - `#172 <https://github.com/ansys/pyconceptev/pull/172>`_
+
+        * - CHORE: Bump nbsphinx from 0.9.5 to 0.9.6
+          - `#173 <https://github.com/ansys/pyconceptev/pull/173>`_
+
+        * - CHORE: Bump tox from 4.23.2 to 4.24.1
+          - `#174 <https://github.com/ansys/pyconceptev/pull/174>`_
+
+        * - CHORE: Bump pytest-cov from 5.0.0 to 6.0.0
+          - `#175 <https://github.com/ansys/pyconceptev/pull/175>`_
+
+        * - CHORE: Bump pytest-asyncio from 0.25.2 to 0.25.3
+          - `#179 <https://github.com/ansys/pyconceptev/pull/179>`_
+
+        * - CHORE: Bump websockets from 14.1 to 15.0
+          - `#181 <https://github.com/ansys/pyconceptev/pull/181>`_
+
+        * - CHORE: Bump sphinx-gallery from 0.18.0 to 0.19.0
+          - `#185 <https://github.com/ansys/pyconceptev/pull/185>`_
+
+        * - CHORE: Bump pydantic-settings from 2.7.1 to 2.8.1
+          - `#186 <https://github.com/ansys/pyconceptev/pull/186>`_
+
+        * - CHORE: Bump matplotlib from 3.9.0 to 3.9.4
+          - `#194 <https://github.com/ansys/pyconceptev/pull/194>`_
+
+        * - CHORE: Bump websockets from 15.0 to 15.0.1
+          - `#196 <https://github.com/ansys/pyconceptev/pull/196>`_
+
+        * - CHORE: Bump tox from 4.24.1 to 4.24.2
+          - `#197 <https://github.com/ansys/pyconceptev/pull/197>`_
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - chore: update CHANGELOG for v0.8
+          - `#159 <https://github.com/ansys/pyconceptev/pull/159>`_
+
+        * - chore: bump version version
+          - `#182 <https://github.com/ansys/pyconceptev/pull/182>`_
+
+
+`0.8 <https://github.com/ansys/pyconceptev/releases/tag/v0.8>`_ - 2024-11-29
+============================================================================
+
+Added
+^^^^^
+
+- added custom exceptions `#157 <https://github.com/ansys/pyconceptev/pull/157>`_
+
+
+Fixed
+^^^^^
+
+- default value was called only once bug `#154 <https://github.com/ansys/pyconceptev/pull/154>`_
+- added a product_id to create_new_concept so it doesn't call ocm to often `#155 <https://github.com/ansys/pyconceptev/pull/155>`_
+- added gateway timeout exception for get_results function `#156 <https://github.com/ansys/pyconceptev/pull/156>`_
+
+
+Dependencies
+^^^^^^^^^^^^
+
+- CHORE: Bump pytest-cov from 5.0.0 to 6.0.0 `#143 <https://github.com/ansys/pyconceptev/pull/143>`_
+- CHORE: Bump websockets from 14.0 to 14.1 `#146 <https://github.com/ansys/pyconceptev/pull/146>`_
+- CHORE: Bump jupyterlab from 4.3.0 to 4.3.1 `#151 <https://github.com/ansys/pyconceptev/pull/151>`_
+- CHORE: Bump msal from 1.31.0 to 1.31.1 `#152 <https://github.com/ansys/pyconceptev/pull/152>`_
+- CHORE: Bump tomli from 2.1.0 to 2.2.1 `#158 <https://github.com/ansys/pyconceptev/pull/158>`_
+
+
+Maintenance
+^^^^^^^^^^^
+
+- chore: update CHANGELOG for v0.7.0 `#150 <https://github.com/ansys/pyconceptev/pull/150>`_
+
+`0.7.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.7.0>`_ - 2024-11-18
+================================================================================
+
+Added
+^^^^^
+
+- gets filtered version and example for motor loss map upload `#149 <https://github.com/ansys/pyconceptev/pull/149>`_
+
+
+Fixed
+^^^^^
+
+- added additional auth check on get results `#148 <https://github.com/ansys/pyconceptev/pull/148>`_
+
+
+Maintenance
+^^^^^^^^^^^
+
+- chore: update CHANGELOG for v0.6 `#145 <https://github.com/ansys/pyconceptev/pull/145>`_
+- CHORE: Bump dev version into 0.7.dev0 `#147 <https://github.com/ansys/pyconceptev/pull/147>`_
+
 `0.6 <https://github.com/ansys/pyconceptev/releases/tag/v0.6>`_ - 2024-11-13
 ============================================================================
 
