@@ -192,6 +192,66 @@ def create_design_instance(project_id, title, token, product_id=None, return_des
     return design_instance_id
 
 
+def get_job_file_signed_url(token, job_id, filename):
+    """Fetch JSON content from S3 using the signed download URL from the OCM file list.
+
+    Uses the ``/job/files/list/{jobId}`` endpoint to obtain a pre-signed S3
+    download URL (``downloadRequest.uri``) for the given filename, then issues
+    a direct HTTP request to S3 and JSON-decodes the response body.
+
+    This bypasses the OCM ``/job/files`` decryption proxy and avoids any
+    server-side Pydantic validation, so it works with result files produced by
+    any solver version, as long as the S3 object is JSON-encoded. Returns the
+    parsed JSON content as a Python object.
+    """
+    client = create_ocm_client(token)
+    list_response = client.get(url=f"/job/files/list/{job_id}")
+    if list_response.status_code != 200:
+        raise ResponseError(
+            f"Failed to list job files for job {job_id}: " f"status={list_response.status_code}."
+        )
+
+    job_files = list_response.json()
+    # fileName in the list is "simulationId/filename" or just "filename"
+    matched = [
+        f
+        for f in job_files
+        if f.get("fileName", "").endswith(filename) and not f.get("directory", False)
+    ]
+    if not matched:
+        available = [
+            {"jobId": f.get("jobId"), "fileName": f.get("fileName")}
+            for f in job_files
+            if not f.get("directory", False)
+        ]
+        raise ResponseError(
+            f"File '{filename}' not found in job {job_id} file list. "
+            f"Available files: {available}."
+        )
+
+    download_request = matched[0].get("downloadRequest")
+    if not download_request or not download_request.get("uri"):
+        raise ResponseError(f"No signed download URL available for '{filename}'.")
+
+    signed_url = download_request["uri"]
+    method = download_request.get("method", "GET").upper()
+    headers = download_request.get("headers", {})
+
+    s3_response = httpx.request(
+        method,
+        signed_url,
+        headers=headers,
+        verify=generate_ssl_context(),
+        timeout=20,
+    )
+    if s3_response.status_code != 200:
+        raise ResponseError(
+            f"Failed to download '{filename}' from S3: status={s3_response.status_code}."
+        )
+
+    return json.loads(s3_response.content)
+
+
 def get_job_file(token, job_id, filename, simulation_id=None, encrypted=False):
     """Get the job file from the OnScale Cloud Manager."""
     encrypted_part = "decrypted/" if encrypted else ""
@@ -254,6 +314,28 @@ def get_status(job_info: dict, token: str) -> str:
         status = processed_response["finalStatus"].upper()
     elif "lastStatus" in processed_response and processed_response["lastStatus"] is not None:
         status = processed_response["lastStatus"].upper()
+    elif processed_response.get("jobStatus") is not None:
+        # Job is newly created — lastStatus/finalStatus not yet populated by OCM.
+        # Fall back to the most recent entry in the jobStatus history list.
+        job_status_history = processed_response.get("jobStatus")
+        if not isinstance(job_status_history, list) or not job_status_history:
+            raise ResponseError(
+                "Failed to get job status: 'jobStatus' history is missing or empty"
+                f" in response {processed_response}."
+            )
+        last_entry = job_status_history[-1]
+        if not isinstance(last_entry, dict):
+            raise ResponseError(
+                "Failed to get job status: last 'jobStatus' entry has unexpected type"
+                f" in response {processed_response}."
+            )
+        raw_status = last_entry.get("jobStatus")
+        if not raw_status:
+            raise ResponseError(
+                "Failed to get job status: last 'jobStatus' entry is missing 'jobStatus'"
+                f" field in response {processed_response}."
+            )
+        status = raw_status.upper()
     else:
         raise ResponseError(f"Failed to get job status {processed_response}.")
     return status
