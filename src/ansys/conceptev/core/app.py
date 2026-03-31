@@ -136,7 +136,7 @@ def get_http_client(
     client.send = retry(
         retry=retry_if_result(is_gateway_error),
         wait=wait_random_exponential(multiplier=1, max=60),
-        stop=stop_after_delay(10),
+        stop=stop_after_delay(120),
     )(client.send)
     return client
 

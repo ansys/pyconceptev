@@ -150,3 +150,44 @@ def test_ssl_cert_custom():
             ssl_context = generate_ssl_context()
             assert ssl_context is not None
             assert ssl_context.verify_mode == ssl.CERT_REQUIRED
+
+
+@pytest.mark.asyncio
+async def test_token_refreshed_on_websocket_reconnect():
+    """When a long-running job causes a WebSocket disconnection, a fresh token should
+    be fetched and used when reconnecting — simulating a mid-job token expiry."""
+    job_id = "test_job"
+    user_id = "test_user"
+    initial_token = "initial_token"
+    refreshed_token = "refreshed_token"
+    app = PublicClientApplication("123")
+
+    progress_message = json.dumps({"jobId": job_id, "messagetype": "progress", "progress": 50})
+    complete_message = json.dumps(
+        {"jobId": job_id, "messagetype": "status", "status": STATUS_COMPLETE}
+    )
+
+    # First connection: delivers a progress message then disconnects (simulates token expiry).
+    # Second connection: delivers the completion message.
+    connection_calls = []
+
+    def fake_connect_to_ocm(uid, token):
+        connection_calls.append(token)
+        if len(connection_calls) == 1:
+            return AsyncContextManager([progress_message])
+        return AsyncContextManager([complete_message])
+
+    with patch(
+        "ansys.conceptev.core.progress.connect_to_ocm", side_effect=fake_connect_to_ocm
+    ), patch(
+        "ansys.conceptev.core.progress.get_ansyId_token", return_value=refreshed_token
+    ) as mock_refresh:
+        result = await monitor_job_messages(job_id, user_id, initial_token, app)
+
+    assert result == STATUS_COMPLETE
+    # First connection used the original token passed in
+    assert connection_calls[0] == initial_token
+    # Second connection used the refreshed token
+    assert connection_calls[1] == refreshed_token
+    # get_ansyId_token was called once to refresh after the first WebSocket disconnected
+    mock_refresh.assert_called_once_with(app)
