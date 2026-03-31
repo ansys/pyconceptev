@@ -31,6 +31,7 @@ import certifi
 from msal import PublicClientApplication
 from websockets.asyncio.client import connect
 
+from ansys.conceptev.core.auth import get_ansyId_token
 from ansys.conceptev.core.settings import settings
 
 if sys.version_info >= (3, 11):
@@ -163,7 +164,7 @@ def monitor_job_progress(
 if __name__ == "__main__":
     """Monitor a single job progress."""
     from ansys.conceptev.core.app import get_user_id
-    from ansys.conceptev.core.auth import create_msal_app, get_ansyId_token
+    from ansys.conceptev.core.auth import create_msal_app
 
     job_id = "ae3f3b4b-91d8-4cdd-8fa3-25eb202a561e"  # Replace with your job ID
     msal_app = create_msal_app()

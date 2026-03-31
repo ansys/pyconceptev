@@ -20,6 +20,10 @@ updates:
       default-days: 10 # Fallback cooldown if no specific rule applies
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     labels:
       - "maintenance"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
