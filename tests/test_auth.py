@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -123,3 +123,71 @@ def test_auth_flow_adds_authorization_header(mocker, httpx_mock: HTTPXMock):
     client = httpx.Client(auth=auth_instance)
     response = client.get("http://example.com")
     assert response.request.headers["Authorization"] == "auth_class_token"
+
+
+def test_auth_flow_retries_on_401_with_fresh_token(mocker, httpx_mock: HTTPXMock):
+    """When the server returns 401, auth_flow should force-refresh the token and retry."""
+    mock_get_ansyId_token = mocker.patch(
+        "ansys.conceptev.core.auth.get_ansyId_token",
+        side_effect=["expired_token", "fresh_token"],
+    )
+    auth_instance = auth.AnsysIDAuth()
+    httpx_mock.add_response(url="http://example.com", status_code=401)
+    httpx_mock.add_response(url="http://example.com", status_code=200)
+
+    client = httpx.Client(auth=auth_instance)
+    response = client.get("http://example.com")
+
+    assert response.status_code == 200
+    assert mock_get_ansyId_token.call_count == 2
+    # Second call must use force=True to bypass the MSAL cache
+    assert mock_get_ansyId_token.call_args_list[1] == mocker.call(auth_instance.app, force=True)
+    assert response.request.headers["Authorization"] == "fresh_token"
+
+
+def test_auth_flow_does_not_retry_on_other_errors(mocker, httpx_mock: HTTPXMock):
+    """Non-401 errors should not trigger a token refresh retry."""
+    mock_get_ansyId_token = mocker.patch(
+        "ansys.conceptev.core.auth.get_ansyId_token", return_value="auth_class_token"
+    )
+    auth_instance = auth.AnsysIDAuth()
+    httpx_mock.add_response(url="http://example.com", status_code=403)
+
+    client = httpx.Client(auth=auth_instance)
+    response = client.get("http://example.com")
+
+    assert response.status_code == 403
+    assert mock_get_ansyId_token.call_count == 1
+
+
+def test_auth_flow_token_expires_mid_sequence(mocker, httpx_mock: HTTPXMock):
+    """When a token expires mid-sequence, the failing request retries with a fresh token
+    and all subsequent requests in the sequence also use the fresh token."""
+    # Requests 1 & 2 succeed with the original token.
+    # Request 3 gets a 401 (token just expired), then retries with a fresh token.
+    # Request 4 should use the now-cached fresh token.
+    token_sequence = [
+        "original_token",  # req 1 – initial fetch
+        "original_token",  # req 2 – initial fetch
+        "original_token",  # req 3 – initial fetch (will be rejected)
+        "fresh_token",  # req 3 – force-refresh after 401
+        "fresh_token",  # req 4 – silent fetch (MSAL cache now holds fresh token)
+    ]
+    mock_get_ansyId_token = mocker.patch(
+        "ansys.conceptev.core.auth.get_ansyId_token", side_effect=token_sequence
+    )
+    auth_instance = auth.AnsysIDAuth()
+
+    httpx_mock.add_response(url="http://example.com", status_code=200)  # req 1
+    httpx_mock.add_response(url="http://example.com", status_code=200)  # req 2
+    httpx_mock.add_response(url="http://example.com", status_code=401)  # req 3 – token expired
+    httpx_mock.add_response(url="http://example.com", status_code=200)  # req 3 – retry
+    httpx_mock.add_response(url="http://example.com", status_code=200)  # req 4
+
+    client = httpx.Client(auth=auth_instance)
+    responses = [client.get("http://example.com") for _ in range(4)]
+
+    assert [r.status_code for r in responses] == [200, 200, 200, 200]
+    assert mock_get_ansyId_token.call_count == 5
+    # The force-refresh must have been triggered on the 4th call (req 3 retry)
+    assert mock_get_ansyId_token.call_args_list[3] == mocker.call(auth_instance.app, force=True)
