@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -31,6 +31,7 @@ import certifi
 from msal import PublicClientApplication
 from websockets.asyncio.client import connect
 
+from ansys.conceptev.core.auth import get_ansyId_token
 from ansys.conceptev.core.settings import settings
 
 if sys.version_info >= (3, 11):
@@ -38,13 +39,33 @@ if sys.version_info >= (3, 11):
 else:
     import async_timeout
 
-STATUS_COMPLETE = "complete"
+STATUS_COMPLETE = "COMPLETED"
 STATUS_FINISHED = "FINISHED"
-STATUS_ERROR = "failed"
+STATUS_ERROR = "FAILED"
 OCM_SOCKET_URL = settings.ocm_socket_url
 JOB_TIMEOUT = settings.job_timeout
-ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-ssl_context.load_verify_locations(certifi.where())
+
+
+def generate_ssl_context() -> ssl.SSLContext:
+    """Generate SSL context for secure websocket connection."""
+    # Try using truststore for system certificates if available
+    if not settings.ssl_cert_file:
+        try:
+            import truststore
+
+            return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        except ImportError:
+            pass
+
+    # Use configured cert file or fall back to certifi's default bundle
+    cert_file = settings.ssl_cert_file or certifi.where()
+
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    context.load_verify_locations(cert_file)
+    return context
+
+
+ssl_context = generate_ssl_context()
 
 
 def connect_to_ocm(user_id: str, token: str):
@@ -62,7 +83,7 @@ def get_status(message: str, job_id: str):
         if message_type == "status":
             status = message_data.get("status", None)
             print(f"Status:{status}")
-            return status
+            return status.upper()
         elif message_type == "progress":
             progress = message_data.get("progress", None)
             print(f"Progress:{progress}")
@@ -143,7 +164,7 @@ def monitor_job_progress(
 if __name__ == "__main__":
     """Monitor a single job progress."""
     from ansys.conceptev.core.app import get_user_id
-    from ansys.conceptev.core.auth import create_msal_app, get_ansyId_token
+    from ansys.conceptev.core.auth import create_msal_app
 
     job_id = "ae3f3b4b-91d8-4cdd-8fa3-25eb202a561e"  # Replace with your job ID
     msal_app = create_msal_app()

@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -27,6 +27,13 @@ from pytest_httpx import HTTPXMock
 
 from ansys.conceptev.core import app
 from ansys.conceptev.core.auth import AnsysIDAuth
+from ansys.conceptev.core.exceptions import ResponseError
+from ansys.conceptev.core.progress import (
+    STATUS_COMPLETE,
+    STATUS_ERROR,
+    STATUS_FINISHED,
+    check_status,
+)
 from ansys.conceptev.core.settings import settings
 
 conceptev_url = settings.conceptev_url
@@ -272,6 +279,8 @@ def test_create_submit_job(httpx_mock: HTTPXMock, client: httpx.Client):
         "uploaded_file": mocked_job[1],
         "account_id": account_id,
         "hpc_id": hpc_id,
+        "docker_tag": "default",
+        "extra_memory": False,
     }
     httpx_mock.add_response(
         url=f"{conceptev_url}/jobs:start?design_instance_id=123&account_id={account_id}",
@@ -333,9 +342,45 @@ def mock_job_results(mocker):
     mocker.patch("ansys.conceptev.core.app.job_status")
 
 
-def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
+def test_read_results_without_units(httpx_mock: HTTPXMock, client: httpx.Client):
+    """When calculate_units=False, results are fetched via S3 signed URL."""
     example_job_info = {"job": "mocked_job", "job_id": "123"}
-    example_results = {"results": "returned"}
+    example_results = [{"requirement": {"name": "test"}, "capability_curve": {}}]
+    signed_url = "https://s3.example.com/bucket/output_file_v3.json?signed=token"
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/utilities:data_format_version?design_instance_id=123",
+        method="get",
+        json=3,
+    )
+    httpx_mock.add_response(
+        url=f"{ocm_url}/job/files/list/123",
+        method="get",
+        json=[
+            {
+                "jobId": "123",
+                "fileName": "sim-id/output_file_v3.json",
+                "directory": False,
+                "downloadRequest": {"method": "GET", "uri": signed_url, "headers": {}},
+            }
+        ],
+    )
+    httpx_mock.add_response(url=signed_url, method="get", json=example_results)
+    httpx_mock.add_response(
+        url=ocm_url + "/user/details", method="post", json={"userId": "user_123"}
+    )
+    httpx_mock.add_response(
+        url=ocm_url + "/job/load",
+        method="post",
+        json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
+    )
+    results = app.read_results(client, example_job_info, calculate_units=False)
+    assert example_results == results
+
+
+def test_read_results_with_units(httpx_mock: HTTPXMock, client: httpx.Client):
+    """When calculate_units=True (default), results are fetched via /jobs:result."""
+    example_job_info = {"job": "mocked_job", "job_id": "123"}
+    example_results = {"results": "with_units"}
     httpx_mock.add_response(
         url=f"{conceptev_url}/utilities:data_format_version?design_instance_id=123",
         method="get",
@@ -352,9 +397,11 @@ def test_read_results(httpx_mock: HTTPXMock, client: httpx.Client):
         url=ocm_url + "/user/details", method="post", json={"userId": "user_123"}
     )
     httpx_mock.add_response(
-        url=ocm_url + "/job/load", method="post", json={"jobStatus": [{"jobStatus": "complete"}]}
+        url=ocm_url + "/job/load",
+        method="post",
+        json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
     )
-    results = app.read_results(client, example_job_info)
+    results = app.read_results(client, example_job_info, calculate_units=True)
     assert example_results == results
 
 
@@ -493,3 +540,58 @@ def test_get_concept(httpx_mock: HTTPXMock, client: httpx.Client):
         "requirements": [{"name": "reequirements"}],
         "architecture": {"name": "architecture"},
     }
+
+
+statuses = [STATUS_COMPLETE, STATUS_FINISHED, STATUS_ERROR, None]
+
+
+@pytest.mark.parametrize("last_status", statuses)
+@pytest.mark.parametrize("final_status", statuses)
+def test_returns_final_status_when_present(httpx_mock, final_status, last_status):
+    job_info = {"job_id": "123"}
+    token = "token"
+    httpx_mock.add_response(
+        url=f"{ocm_url}/job/load",
+        method="post",
+        json={"finalStatus": final_status, "lastStatus": last_status},
+    )
+
+    if final_status is None and last_status is None:
+        with pytest.raises(ResponseError) as exc:
+            result = app.get_status(job_info, token)
+        return True
+    else:
+        result = app.get_status(job_info, token)
+        assert result in [final_status, last_status]
+
+
+def test_get_status_falls_back_to_job_status_list_when_last_and_final_are_none(httpx_mock):
+    """When lastStatus and finalStatus are None (job just created), fall back to jobStatus list."""
+    job_info = {"job_id": "123"}
+    token = "token"
+    httpx_mock.add_response(
+        url=f"{ocm_url}/job/load",
+        method="post",
+        json={
+            "finalStatus": None,
+            "lastStatus": None,
+            "jobStatus": [{"jobStatus": "CREATED"}],
+        },
+    )
+    result = app.get_status(job_info, token)
+    assert result == "CREATED"
+
+
+@pytest.mark.parametrize(
+    "result,expected",
+    [(STATUS_COMPLETE, True), (STATUS_FINISHED, True), (STATUS_ERROR, False), (None, False)],
+)
+def test_check_status(result, expected):
+    if expected:
+        assert check_status(result)
+    elif result is STATUS_ERROR:
+        with pytest.raises(Exception) as exc:
+            check_status(result)
+            assert "Job Failed" in str(exc.value) if result == STATUS_ERROR else True
+    else:
+        assert not check_status(result)

@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -29,7 +29,7 @@ from tenacity import retry, retry_if_result, stop_after_delay, wait_random_expon
 
 from ansys.conceptev.core import auth
 from ansys.conceptev.core.auth import get_token
-from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError, ResultsError
+from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError
 from ansys.conceptev.core.ocm import (
     create_design_instance,
     create_new_project,
@@ -40,6 +40,7 @@ from ansys.conceptev.core.ocm import (
     get_design_of_job,
     get_design_title,
     get_job_file,
+    get_job_file_signed_url,
     get_job_info,
     get_or_create_project,
     get_product_id,
@@ -48,28 +49,29 @@ from ansys.conceptev.core.ocm import (
     get_status,
     get_user_id,
 )
-from ansys.conceptev.core.progress import check_status, monitor_job_progress
+from ansys.conceptev.core.progress import check_status, generate_ssl_context, monitor_job_progress
 from ansys.conceptev.core.responses import is_gateway_error, process_response
 from ansys.conceptev.core.settings import settings
 
 __all__ = [
-    get_or_create_project,
-    create_new_project,
-    create_design_instance,
-    get_product_id,
-    get_user_id,
-    get_account_id,
-    get_account_ids,
-    get_default_hpc,
-    get_job_file,
-    get_job_info,
-    get_design_of_job,
-    get_design_title,
-    get_status,
-    get_project_ids,
-    get_project_id,
-    delete_project,
-    get_token,
+    "get_or_create_project",
+    "create_new_project",
+    "create_design_instance",
+    "get_product_id",
+    "get_user_id",
+    "get_account_id",
+    "get_account_ids",
+    "get_default_hpc",
+    "get_job_file",
+    "get_job_file_signed_url",
+    "get_job_info",
+    "get_design_of_job",
+    "get_design_title",
+    "get_status",
+    "get_project_ids",
+    "get_project_id",
+    "delete_project",
+    "get_token",
 ]
 
 Router = Literal[
@@ -124,11 +126,17 @@ def get_http_client(
     params = {"design_instance_id": design_instance_id} if design_instance_id else None
     header = {"Authorization": token} if token else None
 
-    client = httpx.Client(headers=header, auth=httpx_auth, params=params, base_url=BASE_URL)
+    client = httpx.Client(
+        headers=header,
+        auth=httpx_auth,
+        params=params,
+        base_url=BASE_URL,
+        verify=generate_ssl_context(),
+    )
     client.send = retry(
         retry=retry_if_result(is_gateway_error),
         wait=wait_random_exponential(multiplier=1, max=60),
-        stop=stop_after_delay(10),
+        stop=stop_after_delay(120),
     )(client.send)
     return client
 
@@ -324,6 +332,8 @@ def create_submit_job(
     account_id: str,
     hpc_id: str,
     job_name: str | None = None,
+    docker_tag: str = "default",
+    extra_memory: bool = False,
 ) -> dict:
     """Create and then submit a job."""
     if job_name is None:
@@ -341,6 +351,8 @@ def create_submit_job(
         "uploaded_file": uploaded_file,
         "account_id": account_id,
         "hpc_id": hpc_id,
+        "docker_tag": docker_tag,
+        "extra_memory": extra_memory,
     }
     job_info = post(client, "/jobs:start", data=job_start, account_id=account_id)
     return job_info
@@ -352,26 +364,35 @@ def get_results(
     calculate_units: bool = True,
     filtered: bool = False,
 ):
-    """Get the results."""
+    """Get the results for a completed job.
+
+    When ``calculate_units=False``, fetches the raw result file directly from S3
+    via the signed URL from the OCM ``/job/files/list/{jobId}`` endpoint — the
+    same flow used by the ConceptEV frontend. This bypasses API server Pydantic
+    validation and works with any solver version.
+
+    When ``calculate_units=True`` (default), falls back to the API server's
+    ``/jobs:result`` endpoint which performs server-side unit calculation.
+    """
     version_number = get(client, "/utilities:data_format_version")
     if filtered:
         filename = f"filtered_output_v{version_number}.json"
     else:
         filename = f"output_file_v{version_number}.json"
-    response = client.post(
-        url="/jobs:result",
-        json=job_info,
-        params={
-            "results_file_name": filename,
-            "calculate_units": calculate_units,
-        },
-    )
-    if response.status_code == 502 or response.status_code == 504:
-        raise ResultsError(
-            f"Request timed out {response}. "
-            f"Please try using either calculate_units=False or filtered=True."
+
+    if calculate_units:
+        response = client.post(
+            url="/jobs:result",
+            json=job_info,
+            params={
+                "results_file_name": filename,
+                "calculate_units": calculate_units,
+            },
         )
-    return process_response(response)
+        return process_response(response)
+
+    token = auth.get_token(client)
+    return get_job_file_signed_url(token, job_info["job_id"], filename)
 
 
 def get_component_id_map(client, design_instance_id):
