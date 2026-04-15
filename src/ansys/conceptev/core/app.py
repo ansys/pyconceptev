@@ -191,7 +191,7 @@ def delete(client: httpx.Client, router: Router, id: str, account_id: str | None
     path = "/".join([router, id])
     response = client.delete(url=path, params=params)
     if response.status_code != 204:
-        raise DeleteError(f"Failed to delete from {router} with ID:{id}.")
+        raise DeleteError(f"Failed to delete from {router} with ID:{id}.")  # nosec B608
 
 
 def put(client: httpx.Client, router: Router, id: str, data: dict) -> dict:

@@ -305,24 +305,34 @@ def test_put(httpx_mock: HTTPXMock, client: httpx.Client):
     assert results == example_aero
 
 
-def test_get_project_id(httpx_mock: HTTPXMock):
+def test_get_project_id(httpx_mock: HTTPXMock, mocker):
     name = "poject_name"
     account_id = "123"
     token = "456"
     project_id = "789"
     example_data = {"projects": [{"projectId": project_id, "projectTitle": name}]}
-    httpx_mock.add_response(
-        url=ocm_url + "/project/list/page",
-        method="post",
-        match_json={
-            "filterByName": name,
-            "accountId": account_id,
-            "pageNumber": 0,
-            "pageSize": 1000,
-        },
-        headers={"authorization": token},
-        json=example_data,
-    )
+
+    # Mock the httpx.Client to use the mocked transport
+    def create_mock_client(*args, **kwargs):
+        # Use httpx_mock's transport by creating client with mocked responses
+        return httpx.Client(base_url=ocm_url)
+
+    mocker.patch("ansys.conceptev.core.ocm.create_ocm_client", side_effect=create_mock_client)
+
+    # Add the same response twice - once for get_project_ids call, once for get_project_id call
+    for _ in range(2):
+        httpx_mock.add_response(
+            url=ocm_url + "/project/list/page",
+            method="post",
+            match_json={
+                "filterByName": name,
+                "accountId": account_id,
+                "pageNumber": 0,
+                "pageSize": 1000,
+            },
+            headers={"authorization": token},
+            json=example_data,
+        )
     result = app.get_project_ids(name, account_id, token)
     assert result == {name: [project_id]}
     result = app.get_project_id(name, account_id, token)
