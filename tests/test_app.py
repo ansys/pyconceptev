@@ -319,18 +319,20 @@ def test_get_project_id(httpx_mock: HTTPXMock, mocker):
 
     mocker.patch("ansys.conceptev.core.ocm.create_ocm_client", side_effect=create_mock_client)
 
-    httpx_mock.add_response(
-        url=ocm_url + "/project/list/page",
-        method="post",
-        match_json={
-            "filterByName": name,
-            "accountId": account_id,
-            "pageNumber": 0,
-            "pageSize": 1000,
-        },
-        headers={"authorization": token},
-        json=example_data,
-    )
+    # Add the same response twice - once for get_project_ids call, once for get_project_id call
+    for _ in range(2):
+        httpx_mock.add_response(
+            url=ocm_url + "/project/list/page",
+            method="post",
+            match_json={
+                "filterByName": name,
+                "accountId": account_id,
+                "pageNumber": 0,
+                "pageSize": 1000,
+            },
+            headers={"authorization": token},
+            json=example_data,
+        )
     result = app.get_project_ids(name, account_id, token)
     assert result == {name: [project_id]}
     result = app.get_project_id(name, account_id, token)
