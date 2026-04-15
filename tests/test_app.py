@@ -305,12 +305,20 @@ def test_put(httpx_mock: HTTPXMock, client: httpx.Client):
     assert results == example_aero
 
 
-def test_get_project_id(httpx_mock: HTTPXMock):
+def test_get_project_id(httpx_mock: HTTPXMock, mocker):
     name = "poject_name"
     account_id = "123"
     token = "456"
     project_id = "789"
     example_data = {"projects": [{"projectId": project_id, "projectTitle": name}]}
+
+    # Mock the httpx.Client to use the mocked transport
+    def create_mock_client(*args, **kwargs):
+        # Use httpx_mock's transport by creating client with mocked responses
+        return httpx.Client(base_url=ocm_url)
+
+    mocker.patch("ansys.conceptev.core.ocm.create_ocm_client", side_effect=create_mock_client)
+
     httpx_mock.add_response(
         url=ocm_url + "/project/list/page",
         method="post",
