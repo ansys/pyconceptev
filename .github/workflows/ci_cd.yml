@@ -147,10 +147,12 @@ jobs:
     timeout-minutes: 2160
     #    needs: [ tests ]
     container:
-      image: ${{ format('ghcr.io/ansys/optislang:{0}-jammy', '25.2.0') }}
+      image: ${{ format('ghcr.io/ansys/optislang@sha256:{0}', 'e2ee15479dc58413b37699fdbdbd60d551a31916b556d6dda74c3ed3dc0f7783') }}
       credentials:
         username: ansys-bot
         password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: read # To access container images
     steps:
       - name: "Install Poetry"
         uses: snok/install-poetry@v1
