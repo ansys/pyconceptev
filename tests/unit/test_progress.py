@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -21,8 +21,11 @@
 # SOFTWARE.
 
 import json
+import ssl
+import tempfile
 from unittest.mock import AsyncMock, patch
 
+import certifi
 from msal import PublicClientApplication
 import pytest
 
@@ -33,6 +36,7 @@ from ansys.conceptev.core.progress import (
     STATUS_FINISHED,
     check_status,
     connect_to_ocm,
+    generate_ssl_context,
     get_status,
     monitor_job_messages,
     monitor_job_progress,
@@ -127,3 +131,63 @@ def test_monitor_job_progress():
         result = monitor_job_progress(job_id, user_id, token, app)
         mock_monitor.assert_called_with(job_id, user_id, token, app, 3600)
         assert result == STATUS_COMPLETE
+
+
+def test_ssl_cert_default():
+    ssl_context = generate_ssl_context()
+    assert ssl_context is not None
+    assert ssl_context.verify_mode == ssl.CERT_REQUIRED
+
+
+def test_ssl_cert_custom():
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".pem", delete=False) as temp_cert:
+        with open(certifi.where(), "r") as certifi_file:
+            temp_cert.write(certifi_file.read())
+        temp_cert_path = temp_cert.name
+
+        with patch("ansys.conceptev.core.progress.settings") as mock_settings:
+            mock_settings.ssl_cert_file = temp_cert_path
+            ssl_context = generate_ssl_context()
+            assert ssl_context is not None
+            assert ssl_context.verify_mode == ssl.CERT_REQUIRED
+
+
+@pytest.mark.asyncio
+async def test_token_refreshed_on_websocket_reconnect():
+    """When a long-running job causes a WebSocket disconnection, a fresh token should
+    be fetched and used when reconnecting — simulating a mid-job token expiry."""
+    job_id = "test_job"
+    user_id = "test_user"
+    initial_token = "initial_token"
+    refreshed_token = "refreshed_token"
+    app = PublicClientApplication("123")
+
+    progress_message = json.dumps({"jobId": job_id, "messagetype": "progress", "progress": 50})
+    complete_message = json.dumps(
+        {"jobId": job_id, "messagetype": "status", "status": STATUS_COMPLETE}
+    )
+
+    # First connection: delivers a progress message then disconnects (simulates token expiry).
+    # Second connection: delivers the completion message.
+    connection_calls = []
+
+    def fake_connect_to_ocm(uid, token):
+        connection_calls.append(token)
+        if len(connection_calls) == 1:
+            return AsyncContextManager([progress_message])
+        return AsyncContextManager([complete_message])
+
+    with patch(
+        "ansys.conceptev.core.progress.connect_to_ocm", side_effect=fake_connect_to_ocm
+    ), patch(
+        "ansys.conceptev.core.progress.get_ansyId_token", return_value=refreshed_token
+    ) as mock_refresh:
+        result = await monitor_job_messages(job_id, user_id, initial_token, app)
+
+    assert result == STATUS_COMPLETE
+    # First connection used the original token passed in
+    assert connection_calls[0] == initial_token
+    # Second connection used the refreshed token
+    assert connection_calls[1] == refreshed_token
+    # get_ansyId_token was called once to refresh after the first WebSocket disconnected
+    mock_refresh.assert_called_once_with(app)

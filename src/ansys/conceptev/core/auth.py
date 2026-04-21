@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -100,7 +100,12 @@ class AnsysIDAuth(httpx.Auth):
         """Send the request, with a custom `Authentication` header."""
         token = get_ansyId_token(self.app)
         request.headers["Authorization"] = token
-        yield request
+        response = yield request
+        if response.status_code == 401:
+            logger.info("Token expired or rejected (401). Refreshing token and retrying.")
+            token = get_ansyId_token(self.app, force=True)
+            request.headers["Authorization"] = token
+            yield request
 
 
 def get_token(client: httpx.Client) -> str:
