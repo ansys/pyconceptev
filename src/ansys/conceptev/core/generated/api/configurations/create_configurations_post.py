@@ -1,0 +1,282 @@
+from http import HTTPStatus
+from typing import Any, cast
+
+import httpx
+
+from ... import errors
+from ...client import AuthenticatedClient, Client
+from ...models.aero import Aero
+from ...models.aero_in_db import AeroInDB
+from ...models.ancillary_load import AncillaryLoad
+from ...models.ancillary_load_in_db import AncillaryLoadInDB
+from ...models.deceleration_limit import DecelerationLimit
+from ...models.deceleration_limit_in_db import DecelerationLimitInDB
+from ...models.http_validation_error import HTTPValidationError
+from ...models.mass import Mass
+from ...models.mass_in_db import MassInDB
+from ...models.wheel_in_db import WheelInDB
+from ...models.wheel_input import WheelInput
+from ...types import UNSET, Response, Unset
+
+
+def _get_kwargs(
+    *,
+    body: Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput,
+    design_id: None | str | Unset = UNSET,
+    design_instance_id: None | str | Unset = UNSET,
+) -> dict[str, Any]:
+    headers: dict[str, Any] = {}
+
+    params: dict[str, Any] = {}
+
+    json_design_id: None | str | Unset
+    if isinstance(design_id, Unset):
+        json_design_id = UNSET
+    else:
+        json_design_id = design_id
+    params["design_id"] = json_design_id
+
+    json_design_instance_id: None | str | Unset
+    if isinstance(design_instance_id, Unset):
+        json_design_instance_id = UNSET
+    else:
+        json_design_instance_id = design_instance_id
+    params["design_instance_id"] = json_design_instance_id
+
+    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
+    _kwargs: dict[str, Any] = {
+        "method": "post",
+        "url": "/configurations",
+        "params": params,
+    }
+
+    if isinstance(body, Aero):
+        _kwargs["json"] = body.to_dict()
+    elif isinstance(body, Mass):
+        _kwargs["json"] = body.to_dict()
+    elif isinstance(body, WheelInput):
+        _kwargs["json"] = body.to_dict()
+    elif isinstance(body, DecelerationLimit):
+        _kwargs["json"] = body.to_dict()
+    else:
+        _kwargs["json"] = body.to_dict()
+
+    headers["Content-Type"] = "application/json"
+
+    _kwargs["headers"] = headers
+    return _kwargs
+
+
+def _parse_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError | None:
+    if response.status_code == 201:
+
+        def _parse_response_201(
+            data: object,
+        ) -> AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB:
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                componentsschemas_configuration_in_db_type_0 = AeroInDB.from_dict(data)
+
+                return componentsschemas_configuration_in_db_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                componentsschemas_configuration_in_db_type_1 = MassInDB.from_dict(data)
+
+                return componentsschemas_configuration_in_db_type_1
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                componentsschemas_configuration_in_db_type_2 = WheelInDB.from_dict(data)
+
+                return componentsschemas_configuration_in_db_type_2
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                componentsschemas_configuration_in_db_type_3 = DecelerationLimitInDB.from_dict(data)
+
+                return componentsschemas_configuration_in_db_type_3
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            if not isinstance(data, dict):
+                raise TypeError()
+            componentsschemas_configuration_in_db_type_4 = AncillaryLoadInDB.from_dict(data)
+
+            return componentsschemas_configuration_in_db_type_4
+
+        response_201 = _parse_response_201(response.json())
+
+        return response_201
+
+    if response.status_code == 404:
+        response_404 = cast(Any, None)
+        return response_404
+
+    if response.status_code == 422:
+        response_422 = HTTPValidationError.from_dict(response.json())
+
+        return response_422
+
+    if client.raise_on_unexpected_status:
+        raise errors.UnexpectedStatus(response.status_code, response.content)
+    else:
+        return None
+
+
+def _build_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError]:
+    return Response(
+        status_code=HTTPStatus(response.status_code),
+        content=response.content,
+        headers=response.headers,
+        parsed=_parse_response(client=client, response=response),
+    )
+
+
+def sync_detailed(
+    *,
+    client: AuthenticatedClient,
+    body: Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput,
+    design_id: None | str | Unset = UNSET,
+    design_instance_id: None | str | Unset = UNSET,
+) -> Response[AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError]:
+    """Create
+
+     Create from parameters.
+
+    Args:
+        design_id (None | str | Unset):
+        design_instance_id (None | str | Unset):
+        body (Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput):
+
+    Raises:
+        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+    Returns:
+        Response[AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError]
+    """
+
+    kwargs = _get_kwargs(
+        body=body,
+        design_id=design_id,
+        design_instance_id=design_instance_id,
+    )
+
+    response = client.get_httpx_client().request(
+        **kwargs,
+    )
+
+    return _build_response(client=client, response=response)
+
+
+def sync(
+    *,
+    client: AuthenticatedClient,
+    body: Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput,
+    design_id: None | str | Unset = UNSET,
+    design_instance_id: None | str | Unset = UNSET,
+) -> AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError | None:
+    """Create
+
+     Create from parameters.
+
+    Args:
+        design_id (None | str | Unset):
+        design_instance_id (None | str | Unset):
+        body (Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput):
+
+    Raises:
+        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+    Returns:
+        AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError
+    """
+
+    return sync_detailed(
+        client=client,
+        body=body,
+        design_id=design_id,
+        design_instance_id=design_instance_id,
+    ).parsed
+
+
+async def asyncio_detailed(
+    *,
+    client: AuthenticatedClient,
+    body: Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput,
+    design_id: None | str | Unset = UNSET,
+    design_instance_id: None | str | Unset = UNSET,
+) -> Response[AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError]:
+    """Create
+
+     Create from parameters.
+
+    Args:
+        design_id (None | str | Unset):
+        design_instance_id (None | str | Unset):
+        body (Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput):
+
+    Raises:
+        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+    Returns:
+        Response[AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError]
+    """
+
+    kwargs = _get_kwargs(
+        body=body,
+        design_id=design_id,
+        design_instance_id=design_instance_id,
+    )
+
+    response = await client.get_async_httpx_client().request(**kwargs)
+
+    return _build_response(client=client, response=response)
+
+
+async def asyncio(
+    *,
+    client: AuthenticatedClient,
+    body: Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput,
+    design_id: None | str | Unset = UNSET,
+    design_instance_id: None | str | Unset = UNSET,
+) -> AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError | None:
+    """Create
+
+     Create from parameters.
+
+    Args:
+        design_id (None | str | Unset):
+        design_instance_id (None | str | Unset):
+        body (Aero | AncillaryLoad | DecelerationLimit | Mass | WheelInput):
+
+    Raises:
+        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+    Returns:
+        AeroInDB | AncillaryLoadInDB | DecelerationLimitInDB | MassInDB | WheelInDB | Any | HTTPValidationError
+    """
+
+    return (
+        await asyncio_detailed(
+            client=client,
+            body=body,
+            design_id=design_id,
+            design_instance_id=design_instance_id,
+        )
+    ).parsed

@@ -22,7 +22,7 @@
 
 """Simple API client for the Ansys ConceptEV service."""
 import datetime
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import httpx
 from tenacity import retry, retry_if_result, stop_after_delay, wait_random_exponential
@@ -53,6 +53,9 @@ from ansys.conceptev.core.progress import check_status, generate_ssl_context, mo
 from ansys.conceptev.core.responses import is_gateway_error, process_response
 from ansys.conceptev.core.settings import settings
 
+if TYPE_CHECKING:
+    import ansys.conceptev.core.generated as generated_client
+
 __all__ = [
     "get_or_create_project",
     "create_new_project",
@@ -72,6 +75,8 @@ __all__ = [
     "get_project_id",
     "delete_project",
     "get_token",
+    "get_http_client",
+    "get_conceptev_client",
 ]
 
 Router = Literal[
@@ -139,6 +144,52 @@ def get_http_client(
         stop=stop_after_delay(120),
     )(client.send)
     return client
+
+
+def get_conceptev_client(
+    token: str | None = None,
+    cache_filepath: str = "token_cache.bin",
+) -> "generated_client.Client":
+    """Get a ConceptEV generated API client with auth and retry logic embedded.
+
+    The returned client is a ``conceptev_api_client.Client`` whose underlying
+    ``httpx.Client`` is pre-configured with:
+
+    * **AnsysID auth** (MSAL token acquire + automatic refresh on 401)
+    * **Tenacity retry** on gateway errors (502 / 504)
+    * **SSL context** from :func:`~ansys.conceptev.core.progress.generate_ssl_context`
+
+    Use it together with the generated API modules::
+
+        from ansys.conceptev.core.app import get_conceptev_client
+        from ansys.conceptev.core.generated.api.concepts import (
+            create_concept_check_concepts_post,
+        )
+
+        with get_conceptev_client() as client:
+            concept = create_concept_check_concepts_post.sync(
+                client=client, body=..., design_instance_id="..."
+            )
+
+    Args:
+        token: A pre-acquired bearer token.  When *None* the client obtains
+            and refreshes tokens automatically via MSAL.
+        cache_filepath: Path for the MSAL persistent token cache.
+
+    Returns:
+        A :class:`~ansys.conceptev.core.generated.client.Client` ready for use
+        with all generated API modules.
+    """
+    from ansys.conceptev.core.generated.client import Client as _OpcClient  # noqa: PLC0415
+
+    # Reuse the existing httpx.Client factory — it carries AnsysIDAuth + retry.
+    httpx_client = get_http_client(token=token, cache_filepath=cache_filepath)
+
+    # Inject the pre-configured httpx.Client into the generated OPC Client so
+    # every generated API call automatically inherits auth and retry behaviour.
+    opc_client = _OpcClient(base_url=BASE_URL)
+    opc_client.set_httpx_client(httpx_client)
+    return opc_client
 
 
 def get(
