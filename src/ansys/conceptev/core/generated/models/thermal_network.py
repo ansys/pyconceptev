@@ -7,8 +7,9 @@ from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 if TYPE_CHECKING:
+    from ..models.thermal_network_edges import ThermalNetworkEdges
     from ..models.thermal_network_flow_rate_dict import ThermalNetworkFlowRateDict
-    from ..models.thermal_network_network_dict import ThermalNetworkNetworkDict
+    from ..models.thermal_network_nodes import ThermalNetworkNodes
     from ..models.thermal_network_speed_dict import ThermalNetworkSpeedDict
 
 
@@ -30,13 +31,16 @@ class ThermalNetwork:
 
     """
 
-    network_dict: ThermalNetworkNetworkDict
+    edges: ThermalNetworkEdges
+    nodes: ThermalNetworkNodes
     speed_dict: ThermalNetworkSpeedDict
     flow_rate_dict: ThermalNetworkFlowRateDict
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        network_dict = self.network_dict.to_dict()
+        edges = self.edges.to_dict()
+
+        nodes = self.nodes.to_dict()
 
         speed_dict = self.speed_dict.to_dict()
 
@@ -46,7 +50,8 @@ class ThermalNetwork:
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "network_dict": network_dict,
+                "edges": edges,
+                "nodes": nodes,
                 "speed_dict": speed_dict,
                 "flow_rate_dict": flow_rate_dict,
             }
@@ -56,19 +61,23 @@ class ThermalNetwork:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.thermal_network_edges import ThermalNetworkEdges
         from ..models.thermal_network_flow_rate_dict import ThermalNetworkFlowRateDict
-        from ..models.thermal_network_network_dict import ThermalNetworkNetworkDict
+        from ..models.thermal_network_nodes import ThermalNetworkNodes
         from ..models.thermal_network_speed_dict import ThermalNetworkSpeedDict
 
         d = dict(src_dict)
-        network_dict = ThermalNetworkNetworkDict.from_dict(d.pop("network_dict"))
+        edges = ThermalNetworkEdges.from_dict(d.pop("edges"))
+
+        nodes = ThermalNetworkNodes.from_dict(d.pop("nodes"))
 
         speed_dict = ThermalNetworkSpeedDict.from_dict(d.pop("speed_dict"))
 
         flow_rate_dict = ThermalNetworkFlowRateDict.from_dict(d.pop("flow_rate_dict"))
 
         thermal_network = cls(
-            network_dict=network_dict,
+            edges=edges,
+            nodes=nodes,
             speed_dict=speed_dict,
             flow_rate_dict=flow_rate_dict,
         )

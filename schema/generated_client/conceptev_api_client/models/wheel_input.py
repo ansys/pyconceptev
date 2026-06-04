@@ -21,11 +21,7 @@ T = TypeVar("T", bound="WheelInput")
 
 @_attrs_define
 class WheelInput:
-    """Wheel as a configuration.
-
-    This is what is stored in the database and the class used for creation.
-
-    """
+    """Wheel Input."""
 
     item_type: Literal["config"] | Unset = "config"
     name: str | Unset = "Wheel"
@@ -37,6 +33,7 @@ class WheelInput:
     traction_coefficient: float | Unset = 0.9
     traction_coefficient_key: None | SurfaceConditionTractionConfigs | Unset = UNSET
     config_type: Literal["wheel"] | Unset = "wheel"
+    part_type: Literal["configuration"] | Unset = "configuration"
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -72,6 +69,8 @@ class WheelInput:
 
         config_type = self.config_type
 
+        part_type = self.part_type
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update({})
@@ -95,6 +94,8 @@ class WheelInput:
             field_dict["traction_coefficient_key"] = traction_coefficient_key
         if config_type is not UNSET:
             field_dict["config_type"] = config_type
+        if part_type is not UNSET:
+            field_dict["part_type"] = part_type
 
         return field_dict
 
@@ -155,6 +156,10 @@ class WheelInput:
         if config_type != "wheel" and not isinstance(config_type, Unset):
             raise ValueError(f"config_type must match const 'wheel', got '{config_type}'")
 
+        part_type = cast(Literal["configuration"] | Unset, d.pop("part_type", UNSET))
+        if part_type != "configuration" and not isinstance(part_type, Unset):
+            raise ValueError(f"part_type must match const 'configuration', got '{part_type}'")
+
         wheel_input = cls(
             item_type=item_type,
             name=name,
@@ -166,6 +171,7 @@ class WheelInput:
             traction_coefficient=traction_coefficient,
             traction_coefficient_key=traction_coefficient_key,
             config_type=config_type,
+            part_type=part_type,
         )
 
         wheel_input.additional_properties = d

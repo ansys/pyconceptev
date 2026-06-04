@@ -77,6 +77,7 @@ __all__ = [
     "get_token",
     "get_http_client",
     "get_conceptev_client",
+    "get_local_client",
 ]
 
 Router = Literal[
@@ -144,6 +145,39 @@ def get_http_client(
         stop=stop_after_delay(120),
     )(client.send)
     return client
+
+
+def get_local_client(
+    base_url: str = "http://127.0.0.1:8080/api",
+) -> "generated_client.Client":
+    """Get a generated API client pointed at a local ConceptEV server.
+
+    No authentication is performed — intended for use with a locally running
+    instance of the ConceptEV service (e.g. ``http://127.0.0.1:8080/api``).
+
+    Use it with the generated v2 API modules::
+
+        from ansys.conceptev.core.app import get_local_client
+        from ansys.conceptev.core.generated.api.concept_v2 import (
+            create_concept_v2_concept_post,
+        )
+        from ansys.conceptev.core.generated.models import ConceptInput
+
+        with get_local_client() as client:
+            concept = create_concept_v2_concept_post.sync(
+                client=client, body=ConceptInput(name="My Study")
+            )
+
+    Args:
+        base_url: Base URL of the local ConceptEV API.
+
+    Returns:
+        A :class:`~ansys.conceptev.core.generated.client.Client` ready for use
+        with all generated v2 API modules.
+    """
+    from ansys.conceptev.core.generated.client import Client as _OpcClient  # noqa: PLC0415
+
+    return _OpcClient(base_url=base_url)
 
 
 def get_conceptev_client(

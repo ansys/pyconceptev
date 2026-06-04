@@ -2,372 +2,220 @@
 
 from .acceleration_unit import AccelerationUnit
 from .aero import Aero
-from .aero_in_db import AeroInDB
-from .ancillary_load import AncillaryLoad
-from .ancillary_load_in_db import AncillaryLoadInDB
+from .aero_input import AeroInput
+from .aero_output import AeroOutput
 from .angle_unit import AngleUnit
 from .angular_acceleration_unit import AngularAccelerationUnit
 from .angular_speed_unit import AngularSpeedUnit
-from .architecture_input_ids import ArchitectureInputIds
-from .architecture_outline import ArchitectureOutline
+from .architecture_input import ArchitectureInput
+from .architecture_output import ArchitectureOutput
 from .area_unit import AreaUnit
 from .battery_configuration import BatteryConfiguration
-from .battery_fixed_voltages import BatteryFixedVoltages
-from .battery_fixed_voltages_in_db import BatteryFixedVoltagesInDB
-from .battery_lookup_table import BatteryLookupTable
+from .battery_fixed_voltages_input import BatteryFixedVoltagesInput
+from .battery_fixed_voltages_output import BatteryFixedVoltagesOutput
 from .battery_lookup_table_data import BatteryLookupTableData
-from .battery_lookup_table_data_in_db import BatteryLookupTableDataInDB
-from .battery_lookup_table_id import BatteryLookupTableID
-from .battery_lookup_table_in_db import BatteryLookupTableInDB
+from .battery_lookup_table_input import BatteryLookupTableInput
+from .battery_lookup_table_output import BatteryLookupTableOutput
 from .battery_state import BatteryState
-from .blob import Blob
-from .body_add_thermal_model_components_thermal_model_post import BodyAddThermalModelComponentsThermalModelPost
-from .body_create_component_data_from_file_components_upload_file_post import (
-    BodyCreateComponentDataFromFileComponentsUploadFilePost,
+from .body_create_file_item import BodyCreateFileItem
+from .check_job_backend_availability_response_check_job_backend_availability import (
+    CheckJobBackendAvailabilityResponseCheckJobBackendAvailability,
 )
-from .body_create_file_items_components_upload_post import BodyCreateFileItemsComponentsUploadPost
-from .body_create_from_file_drive_cycles_from_file_post import BodyCreateFromFileDriveCyclesFromFilePost
-from .body_import_concept_concepts_import_post import BodyImportConceptConceptsImportPost
-from .body_upload_drive_cycle_file_drive_cycles_upload_file_post import (
-    BodyUploadDriveCycleFileDriveCyclesUploadFilePost,
-)
-from .capability_curve import CapabilityCurve
-from .capability_curve_errors import CapabilityCurveErrors
-from .cev_job_status import CevJobStatus
 from .component_axle import ComponentAxle
 from .component_configuration_set import ComponentConfigurationSet
 from .component_file_type import ComponentFileType
 from .component_loss_map_args import ComponentLossMapArgs
-from .component_side import ComponentSide
-from .concept import Concept
-from .concept_clone_input import ConceptCloneInput
-from .concept_populated import ConceptPopulated
-from .concept_settings import ConceptSettings
-from .concept_update import ConceptUpdate
-from .create_file_items_components_upload_post_response_201_item_type_1_type_0 import (
-    CreateFileItemsComponentsUploadPostResponse201ItemType1Type0,
-)
+from .concept_input import ConceptInput
+from .concept_job_record import ConceptJobRecord
+from .concept_output import ConceptOutput
+from .concept_save_request import ConceptSaveRequest
 from .current_unit import CurrentUnit
-from .deceleration_limit import DecelerationLimit
-from .deceleration_limit_in_db import DecelerationLimitInDB
 from .density_unit import DensityUnit
-from .disconnect_clutch_input import DisconnectClutchInput
-from .disconnect_clutch_input_in_db import DisconnectClutchInputInDB
-from .drive_cycle import DriveCycle
-from .drive_cycle_in_db import DriveCycleInDB
-from .drive_cycle_requirement import DriveCycleRequirement
-from .drive_cycle_requirement_ids import DriveCycleRequirementIds
-from .drive_cycle_s3 import DriveCycleS3
-from .drive_cycle_s3_in_db import DriveCycleS3InDB
-from .drive_cycle_solved import DriveCycleSolved
-from .drive_cycle_solved_energy_axle_split import DriveCycleSolvedEnergyAxleSplit
-from .drive_cycle_solved_warnings import DriveCycleSolvedWarnings
-from .dynamic_requirement import DynamicRequirement
-from .dynamic_requirement_inputs_ids import DynamicRequirementInputsIds
-from .dynamic_requirement_solved import DynamicRequirementSolved
-from .dynamic_requirement_solved_energy_axle_split import DynamicRequirementSolvedEnergyAxleSplit
+from .drive_cycle_input import DriveCycleInput
+from .drive_cycle_output import DriveCycleOutput
+from .drive_cycle_requirement_input import DriveCycleRequirementInput
+from .drive_cycle_requirement_output import DriveCycleRequirementOutput
+from .dynamic_requirement_input import DynamicRequirementInput
+from .dynamic_requirement_output import DynamicRequirementOutput
+from .edge import Edge
 from .electric_charge_unit import ElectricChargeUnit
 from .electrical_energy_unit import ElectricalEnergyUnit
 from .electrical_power_unit import ElectricalPowerUnit
 from .energy_unit import EnergyUnit
-from .exchange_file import ExchangeFile
-from .file_parameters import FileParameters
+from .file_info import FileInfo
+from .file_item_create_response import FileItemCreateResponse
+from .file_item_create_response_calculated_values import FileItemCreateResponseCalculatedValues
+from .file_item_input import FileItemInput
+from .file_item_output import FileItemOutput
 from .force_unit import ForceUnit
 from .frequency_unit import FrequencyUnit
-from .get_from_library_library_object_id_get_response_get_from_library_library_object_id_get import (
-    GetFromLibraryLibraryObjectIdGetResponseGetFromLibraryLibraryObjectIdGet,
-)
 from .get_info_unit_choices_info_get_response_get_info_unit_choices_info_get import (
     GetInfoUnitChoicesInfoGetResponseGetInfoUnitChoicesInfoGet,
 )
-from .health_check_health_get_response_health_check_health_get import HealthCheckHealthGetResponseHealthCheckHealthGet
 from .http_validation_error import HTTPValidationError
 from .inertia_unit import InertiaUnit
-from .inverter_analytical import InverterAnalytical
-from .inverter_analytical_in_db import InverterAnalyticalInDB
-from .inverter_igbt_data import InverterIGBTData
-from .inverter_loss_map_data_in_db import InverterLossMapDataInDB
-from .inverter_loss_map_id import InverterLossMapID
-from .inverter_mosfet_data import InverterMOSFETData
-from .inverter_simple_data import InverterSimpleData
-from .item_and_blobs import ItemAndBlobs
-from .job import Job
-from .job_data import JobData
-from .job_input import JobInput
-from .job_start import JobStart
-from .job_status import JobStatus
+from .job_output import JobOutput
+from .job_request import JobRequest
 from .length_unit import LengthUnit
-from .list_drive_cycle_data_drive_cycles_data_get_response_200_item import (
-    ListDriveCycleDataDriveCyclesDataGetResponse200Item,
-)
-from .list_drive_cycle_names_drive_cycles_names_get_response_list_drive_cycle_names_drive_cycles_names_get import (
-    ListDriveCycleNamesDriveCyclesNamesGetResponseListDriveCycleNamesDriveCyclesNamesGet,
-)
+from .loss_map_grid_lab import LossMapGridLab
+from .loss_map_grid_power import LossMapGridPower
+from .loss_map_grid_power_meta_data import LossMapGridPowerMetaData
 from .mass import Mass
-from .mass_in_db import MassInDB
+from .mass_input import MassInput
+from .mass_output import MassOutput
 from .mass_unit import MassUnit
 from .motor_configuration import MotorConfiguration
-from .motor_lab import MotorLab
 from .motor_lab_data import MotorLabData
-from .motor_lab_data_in_db import MotorLabDataInDB
-from .motor_lab_data_in_db_lab_file_dict import MotorLabDataInDBLabFileDict
 from .motor_lab_data_lab_file_dict import MotorLabDataLabFileDict
-from .motor_lab_id import MotorLabID
-from .motor_lab_in_db import MotorLabInDB
-from .motor_loss_map import MotorLossMap
-from .motor_loss_map_data import MotorLossMapData
-from .motor_loss_map_data_in_db import MotorLossMapDataInDB
-from .motor_loss_map_id import MotorLossMapID
-from .motor_loss_map_in_db import MotorLossMapInDB
+from .motor_lab_input import MotorLabInput
+from .motor_lab_output import MotorLabOutput
 from .motor_state import MotorState
 from .motor_thermal_limits import MotorThermalLimits
-from .motor_torque_curves import MotorTorqueCurves
-from .motor_torque_curves_data import MotorTorqueCurvesData
-from .motor_torque_curves_data_in_db import MotorTorqueCurvesDataInDB
-from .motor_torque_curves_id import MotorTorqueCurvesID
-from .motor_torque_curves_in_db import MotorTorqueCurvesInDB
-from .part_names import PartNames
+from .node import Node
+from .part_type import PartType
 from .power_unit import PowerUnit
 from .pressure_unit import PressureUnit
-from .pwm_frequency_definition import PWMFrequencyDefinition
 from .ratio_unit import RatioUnit
 from .resistance_unit import ResistanceUnit
 from .road_efficiency_unit import RoadEfficiencyUnit
-from .solved_battery import SolvedBattery
-from .solved_disconnect_clutch import SolvedDisconnectClutch
-from .solved_inverter import SolvedInverter
-from .solved_motor import SolvedMotor
-from .solved_road import SolvedRoad
-from .solved_transmission import SolvedTransmission
-from .solved_wheel import SolvedWheel
+from .save_state import SaveState
 from .speed_unit import SpeedUnit
-from .standard_drive_cycles import StandardDriveCycles
-from .static_requirement import StaticRequirement
-from .static_requirement_acceleration_ids import StaticRequirementAccelerationIds
-from .static_requirement_solved import StaticRequirementSolved
-from .static_requirement_solved_energy_axle_split import StaticRequirementSolvedEnergyAxleSplit
-from .statuses import Statuses
-from .submitted_job import SubmittedJob
+from .static_requirement_input import StaticRequirementInput
+from .static_requirement_output import StaticRequirementOutput
 from .surface_condition_traction_configs import SurfaceConditionTractionConfigs
 from .temperature_unit import TemperatureUnit
-from .template import Template
-from .thermal_model_details import ThermalModelDetails
-from .thermal_model_solver import ThermalModelSolver
-from .thermal_model_solver_loss_map import ThermalModelSolverLossMap
-from .thermal_model_solver_loss_map_additional_property import ThermalModelSolverLossMapAdditionalProperty
-from .thermal_model_solver_temperature_map import ThermalModelSolverTemperatureMap
-from .thermal_model_solver_temperature_map_additional_property import ThermalModelSolverTemperatureMapAdditionalProperty
-from .thermal_model_type import ThermalModelType
+from .thermal_model import ThermalModel
+from .thermal_model_loss_map import ThermalModelLossMap
+from .thermal_model_loss_map_additional_property import ThermalModelLossMapAdditionalProperty
+from .thermal_model_temperature_map import ThermalModelTemperatureMap
+from .thermal_model_temperature_map_additional_property import ThermalModelTemperatureMapAdditionalProperty
 from .thermal_network import ThermalNetwork
+from .thermal_network_edges import ThermalNetworkEdges
 from .thermal_network_flow_rate_dict import ThermalNetworkFlowRateDict
-from .thermal_network_network_dict import ThermalNetworkNetworkDict
-from .thermal_network_network_dict_additional_property import ThermalNetworkNetworkDictAdditionalProperty
+from .thermal_network_nodes import ThermalNetworkNodes
 from .thermal_network_speed_dict import ThermalNetworkSpeedDict
 from .time_unit import TimeUnit
 from .torque_unit import TorqueUnit
-from .total_tractive_torque_graph import TotalTractiveTorqueGraph
-from .transient_calculation_point import TransientCalculationPoint
-from .transient_total_values import TransientTotalValues
-from .transient_total_values_efficiency_by_component import TransientTotalValuesEfficiencyByComponent
-from .transient_total_values_loss_by_component import TransientTotalValuesLossByComponent
-from .transient_total_values_loss_by_component_ratio import TransientTotalValuesLossByComponentRatio
-from .transmission_loss_coefficients import TransmissionLossCoefficients
-from .transmission_loss_coefficients_in_db import TransmissionLossCoefficientsInDB
-from .transmission_loss_map import TransmissionLossMap
-from .transmission_loss_map_data import TransmissionLossMapData
-from .transmission_loss_map_data_in_db import TransmissionLossMapDataInDB
-from .transmission_loss_map_id import TransmissionLossMapID
-from .transmission_loss_map_in_db import TransmissionLossMapInDB
-from .transmission_neglect import TransmissionNeglect
+from .total_tractive_torque_graph_input import TotalTractiveTorqueGraphInput
+from .total_tractive_torque_graph_output import TotalTractiveTorqueGraphOutput
+from .transmission_loss_coefficients_input import TransmissionLossCoefficientsInput
+from .transmission_loss_coefficients_output import TransmissionLossCoefficientsOutput
 from .unit_choices import UnitChoices
 from .unit_choices_unit_type_to_unit_map import UnitChoicesUnitTypeToUnitMap
-from .uploaded_file import UploadedFile
 from .validation_error import ValidationError
 from .validation_error_context import ValidationErrorContext
-from .version_version_get_response_version_version_get import VersionVersionGetResponseVersionVersionGet
 from .voltage_unit import VoltageUnit
 from .volume_unit import VolumeUnit
 from .volumetric_flow_rate_unit import VolumetricFlowRateUnit
-from .wheel_in_db import WheelInDB
 from .wheel_input import WheelInput
+from .wheel_output import WheelOutput
 from .wheel_rolling_resistance_configs import WheelRollingResistanceConfigs
 
 __all__ = (
     "AccelerationUnit",
     "Aero",
-    "AeroInDB",
-    "AncillaryLoad",
-    "AncillaryLoadInDB",
+    "AeroInput",
+    "AeroOutput",
     "AngleUnit",
     "AngularAccelerationUnit",
     "AngularSpeedUnit",
-    "ArchitectureInputIds",
-    "ArchitectureOutline",
+    "ArchitectureInput",
+    "ArchitectureOutput",
     "AreaUnit",
     "BatteryConfiguration",
-    "BatteryFixedVoltages",
-    "BatteryFixedVoltagesInDB",
-    "BatteryLookupTable",
+    "BatteryFixedVoltagesInput",
+    "BatteryFixedVoltagesOutput",
     "BatteryLookupTableData",
-    "BatteryLookupTableDataInDB",
-    "BatteryLookupTableID",
-    "BatteryLookupTableInDB",
+    "BatteryLookupTableInput",
+    "BatteryLookupTableOutput",
     "BatteryState",
-    "Blob",
-    "BodyAddThermalModelComponentsThermalModelPost",
-    "BodyCreateComponentDataFromFileComponentsUploadFilePost",
-    "BodyCreateFileItemsComponentsUploadPost",
-    "BodyCreateFromFileDriveCyclesFromFilePost",
-    "BodyImportConceptConceptsImportPost",
-    "BodyUploadDriveCycleFileDriveCyclesUploadFilePost",
-    "CapabilityCurve",
-    "CapabilityCurveErrors",
-    "CevJobStatus",
+    "BodyCreateFileItem",
+    "CheckJobBackendAvailabilityResponseCheckJobBackendAvailability",
     "ComponentAxle",
     "ComponentConfigurationSet",
     "ComponentFileType",
     "ComponentLossMapArgs",
-    "ComponentSide",
-    "Concept",
-    "ConceptCloneInput",
-    "ConceptPopulated",
-    "ConceptSettings",
-    "ConceptUpdate",
-    "CreateFileItemsComponentsUploadPostResponse201ItemType1Type0",
+    "ConceptInput",
+    "ConceptJobRecord",
+    "ConceptOutput",
+    "ConceptSaveRequest",
     "CurrentUnit",
-    "DecelerationLimit",
-    "DecelerationLimitInDB",
     "DensityUnit",
-    "DisconnectClutchInput",
-    "DisconnectClutchInputInDB",
-    "DriveCycle",
-    "DriveCycleInDB",
-    "DriveCycleRequirement",
-    "DriveCycleRequirementIds",
-    "DriveCycleS3",
-    "DriveCycleS3InDB",
-    "DriveCycleSolved",
-    "DriveCycleSolvedEnergyAxleSplit",
-    "DriveCycleSolvedWarnings",
-    "DynamicRequirement",
-    "DynamicRequirementInputsIds",
-    "DynamicRequirementSolved",
-    "DynamicRequirementSolvedEnergyAxleSplit",
+    "DriveCycleInput",
+    "DriveCycleOutput",
+    "DriveCycleRequirementInput",
+    "DriveCycleRequirementOutput",
+    "DynamicRequirementInput",
+    "DynamicRequirementOutput",
+    "Edge",
     "ElectricalEnergyUnit",
     "ElectricalPowerUnit",
     "ElectricChargeUnit",
     "EnergyUnit",
-    "ExchangeFile",
-    "FileParameters",
+    "FileInfo",
+    "FileItemCreateResponse",
+    "FileItemCreateResponseCalculatedValues",
+    "FileItemInput",
+    "FileItemOutput",
     "ForceUnit",
     "FrequencyUnit",
-    "GetFromLibraryLibraryObjectIdGetResponseGetFromLibraryLibraryObjectIdGet",
     "GetInfoUnitChoicesInfoGetResponseGetInfoUnitChoicesInfoGet",
-    "HealthCheckHealthGetResponseHealthCheckHealthGet",
     "HTTPValidationError",
     "InertiaUnit",
-    "InverterAnalytical",
-    "InverterAnalyticalInDB",
-    "InverterIGBTData",
-    "InverterLossMapDataInDB",
-    "InverterLossMapID",
-    "InverterMOSFETData",
-    "InverterSimpleData",
-    "ItemAndBlobs",
-    "Job",
-    "JobData",
-    "JobInput",
-    "JobStart",
-    "JobStatus",
+    "JobOutput",
+    "JobRequest",
     "LengthUnit",
-    "ListDriveCycleDataDriveCyclesDataGetResponse200Item",
-    "ListDriveCycleNamesDriveCyclesNamesGetResponseListDriveCycleNamesDriveCyclesNamesGet",
+    "LossMapGridLab",
+    "LossMapGridPower",
+    "LossMapGridPowerMetaData",
     "Mass",
-    "MassInDB",
+    "MassInput",
+    "MassOutput",
     "MassUnit",
     "MotorConfiguration",
-    "MotorLab",
     "MotorLabData",
-    "MotorLabDataInDB",
-    "MotorLabDataInDBLabFileDict",
     "MotorLabDataLabFileDict",
-    "MotorLabID",
-    "MotorLabInDB",
-    "MotorLossMap",
-    "MotorLossMapData",
-    "MotorLossMapDataInDB",
-    "MotorLossMapID",
-    "MotorLossMapInDB",
+    "MotorLabInput",
+    "MotorLabOutput",
     "MotorState",
     "MotorThermalLimits",
-    "MotorTorqueCurves",
-    "MotorTorqueCurvesData",
-    "MotorTorqueCurvesDataInDB",
-    "MotorTorqueCurvesID",
-    "MotorTorqueCurvesInDB",
-    "PartNames",
+    "Node",
+    "PartType",
     "PowerUnit",
     "PressureUnit",
-    "PWMFrequencyDefinition",
     "RatioUnit",
     "ResistanceUnit",
     "RoadEfficiencyUnit",
-    "SolvedBattery",
-    "SolvedDisconnectClutch",
-    "SolvedInverter",
-    "SolvedMotor",
-    "SolvedRoad",
-    "SolvedTransmission",
-    "SolvedWheel",
+    "SaveState",
     "SpeedUnit",
-    "StandardDriveCycles",
-    "StaticRequirement",
-    "StaticRequirementAccelerationIds",
-    "StaticRequirementSolved",
-    "StaticRequirementSolvedEnergyAxleSplit",
-    "Statuses",
-    "SubmittedJob",
+    "StaticRequirementInput",
+    "StaticRequirementOutput",
     "SurfaceConditionTractionConfigs",
     "TemperatureUnit",
-    "Template",
-    "ThermalModelDetails",
-    "ThermalModelSolver",
-    "ThermalModelSolverLossMap",
-    "ThermalModelSolverLossMapAdditionalProperty",
-    "ThermalModelSolverTemperatureMap",
-    "ThermalModelSolverTemperatureMapAdditionalProperty",
-    "ThermalModelType",
+    "ThermalModel",
+    "ThermalModelLossMap",
+    "ThermalModelLossMapAdditionalProperty",
+    "ThermalModelTemperatureMap",
+    "ThermalModelTemperatureMapAdditionalProperty",
     "ThermalNetwork",
+    "ThermalNetworkEdges",
     "ThermalNetworkFlowRateDict",
-    "ThermalNetworkNetworkDict",
-    "ThermalNetworkNetworkDictAdditionalProperty",
+    "ThermalNetworkNodes",
     "ThermalNetworkSpeedDict",
     "TimeUnit",
     "TorqueUnit",
-    "TotalTractiveTorqueGraph",
-    "TransientCalculationPoint",
-    "TransientTotalValues",
-    "TransientTotalValuesEfficiencyByComponent",
-    "TransientTotalValuesLossByComponent",
-    "TransientTotalValuesLossByComponentRatio",
-    "TransmissionLossCoefficients",
-    "TransmissionLossCoefficientsInDB",
-    "TransmissionLossMap",
-    "TransmissionLossMapData",
-    "TransmissionLossMapDataInDB",
-    "TransmissionLossMapID",
-    "TransmissionLossMapInDB",
-    "TransmissionNeglect",
+    "TotalTractiveTorqueGraphInput",
+    "TotalTractiveTorqueGraphOutput",
+    "TransmissionLossCoefficientsInput",
+    "TransmissionLossCoefficientsOutput",
     "UnitChoices",
     "UnitChoicesUnitTypeToUnitMap",
-    "UploadedFile",
     "ValidationError",
     "ValidationErrorContext",
-    "VersionVersionGetResponseVersionVersionGet",
     "VoltageUnit",
     "VolumetricFlowRateUnit",
     "VolumeUnit",
-    "WheelInDB",
     "WheelInput",
+    "WheelOutput",
     "WheelRollingResistanceConfigs",
 )

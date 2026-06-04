@@ -20,13 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """
-Bulk Job Submit.
-================
+Bulk Job Submit
+===============
 
-Example Script to bulk submit jobs to the ConceptEV API.
-This example copies the template into a project and runs a number of jobs with different
-combinations of components.
-The combinations of components are specified in a CSV file format.
+Example script to bulk-submit jobs to the local ConceptEV v2 API.
+
+This example reads a list of component combinations from a CSV file and, for
+each combination, creates a new concept on the server, assembles it with the
+chosen components, and submits a job.  The resulting concept IDs and job IDs
+are written to an Excel file for later result retrieval.
+
+The combinations CSV must contain a column per component role matching the
+``component_order`` dictionary below, with component names as values.
+
+The ``base_concept_id`` is an existing concept on the server whose components
+will be referenced when building each variant.
 """
 
 # %%
@@ -37,200 +45,175 @@ import datetime
 
 import pandas as pd
 
-from ansys.conceptev.core import app
-from ansys.conceptev.core.exceptions import ResponseError
+from ansys.conceptev.core.app import get_local_client
+from ansys.conceptev.core.generated.api.concept_v2 import (
+    create_concept,
+    create_concept_part,
+    delete_concept,
+    get_concept,
+    create_job,
+)
+from ansys.conceptev.core.generated.models import (
+    ArchitectureInput,
+    ConceptInput,
+)
+from ansys.conceptev.core.generated.models.job_request import JobRequest
 
 # %%
-# Set up inputs.
-# ------------------------
+# Set up inputs
+# -------------
 # Change the following variables to match your data.
 # The current filename for combinations can be used as an example.
-# The current base_concept_id is a template concept that will be copied.
-# Component Order is dictionary that maps the column names in the combinations file to the
-# component names in the API.
+# The ``base_concept_id`` must be the ID of an existing concept on the server
+# that contains the components referenced in the combinations file.
+# ``component_order`` maps CSV column names → architecture field names.
+
 filename = "resources/combinations.csv"  # See example file for format.
-base_concept_id = "2465235f-ad2e-4923-9125-e2e69ccf5816"  # Truck template.
+base_concept_id = "2465235f-ad2e-4923-9125-e2e69ccf5816"  # Existing concept on the server.
 component_order = {
     "front_transmission_id": "Front Transmission",
     "front_motor_id": "Front Motor",
-    "front_inverter_id": "Front Inverter",
     "rear_transmission_id": "Rear Transmission",
     "rear_motor_id": "Rear Motor",
-    "rear_inverter_id": "Rear Inverter",
     "battery_id": "Battery",
-    "front_clutch_id": "Front Clutch",
-    "rear_clutch_id": "Rear Clutch",
 }
 
 
-def update_architecture(components, combo, base_architecture):
-    # Update Architecture to match the new combinations.
-    arch = {key: components[combo[value]] for key, value in component_order.items()}
-    arch["number_of_front_wheels"] = base_architecture["number_of_front_wheels"]
-    arch["number_of_front_motors"] = base_architecture["number_of_front_motors"]
-    arch["number_of_rear_wheels"] = base_architecture["number_of_rear_wheels"]
-    arch["number_of_rear_motors"] = base_architecture["number_of_rear_motors"]
-    arch["wheelbase"] = base_architecture["wheelbase"]
-    return arch
-
-
 # %%
-# Create a client and create a new project from template.
+# Helper: build a component name → ID map from a concept
 # -------------------------------------------------------
-# Authenticate and get a token
-# Create an API client.
-# Get the account ID and HPC ID.
-# Copy the template into a new project.
-# Add a clutch to the concept.
-# Get the component IDs for the new concept.
-# Get the architecture for the new concept.
 
 
-# Use API client for the Ansys ConceptEV service
-with app.get_http_client() as client:
-    client.timeout = 200  # Extend timeout for uploading files.
-    token = app.get_token(client)
-    accounts = app.get_account_ids(token)
-    account_id = accounts["conceptev_saas@ansys.com"]
-    hpc_id = app.get_default_hpc(token, account_id)
+def get_component_id_map(concept) -> dict[str, str]:
+    """Return {component_name: component_id} from a ConceptOutput."""
+    result = {}
+    if concept.components:
+        for comp in concept.components:
+            result[comp.name] = comp.id
+    return result
 
-    project = app.create_new_project(
-        client, account_id, hpc_id, f"New Project {datetime.datetime.now()}"
-    )
-    project_id = project["projectId"]
-    design_instance_id = app.create_design_instance(
-        project_id, f"New Concept {datetime.datetime.now()}", token
-    )
-    app.copy_concept(base_concept_id, design_instance_id, client)
-    base_concept_id = design_instance_id
-    app.post(
-        client,
-        "/components",
-        data={
-            "item_type": "component",
-            "name": "Disconnect Clutch",
-            "mass": 0,
-            "moment_of_inertia": 0,
-            "cost": 0,
-            "component_type": "ClutchInput",
-            "efficiency": "95",
-            "switch_energy": "10",
-            "engaged_power": 0,
-        },
-        params={"design_instance_id": base_concept_id},
-    )
-    base_components = app.get_component_id_map(client, base_concept_id)
-
-    base_concept = app.get(client, f"/concepts/{base_concept_id}")
-    base_architecture = app.get(
-        client,
-        f"/architectures/{base_concept['architecture_id']}",
-        params={"design_instance_id": base_concept_id},
-    )
 
 # %%
-# Read combinations from a csv file and check they match the combinations file.
-# -----------------------------------------------------------------------------
-# Read combinations from a csv file.
-# Get the component types from the component_order dictionary.
-# Turn them into set.
-# Check that the component types are in the combinations file.
-# Get the component names from the combinations.
-# Check the component names are in the base components.
+# Load the base concept and validate the combinations file
+# --------------------------------------------------------
 
-combinations = pd.read_csv(filename, na_filter=False)
-combinations = combinations.to_dict("records")
+combinations = pd.read_csv(filename, na_filter=False).to_dict("records")
 
-# Check the component types are in the header of the combinations file.
-component_types = set(component_order.values())
-component_types_from_combo_header = set(combinations[0].keys())
-assert component_types <= component_types_from_combo_header, component_types.difference(
-    component_types_from_combo_header
+# Validate that every required column exists.
+required_columns = set(component_order.values())
+file_columns = set(combinations[0].keys()) if combinations else set()
+assert required_columns <= file_columns, (
+    f"Missing columns in combinations file: {required_columns - file_columns}"
 )
-# Check the component names in the combinations file are in the base components.
-component_names_from_combo = set([value for combo in combinations for value in combo.values()])
-component_names_from_base = set(base_components.keys())
-assert (
-    component_names_from_combo <= component_names_from_base
-), component_names_from_combo.difference(component_names_from_base)
 
-# %%
-# Submit jobs for each combination.
-# ---------------------------------
-# Create a new design instance with title.
-# Create an output list to store the created designs.
-# Copy the base Concept into that new design instance.
-# Get the component IDs for the new design instance as they change when copied.
-# Change the base concept to use the new components.
-# Update the architecture on the server.
-# Update the local concept instance with the new architecture id.
-# Create and submit a job using the new concept (with the new architecture).
+with get_local_client() as client:
+    base_concept = get_concept.sync(id=base_concept_id, client=client)
+    base_component_map = get_component_id_map(base_concept)
 
-with app.get_http_client() as client:
-    token = app.get_token(client)
-    created_designs = []
+    # Validate that every component name in the file exists in the base concept.
+    combo_component_names = {v for row in combinations for v in row.values() if v}
+    assert combo_component_names <= set(base_component_map.keys()), (
+        f"Unknown components in combinations: "
+        f"{combo_component_names - set(base_component_map.keys())}"
+    )
+
+    # Identify the requirement IDs to run (all requirements from the base concept).
+    requirement_ids = [r.id for r in (base_concept.requirements or [])]
+
+    # %%
     # Submit jobs for each combination
-    for combo in combinations:
-        try:
-            # Create a new design instance with title.
-            title = f"F_{combo['Front Motor']}_R_{combo['Rear Motor']} {datetime.datetime.now()}"
-            design_instance_id = app.create_design_instance(project_id, title=title, token=token)
+    # ---------------------------------
+    # For each row in the combinations CSV:
+    # 1. Create a new concept.
+    # 2. Add an architecture referencing the chosen components.
+    # 3. Submit a job.
 
-            # Copy base Concept into that new design instance.
-            concept = app.copy_concept(base_concept_id, design_instance_id, client)
-            print(f"ID of the cloned concept: {concept['id']}")
-            # Save that in output list.
+    created_designs = []
+    for combo in combinations:
+        title = (
+            f"FM_{combo['Front Motor']}_RM_{combo['Rear Motor']}_"
+            f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        )
+        try:
+            # 1. Create a new concept.
+            concept = create_concept.sync(
+                client=client,
+                body=ConceptInput(name=title),
+            )
+            concept_id = concept.id
+
+            # 2. Build the architecture referencing the chosen component IDs.
+            arch_kwargs = {
+                field: base_component_map[combo[label]]
+                for field, label in component_order.items()
+                if combo.get(label)
+            }
+            # battery_id is required by ArchitectureInput.
+            battery_id = arch_kwargs.pop("battery_id")
+            created_arch = create_concept_part.sync(
+                id=concept_id,
+                part_type="architecture",
+                client=client,
+                body=ArchitectureInput(
+                    battery_id=battery_id,
+                    number_of_front_wheels=base_concept.architectures[0].number_of_front_wheels
+                    if base_concept.architectures
+                    else 2,
+                    number_of_front_motors=base_concept.architectures[0].number_of_front_motors
+                    if base_concept.architectures
+                    else 1,
+                    number_of_rear_wheels=base_concept.architectures[0].number_of_rear_wheels
+                    if base_concept.architectures
+                    else 2,
+                    number_of_rear_motors=base_concept.architectures[0].number_of_rear_motors
+                    if base_concept.architectures
+                    else 0,
+                    **arch_kwargs,
+                ),
+            )
+
+            # 3. Submit a job.
+            job_record = create_job.sync(
+                concept_id=concept_id,
+                client=client,
+                body=JobRequest(
+                    name=f"bulk_job: {title}",
+                    requirement_ids=requirement_ids,
+                    architecture_id=created_arch.id,
+                ),
+            )
+            print(f"Submitted job {job_record.id} for concept {concept_id} ({title})")
+
             created_designs.append(
                 {
-                    "Project Name": title,
-                    "Design Instance Id": design_instance_id,
-                    "Concept_ID": concept["id"],
-                },
+                    "Title": title,
+                    "Concept ID": concept_id,
+                    "Architecture ID": created_arch.id,
+                    "Job ID": job_record.id,
+                }
             )
-            # Get the component IDs for the new design instance as they change when copied.
-            params = {"design_instance_id": design_instance_id}
-            components = app.get_component_id_map(client, design_instance_id)
-            # Change the base concept to use the new components.
-            updated_architecture = update_architecture(components, combo, base_architecture)
-            # Update the architecture on the server.
-            created_arch = app.post(client, "/architectures", data=updated_architecture)
-            print(f"Created architecture: {created_arch}\n")
+        except Exception as err:
+            print(f"Failed for combination {combo}: {err}")
+            continue
 
-            # Update the local concept instance with the new architecture id.
-            concept["architecture_id"] = created_arch["id"]
-
-            # Create and submit a job using the new concept (with the new architecture)
-            job_info = app.create_submit_job(
-                client,
-                concept,
-                account_id,
-                hpc_id,
-                job_name=f"cli_job: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}",
-            )
-            print(f"Submitted job for combination {combo}: {job_info}")
-        except ResponseError as err:
-            print(f"Failed to submit job for combination {combo}: {err}")
-            continue  # If one job fails to submit keep trying the other jobs.
 # %%
-# Save the list of created designs to a file.
-# -------------------------------------------
-# Create a pandas dataframe.
-# Export to Excel.
+# Save the list of created designs to a file
+# ------------------------------------------
+
 all_results = pd.DataFrame(created_designs)
-all_results.to_excel("created_designs.xlsx")
+all_results.to_excel("created_designs.xlsx", index=False)
+print(f"Saved {len(created_designs)} designs to created_designs.xlsx")
 
 # %%
-# Delete the extra project on the server.
-# ---------------------------------------
-# Delete the project on the server.
+# Clean up: delete all created concepts
+# --------------------------------------
 #
 # .. warning::
-#    This will delete the project and all its contents.
-#    Only needed for keep test environment clean.
+#    This permanently removes all concepts created above from the server.
+#    Comment out this section if you want to keep them.
 
-with app.get_http_client() as client:
-    for concept in created_designs:
-        client.params = client.params.set("design_instance_id", concept["Design Instance Id"])
-        app.delete(client, "concepts", id=concept["Concept_ID"])
-    app.delete_project(project_id, token)
-    print(f"Deleted project {project_id}")
+with get_local_client() as client:
+    for design in created_designs:
+        delete_concept.sync(id=design["Concept ID"], client=client)
+        print(f"Deleted concept {design['Concept ID']}")
+    print("Cleanup complete.")
