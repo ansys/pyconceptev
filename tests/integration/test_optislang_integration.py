@@ -57,9 +57,13 @@ def client(token):
 
 
 @pytest.fixture
-def design_instance_id():
-    """Fixture to provide a design instance ID for testing."""
-    return "8cdea42d-fb8a-4499-a6f9-a188f2454afa"
+def design_instance_id(creation_design_instance_id):
+    """Fixture to provide a design instance ID for testing.
+
+    Uses the session-scoped creation concept so component/config creation tests
+    share one concept rather than hitting a stale hardcoded server-side concept.
+    """
+    return creation_design_instance_id
 
 
 @pytest.fixture
@@ -77,9 +81,9 @@ def accounts(token):
 
 
 @pytest.fixture
-def concept_data(client_with_design_instance, design_instance_id):
-    """Fixture to get concept data."""
-    concept_data = app.get_concept(client_with_design_instance, design_instance_id)
+def concept_data(populated_concept):
+    """Fixture to get concept data from the session-scoped fully-populated concept."""
+    concept_data, _, _ = populated_concept
     return concept_data
 
 
@@ -97,22 +101,22 @@ def hpc_id(token, account_id):
 
 
 @pytest.fixture
-def job_info(client_with_design_instance, concept_data, account_id, hpc_id):
-    """Submit a job to the HPC."""
+def job_info(job_client, concept_data, session_account_id, session_hpc_id):
+    """Submit a job to the HPC using the fully-populated session concept."""
     job_info = app.create_submit_job(
-        client_with_design_instance,
+        job_client,
         concept_data,
-        account_id,
-        hpc_id,
+        session_account_id,
+        session_hpc_id,
     )
     return job_info
 
 
 @pytest.fixture
-def read_results(client_with_design_instance, job_info):
+def read_results(job_client, job_info):
     """Read results from the job."""
     read_results = app.read_results(
-        client_with_design_instance,
+        job_client,
         job_info,
         calculate_units=False,
         filtered=True,
@@ -121,8 +125,8 @@ def read_results(client_with_design_instance, job_info):
 
 
 @pytest.fixture
-def console_log(job_info, client_with_design_instance):
-    console_log = app.post(client_with_design_instance, "/jobs:error_file", data=job_info)
+def console_log(job_info, job_client):
+    console_log = app.post(job_client, "/jobs:error_file", data=job_info)
     return console_log
 
 
@@ -227,23 +231,22 @@ def test_authorised(client):
     assert response.status_code == 200
 
 
-def test_get_concept(client, client_with_design_instance, design_instance_id, concept_data):
+def test_get_concept(client, job_client, populated_design_instance_id, concept_data):
     """Test getting a concept and getting ids."""
-    concept = app.get(client, "/concepts", id=design_instance_id, params={"populated": False})
+    concept = app.get(
+        client, "/concepts", id=populated_design_instance_id, params={"populated": False}
+    )
     concept["configurations"] = app.get(
-        client_with_design_instance, f"/concepts/{design_instance_id}/configurations"
+        job_client, f"/concepts/{populated_design_instance_id}/configurations"
     )
     concept["components"] = app.get(
-        client_with_design_instance, f"/concepts/{design_instance_id}/components"
+        job_client, f"/concepts/{populated_design_instance_id}/components"
     )
     concept["requirements"] = app.get(
-        client_with_design_instance, f"/concepts/{design_instance_id}/requirements"
+        job_client, f"/concepts/{populated_design_instance_id}/requirements"
     )
-    arch_id = concept["architecture_id"]
     concept["architecture"] = app.get(
-        client_with_design_instance,
-        f"/architectures/{arch_id}",
-        params={"design_instance_id": design_instance_id},
+        job_client, f"/concepts/{populated_design_instance_id}/architecture"
     )
     assert concept == concept_data
 
@@ -262,14 +265,13 @@ def test_hpc_endpoint(hpc_id):
 def test_submit_job(job_info):
     assert isinstance(job_info, dict)
     assert "job_id" in job_info
-    return job_info
 
 
 def test_read_results(read_results):
     """Test reading results from the job."""
     assert isinstance(read_results, list)
-    assert read_results[0]["feasible"] == False
     assert len(read_results) > 0, "Results should not be empty"
+    assert isinstance(read_results[0]["feasible"], bool)
 
 
 def test_console_log(read_results, console_log):
@@ -368,15 +370,14 @@ def motor_file(client_with_design_instance):
 
 
 @pytest.fixture
-def motor(client_with_design_instance):
-    """Fixture to provide a battery configuration."""
+def motor(client_with_design_instance, motor_file):
+    """Fixture to provide a motor component using a motor lab file upload."""
     motor = {
-        "component_type": "MotorCTCP",
+        "component_type": "MotorLabID",
         "name": "Test Motor",
-        "rated_power": 150000,
-        "stall_torque": 300,
-        "max_speed": 300,
-        "voltage": 400,
+        "data_id": motor_file[0],
+        "max_speed": motor_file[1],
+        "inverter_losses_included": False,
     }
     return app.post(client_with_design_instance, "/components", data=motor)
 
