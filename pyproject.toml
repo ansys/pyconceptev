@@ -114,6 +114,11 @@ optional = true
 [tool.poetry.group.linux-encryption.dependencies]
 pygobject = {version = "<3.56.4", platform = "linux"}
 
+[tool.pytest.ini_options]
+markers = [
+    "e2e: end-to-end tests requiring optiSLang and the ConceptEV test environment",
+]
+
 [tool.black]
 line-length = 100
 
