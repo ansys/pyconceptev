@@ -96,10 +96,10 @@ def get_results_for_concept(client, concept_id: str) -> dict:
     job = wait_for_job(client, concept_id, jobs[0].id)
 
     results = None
-    if job.status == "COMPLETED" and job.output_urls:
+    if job.status == "COMPLETED" and job.files:
         import httpx as _httpx  # noqa: PLC0415
 
-        results_url = job.output_urls[0]
+        results_url = job.files[0].path
         results = _httpx.get(results_url).json()
 
     return {

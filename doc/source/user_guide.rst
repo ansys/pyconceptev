@@ -127,7 +127,7 @@ component:
        create_concept_part,
    )
    from ansys.conceptev.core.generated.models import (
-       BodyCreateFileV2ConceptIdFilesPost,
+       BodyCreateFileItem,
        MotorLabInput,
    )
 
@@ -135,7 +135,7 @@ component:
        file_resp = create_file_item.sync(
            id=concept_id,
            client=client,
-           body=BodyCreateFileV2ConceptIdFilesPost(file=f.read().decode("latin-1")),
+           body=BodyCreateFileItem(file=f.read().decode("latin-1")),
            name="e9.lab",
            component_file_type="motor_lab_file",
        )

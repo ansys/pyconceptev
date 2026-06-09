@@ -57,7 +57,7 @@ from ansys.conceptev.core.generated.models import (
     AeroInput,
     ArchitectureInput,
     BatteryFixedVoltagesInput,
-    BodyCreateFileV2ConceptIdFilesPost,
+    BodyCreateFileItem,
     ConceptInput,
     DynamicRequirementInput,
     MassInput,
@@ -165,7 +165,7 @@ with get_local_client() as client:
         file_response = create_file_item.sync(
             id=concept_id,
             client=client,
-            body=BodyCreateFileV2ConceptIdFilesPost(file=f.read().decode("latin-1")),
+            body=BodyCreateFileItem(file=f.read().decode("latin-1")),
             name=MOTOR_LAB_FILE.name,
             component_file_type="motor_lab_file",
         )
@@ -304,10 +304,10 @@ with get_local_client() as client:
     # -----------------------------------
     # Read the results from the completed job and display a capability curve.
 
-    if job_record.status == "COMPLETED" and job_record.output_urls:
+    if job_record.status == "COMPLETED" and job_record.files:
         import httpx as _httpx  # noqa: PLC0415
 
-        results_url = job_record.output_urls[0]
+        results_url = job_record.files[0].path
         results = _httpx.get(results_url).json()
         x = results[0]["capability_curve"]["speeds"]
         y = results[0]["capability_curve"]["torques"]
