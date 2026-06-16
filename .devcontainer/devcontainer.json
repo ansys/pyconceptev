@@ -16,7 +16,8 @@
     "PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT": "true",
     "PYCONCEPTEV_SETTINGS": "${containerWorkspaceFolder}/tests/integration/config.toml",
     "CONCEPTEV_PASSWORD": "${localEnv:CONCEPTEV_PASSWORD}",
-    "LICENSE_SERVER": "${localEnv:LICENSE_SERVER}"
+    "LICENSE_SERVER": "${localEnv:LICENSE_SERVER}",
+    "GH_TOKEN": "${localEnv:GITHUB_TOKEN}"
   },
   "remoteUser": "vscode",
   "customizations": {
