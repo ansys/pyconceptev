@@ -5,7 +5,8 @@
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "moby": true,
       "installDockerBuildx": true
-    }
+    },
+    "ghcr.io/devcontainers-contrib/features/poetry:2": {}
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteEnv": {

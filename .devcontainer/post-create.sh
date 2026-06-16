@@ -1,12 +1,8 @@
 #!/bin/bash
 # Post-create setup for the pyconceptev devcontainer.
-# Installs Poetry and all project dependencies so the environment is ready immediately.
+# Poetry is pre-installed via the devcontainer feature; this script installs
+# project dependencies and sets up the local venv and pre-commit hooks.
 set -e
-
-# Install Poetry if not already present in the image
-if ! command -v poetry &> /dev/null; then
-    pip install poetry --quiet
-fi
 
 # Store the virtualenv inside the project directory so VS Code discovers it automatically
 poetry config virtualenvs.in-project true
