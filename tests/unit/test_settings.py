@@ -20,14 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
+from pathlib import Path
+
+import pytest
 
 from ansys.conceptev.core.settings import Settings
 
+INTEGRATION_CONFIG_DIR = Path(__file__).resolve().parents[2] / "tests" / "integration"
 
-def test_settings():
-    os.environ["ACCOUNT_NAME"] = "borked"
+
+def test_settings(monkeypatch):
+    # pydantic-settings resolves "./config.toml" relative to CWD at instantiation time.
+    # Changing CWD to tests/integration/ makes it pick up the dev-environment config.toml.
+    monkeypatch.chdir(INTEGRATION_CONFIG_DIR)
+    monkeypatch.setenv("ACCOUNT_NAME", "borked")
     settings = Settings()
-    assert settings.job_timeout == 3600  # from resources
-    assert settings.ocm_url == "https://dev.portal.onscale.com/api"  # from working directory
+    assert settings.job_timeout == 3600  # from config.toml
+    assert settings.ocm_url == "https://dev.portal.onscale.com/api"  # from ./config.toml
     assert settings.account_name == "borked"  # from environment variable
