@@ -10,7 +10,8 @@
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteEnv": {
-    "PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT": "true"
+    "PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT": "true",
+    "PYCONCEPTEV_SETTINGS": "${containerWorkspaceFolder}/tests/integration/config.toml"
   },
   "secrets": {
     "CONCEPTEV_PASSWORD": {
