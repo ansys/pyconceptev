@@ -152,9 +152,7 @@ def populated_concept(session_token, session_account_id, session_hpc_id):
     design_instance_id = concept["design_instance_id"]
 
     with app.get_http_client(session_token, design_instance_id) as client:
-        motor_file_result = app.post_component_file(
-            client, DATA_DIR / "e9.lab", "motor_lab_file"
-        )
+        motor_file_result = app.post_component_file(client, DATA_DIR / "e9.lab", "motor_lab_file")
         motor = app.post(
             client,
             "/components",
@@ -166,9 +164,7 @@ def populated_concept(session_token, session_account_id, session_hpc_id):
                 "inverter_losses_included": False,
             },
         )
-        battery = app.post(
-            client, "/components", data={"component_type": "BatteryFixedVoltages"}
-        )
+        battery = app.post(client, "/components", data={"component_type": "BatteryFixedVoltages"})
         transmission = app.post(
             client,
             "/components",

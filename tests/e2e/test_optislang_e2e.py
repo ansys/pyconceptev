@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -23,12 +23,11 @@
 import json
 import logging
 import os
+from pathlib import Path
 import shutil
 import traceback
-from pathlib import Path
 from typing import Any
 
-from ansys.conceptev.core.settings import Settings
 from ansys.optislang.core import Optislang
 import ansys.optislang.core.node_types as node_types
 from ansys.optislang.core.nodes import DesignFlow
@@ -38,6 +37,8 @@ from ansys.optislang.core.project_parametric import (
     ObjectiveCriterion,
 )
 import pytest
+
+from ansys.conceptev.core.settings import Settings
 
 E2E_CONFIG = Path(__file__).resolve().parent / "config.toml"
 

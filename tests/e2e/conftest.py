@@ -70,9 +70,9 @@ def e2e_settings():
         "e2e tests must target the ConceptEV test API, not production. "
         f"Got conceptev_url={settings.conceptev_url!r}"
     )
-    assert settings.ocm_url == "https://dev.portal.onscale.com/api", (
-        f"e2e tests must target the OCM dev API. Got ocm_url={settings.ocm_url!r}"
-    )
+    assert (
+        settings.ocm_url == "https://dev.portal.onscale.com/api"
+    ), f"e2e tests must target the OCM dev API. Got ocm_url={settings.ocm_url!r}"
     assert TEST_AUTHORITY_MARKER in settings.authority, (
         "e2e tests must use the Ansys ID test authority "
         f"({TEST_AUTHORITY_MARKER}). Got authority={settings.authority!r}"
@@ -178,9 +178,7 @@ def e2e_concept(session_token, session_account_id, session_hpc_id):
     design_instance_id = concept["design_instance_id"]
 
     with app.get_http_client(session_token, design_instance_id) as client:
-        motor_file_result = app.post_component_file(
-            client, DATA_DIR / "e9.lab", "motor_lab_file"
-        )
+        motor_file_result = app.post_component_file(client, DATA_DIR / "e9.lab", "motor_lab_file")
         motor = app.post(
             client,
             "/components",
