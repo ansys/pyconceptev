@@ -33,7 +33,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-python-dotenv = ">=1.0.0"
+python-dotenv = ">=1.2.0"
 httpx = ">=0.26.0"
 msal = ">=1.29.0"
 msal-extensions = ">=1.2.0"
@@ -64,8 +64,8 @@ cryptography = ">=44.0.0"
 h11 = ">=0.16.0"
 requests = ">=2.32.4"
 urllib3 = ">=2.5.0"
-pyjwt = ">=2.10.1"
-python-dotenv = ">=1.0.1"
+pyjwt = ">=2.10.2"
+python-dotenv = ">=1.2.0"
 pywin32 = {version = ">=310", markers = "sys_platform == 'win32' and platform_python_implementation != 'PyPy'"}
 watchfiles = ">=1.0.5"
 
