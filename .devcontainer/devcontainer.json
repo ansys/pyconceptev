@@ -4,36 +4,41 @@
     "dockerfile": "Dockerfile"
   },
   "features": {
-    "ghcr.io/devcontainers/features/sshd:1": {},
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-    "ghcr.io/devcontainers-contrib/features/poetry:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteEnv": {
     "PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT": "true",
-    "PYCONCEPTEV_SETTINGS": "${containerWorkspaceFolder}/tests/integration/config.toml"
+    "PYCONCEPTEV_SETTINGS": "${containerWorkspaceFolder}/tests/integration/config.toml",
+    "CONCEPTEV_PASSWORD": "${localEnv:CONCEPTEV_PASSWORD}",
+    "LICENSE_SERVER": "${localEnv:LICENSE_SERVER}"
   },
-  "secrets": {
-    "CONCEPTEV_PASSWORD": {
-      "description": "Password for the ConceptEV test account (conceptev_testing@ansys.com). Required for integration and e2e tests."
-    },
-    "LICENSE_SERVER": {
-      "description": "Hostname of the Ansys license server for optiSLang e2e tests. Used to construct ANSYSLMD_LICENSE_FILE=1055@<LICENSE_SERVER>."
-    }
-  },
+  "remoteUser": "vscode",
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-python.python",
         "ms-python.black-formatter",
         "ms-python.isort",
-        "ms-python.vscode-pylance"
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker"
       ],
       "settings": {
         "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests/unit"],
         "editor.formatOnSave": true,
         "[python]": {
-          "editor.defaultFormatter": "ms-python.black-formatter"
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+          }
         }
       }
     }
