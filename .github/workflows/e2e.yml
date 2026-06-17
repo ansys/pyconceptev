@@ -33,6 +33,7 @@ jobs:
         # The runner tool-cache Python binaries require GLIBC 2.38 and cannot run
         # inside this jammy container. pip is not pre-installed in the optiSLang image.
         run: |
+          apt-get update
           apt-get install -y python3-pip
           python3 -m pip install --quiet poetry
           poetry install --with tests
