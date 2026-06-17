@@ -12,6 +12,8 @@ permissions: {}
 
 jobs:
   tests-e2e:
+    permissions:
+      packages: read
     name: E2E Tests
     runs-on: ubuntu-latest
     container:

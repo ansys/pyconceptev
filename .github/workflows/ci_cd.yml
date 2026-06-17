@@ -146,6 +146,8 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [ tests ]
+    permissions:
+      packages: read
     container:
       image: ghcr.io/ansys/optislang:25.2.0-jammy
       credentials:
