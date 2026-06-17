@@ -149,7 +149,7 @@ jobs:
     permissions:
       packages: read
     container:
-      image: ghcr.io/ansys/optislang:25.2.0-jammy
+      image: ghcr.io/ansys/optislang:25.2.0-jammy@sha256:e2ee15479dc58413b37699fdbdbd60d551a31916b556d6dda74c3ed3dc0f7783
       credentials:
         username: ansys-bot
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -163,7 +163,7 @@ jobs:
           PYCONCEPTEV_SETTINGS: "tests/e2e/config.toml"
         uses: ansys/actions/tests-pytest@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25 # v10.2.12
         with:
-          python-version: ${{ env.MAIN_PYTHON_VERSION }}
+          python-version: "3.12"  # jammy (Ubuntu 22.04) has GLIBC 2.35; Python 3.14 requires GLIBC 2.38
           pytest-extra-args: "tests/e2e"
   doc-build:
     name: Build documentation
