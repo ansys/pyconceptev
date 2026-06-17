@@ -69,6 +69,7 @@ python-dotenv = ">=1.2.0"
 pywin32 = {version = ">=310", markers = "sys_platform == 'win32' and platform_python_implementation != 'PyPy'"}
 watchfiles = ">=1.0.5"
 python-calamine = ">=0.4.0"
+rpds-py = ">=0.24.0"
 
 
 
