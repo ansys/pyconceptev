@@ -147,7 +147,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ tests ]
     container:
-      image: ghcr.io/ansys/optislang:25.2.0-jammy@sha256:e2ee15479dc58413b37699fdbdbd60d551a31916b556d6dda74c3ed3dc0f7783
+      image: ghcr.io/ansys/optislang:25.2.0-jammy
       credentials:
         username: ansys-bot
         password: ${{ secrets.GITHUB_TOKEN }}
