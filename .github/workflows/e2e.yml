@@ -10,12 +10,16 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests-e2e:
-    permissions:
-      packages: read
     name: E2E Tests
     runs-on: ubuntu-latest
+    permissions:
+      packages: read # Needed to pull the optiSLang container image from ghcr.io
     container:
       image: ghcr.io/ansys/optislang:25.2.0-jammy@sha256:e2ee15479dc58413b37699fdbdbd60d551a31916b556d6dda74c3ed3dc0f7783
       credentials:
