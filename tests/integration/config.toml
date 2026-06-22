@@ -1,0 +1,9 @@
+OCM_URL = "https://dev.portal.onscale.com/api"
+OCM_SOCKET_URL = "wss://sockets.dev.portal.onscale.com/socket"
+CONCEPTEV_URL = "https://test-conceptev.awsansys3np.onscale.com/api"
+client_id = "743c94e3-c72d-4ace-b9ee-ab5c3cbe6504"
+authority = "https://a365dev.b2clogin.com/a365dev.onmicrosoft.com/b2c_1a_ansysid_signup_signin_test"
+scope = "https://a365dev.onmicrosoft.com/AnsysID/Authentication"
+conceptev_username = "conceptev_testing@ansys.com"
+account_name = "ConceptEv Test Account"
+job_timeout = 3600
