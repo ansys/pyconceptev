@@ -36,10 +36,10 @@ from ansys.optislang.core.project_parametric import (
     ConstraintCriterion,
     ObjectiveCriterion,
 )
+from conftest import _OSL_INTEGRATIONS_DIR
 import pytest
 
 from ansys.conceptev.core.settings import Settings
-from conftest import _OSL_INTEGRATIONS_DIR
 
 
 class QueryHandler(logging.Handler):
@@ -164,7 +164,9 @@ def check_progress_log_markers(log_text: str) -> dict[str, Any]:
     }
 
 
-def assert_progress_log_markers(osl: Optislang, node: Any, working_dir: str, debug_dir: str) -> None:
+def assert_progress_log_markers(
+    osl: Optislang, node: Any, working_dir: str, debug_dir: str
+) -> None:
     """Fail the test if the optiSLang run log is missing expected run markers."""
     log_text = collect_run_log_text(osl, node, working_dir)
     log_path = os.path.join(debug_dir, "progress_log.txt")
@@ -264,9 +266,7 @@ def _query_integration_version(osl: Optislang) -> str:
         return f"<run_python_script error: {exc}>"
 
 
-def _log_osl_runtime_versions(
-    osl: Optislang, debug_dir: str, inject_integration=None
-) -> None:
+def _log_osl_runtime_versions(osl: Optislang, debug_dir: str, inject_integration=None) -> None:
     """Query version info from the live optiSLang instance and write to versions.txt.
 
     Uses osl.osl_version_string (property) and
@@ -327,12 +327,13 @@ def _log_osl_runtime_versions(
     print(f"[versions] written to {versions_path}")
 
     # Also print for -s / --capture=no runs.
+    v = versions
     print(
-        f"[versions]   optiSLang application                : {versions.get('osl_version')}\n"
-        f"[versions]   pyconceptev        (optiSLang Python): {versions.get('pyconceptev_version', '<unknown>')}\n"
-        f"[versions]   pyconceptev path   (optiSLang Python): {versions.get('pyconceptev_path', '<unknown>')}\n"
-        f"[versions]   conceptev_ci.py path                 : {versions.get('conceptev_ci_path', '<unknown>')}\n"
-        f"[versions]   conceptev node registered in         : {versions.get('conceptev_node_category', '<unknown>')}"
+        f"[versions]   optiSLang application      : {v.get('osl_version')}\n"
+        f"[versions]   pyconceptev  (osl Python)  : {v.get('pyconceptev_version', '<unknown>')}\n"
+        f"[versions]   pyconceptev path           : {v.get('pyconceptev_path', '<unknown>')}\n"
+        f"[versions]   conceptev_ci.py path       : {v.get('conceptev_ci_path', '<unknown>')}\n"
+        f"[versions]   conceptev node category    : {v.get('conceptev_node_category', '<unknown>')}"
     )
 
 

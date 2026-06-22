@@ -93,13 +93,9 @@ CEV_ENV = _read_cev_env_early()
 # OptiSLang integration injection
 # ---------------------------------------------------------------------------
 
-_OSL_INTEGRATIONS_DIR = Path(
-    "C:/Program Files/ANSYS Inc/v271/optiSLang/scripting/integrations"
-)
+_OSL_INTEGRATIONS_DIR = Path("C:/Program Files/ANSYS Inc/v271/optiSLang/scripting/integrations")
 # Python interpreter bundled with optiSLang — used to upgrade packages in-place.
-_OSL_PYTHON = Path(
-    "C:/Program Files/ANSYS Inc/v271/optiSLang/lib/python3.10/python.exe"
-)
+_OSL_PYTHON = Path("C:/Program Files/ANSYS Inc/v271/optiSLang/lib/python3.10/python.exe")
 
 # Configure PYCONCEPTEV_SETTINGS before any ansys.conceptev.core import.
 # In prod mode we deliberately leave it unset so pyconceptev uses its bundled
@@ -200,13 +196,15 @@ def e2e_settings():
     if _loaded_settings.conceptev_password and not os.environ.get("CONCEPTEV_PASSWORD"):
         os.environ["CONCEPTEV_PASSWORD"] = _loaded_settings.conceptev_password
 
+    pycv_settings = os.environ.get("PYCONCEPTEV_SETTINGS", "<pyconceptev default>")
+    password_set = bool(_loaded_settings.conceptev_password or os.environ.get("CONCEPTEV_PASSWORD"))
     print(
         f"\n[e2e-settings] env={CEV_ENV!r}\n"
-        f"  PYCONCEPTEV_SETTINGS={os.environ.get('PYCONCEPTEV_SETTINGS', '<pyconceptev default>')}\n"
+        f"  PYCONCEPTEV_SETTINGS={pycv_settings}\n"
         f"  CONCEPTEV_URL={_loaded_settings.conceptev_url}\n"
         f"  ACCOUNT_NAME={_loaded_settings.account_name}\n"
         f"  USERNAME={_loaded_settings.conceptev_username}\n"
-        f"  PASSWORD set: {bool(_loaded_settings.conceptev_password or os.environ.get('CONCEPTEV_PASSWORD'))}"
+        f"  PASSWORD set: {password_set}"
     )
     return _loaded_settings
 
@@ -455,8 +453,7 @@ def install_pyconceptev(request):
         print(f"[install-pyconceptev] pip stderr:\n{result.stderr}")
     if result.returncode != 0:
         pytest.fail(
-            f"pip install '{src}' failed (exit {result.returncode}).\n"
-            f"stderr: {result.stderr}"
+            f"pip install '{src}' failed (exit {result.returncode}).\n" f"stderr: {result.stderr}"
         )
 
     print(f"[install-pyconceptev] installation succeeded")
@@ -494,9 +491,7 @@ def inject_integration(request, install_pyconceptev):  # noqa: ARG001
         p for p in (src_dir / "conceptev").rglob("*.py") if not p.name.startswith("_")
     ]
     # Also include __init__.py files.
-    src_files += [
-        p for p in (src_dir / "conceptev").rglob("__init__.py")
-    ]
+    src_files += [p for p in (src_dir / "conceptev").rglob("__init__.py")]
     # Deduplicate while preserving order.
     seen: set[Path] = set()
     unique_src: list[Path] = []
