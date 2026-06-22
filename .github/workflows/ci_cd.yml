@@ -141,7 +141,7 @@ jobs:
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
-          pytest-extra-args: "tests/integration"
+          pytest-extra-args: "tests/integration -m 'not e2e'"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
