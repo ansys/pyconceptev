@@ -111,7 +111,8 @@ jobs:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
-          pytest-extra-args: "-m 'not integration' --cov=ansys --cov-report=term --cov-report=html:.cov/html"
+          pytest-extra-args: "tests/unit --cov=ansys --cov-report=term --cov-report=html:.cov/html"
+          pytest-postargs: "-vv"
 
       - name: Upload coverage results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -135,12 +136,12 @@ jobs:
     steps:
       - uses: ansys/actions/tests-pytest@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25 # v10.2.12
         env:
-          PYCONCEPTEV_SETTINGS: "tests/config.toml"
+          PYCONCEPTEV_SETTINGS: "tests/integration/config.toml"
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
-          pytest-extra-args: "-s -m integration --log-cli-level=INFO"
+          pytest-extra-args: "tests/integration -m 'not e2e'"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
@@ -165,6 +166,7 @@ jobs:
           group-dependencies-name: "doc"
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
   package:
     name: Package library
