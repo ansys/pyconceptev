@@ -50,21 +50,18 @@ def token():
     return token
 
 
-@pytest.mark.integration
 def test_product_id(token):
     """Test product id from OCM."""
     product_id = ocm.get_product_id(token)
     assert product_id == "SAAS000040"
 
 
-@pytest.mark.integration
 def test_get_user_id(token):
     """Test user id from OCM."""
     user_id = ocm.get_user_id(token)
     assert is_uuid(user_id)
 
 
-@pytest.mark.integration
 def test_get_account_ids(token):
     """Test account ids from OCM."""
     account_ids = ocm.get_account_ids(token)
@@ -74,52 +71,66 @@ def test_get_account_ids(token):
         assert is_uuid(value)
 
 
-@pytest.mark.integration
 def test_get_account_id(token):
     """Test account ids from OCM."""
     account_id = ocm.get_account_id(token)
     assert is_uuid(account_id)
 
 
-@pytest.mark.integration
-def test_get_default_hpc(token):
-    """Test default HPC from OCM."""
-    account_id = "2a566ece-938d-4658-bae5-ffa387ac0547"
+@pytest.fixture()
+def account_id(token):
+    """Look up the test account ID dynamically."""
+    return ocm.get_account_id(token)
+
+
+@pytest.fixture()
+def hpc_id(token, account_id):
+    """Look up the default HPC ID dynamically."""
+    return ocm.get_default_hpc(token, account_id)
+
+
+@pytest.fixture()
+def temp_project(token, account_id, hpc_id):
+    """Create a temporary project for the duration of one test, then delete it."""
+    client = httpx.Client(headers={"Authorization": token})
+    project_name = f"OCM test project {datetime.now()}"
+    project = ocm.create_new_project(client, account_id, hpc_id, project_name)
+    yield project
+    ocm.delete_project(project["projectId"], token)
+
+
+def test_get_default_hpc(token, account_id):
+    """Test default HPC from OCM using dynamically resolved account ID."""
     hpc_id = ocm.get_default_hpc(token, account_id)
     assert is_uuid(hpc_id)
 
 
-@pytest.mark.integration
-def test_get_project_ids(token):
-    """Test projects from OCM."""
-    project_name = "New Project (with brackets)"
-
-    account_id = "2a566ece-938d-4658-bae5-ffa387ac0547"
+def test_get_project_ids(token, account_id, temp_project):
+    """Test project list from OCM by creating a project and then finding it."""
+    project_name = temp_project["projectTitle"]
     project_ids = ocm.get_project_ids(re.escape(project_name), account_id, token)
     assert project_name in project_ids.keys()
-    assert "00932037-a633-464c-8d05-28353d9bfc49" in project_ids[project_name]
+    assert temp_project["projectId"] in project_ids[project_name]
 
 
-@pytest.mark.integration
-def test_create_new_project(token):
-    """Test create new project from OCM."""
-    account_id = "2a566ece-938d-4658-bae5-ffa387ac0547"
-    hpc_id = "23c70728-b930-d1eb-a0b1-dbf9ea0f6278"
+def test_create_new_project(token, account_id, hpc_id):
+    """Test create new project from OCM using dynamically resolved IDs."""
     project_name = f"hello {datetime.now()}"
     client = httpx.Client(headers={"Authorization": token})
     project = ocm.create_new_project(client, account_id, hpc_id, project_name)
-    assert project["projectTitle"] == project_name
-    now = datetime.now().timestamp()
-    seconds_ago = now - (project["createDate"] / 1000)
-    assert seconds_ago < 10
+    try:
+        assert project["projectTitle"] == project_name
+        now = datetime.now().timestamp()
+        seconds_ago = now - (project["createDate"] / 1000)
+        assert seconds_ago < 10
+    finally:
+        ocm.delete_project(project["projectId"], token)
 
 
-@pytest.mark.integration
-def test_create_new_design(token):
-    """Test create new project from OCM."""
-
+def test_create_new_design(token, temp_project):
+    """Test create new design from OCM using a dynamically created project."""
     product_id = "SAAS000040"
-    project_id = "fcafedf2-9cb6-4035-9c6c-2bd7602537f2"
+    project_id = temp_project["projectId"]
 
     client = httpx.Client(headers={"Authorization": token})
     design = ocm.create_new_design(client, project_id, product_id)

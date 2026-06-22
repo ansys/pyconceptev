@@ -157,3 +157,19 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+
+# e2e / optiSLang test artefacts and local debug logs
+test_working_dir/
+tests/e2e/test_working_dir/
+ci_log_*.txt
+ci_*_out.txt
+ci_*_full.txt
+ci_failing_job_logs_*.txt
+*_pytest_output*.txt
+e2e_pytest_*.txt
+poetry_lock_output.txt
+shell_test_out.txt
+
+# Local secret / credential files
+CONCEPTEV_PASSWORD
+token_cache.bin

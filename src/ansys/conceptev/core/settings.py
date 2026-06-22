@@ -67,7 +67,7 @@ def load_settings(toml_file) -> Settings:
     """Load settings."""
     with open(toml_file, "rb") as f:
         settings_data = tomllib.load(f)
-    return Settings.model_validate(settings_data)
+    return Settings.model_validate({k.lower(): v for k, v in settings_data.items()})
 
 
 settings = Settings()
