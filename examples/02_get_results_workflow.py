@@ -106,7 +106,7 @@ def get_results_for_concept(client, concept_id: str) -> dict:
 # Load concept IDs and collect results
 # ------------------------------------
 
-concept_ids_df = pd.read_csv("resources/design_instance_ids.csv")
+concept_ids_df = pd.read_csv("resources/design_instance_ids.csv", header=None, names=["design_instance_id"])
 concept_ids = concept_ids_df["design_instance_id"].tolist()
 
 if get_results_off_server:

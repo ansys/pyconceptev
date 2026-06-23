@@ -50,6 +50,7 @@ repos:
     - id: add-license-headers
       args:
       - --start_year=2023
+      exclude: "^(src/ansys/conceptev/core/generated|schema)"
 
 # Validate the pre-commit.ci configuration
 - repo: https://github.com/pre-commit-ci/pre-commit-ci-config
