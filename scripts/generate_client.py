@@ -20,12 +20,12 @@ The generated client is written to schema/generated_client/.
 """
 
 import argparse
+from datetime import datetime, timezone
 import json
+from pathlib import Path
 import shutil
 import subprocess
 import sys
-from datetime import datetime, timezone
-from pathlib import Path
 
 REPO_ROOT = Path(__file__).parents[1]
 DEFAULT_SPEC = REPO_ROOT / "schema" / "openapi_v2.json"
@@ -57,10 +57,16 @@ def generate_client(spec: Path, output: Path, config: Path) -> None:
     """Run openapi-python-client generator."""
     print(f"==> Generating client from {spec}...")
     cmd = [
-        sys.executable, "-m", "openapi_python_client", "generate",
-        "--path", str(spec),
-        "--output-path", str(output),
-        "--config", str(config),
+        sys.executable,
+        "-m",
+        "openapi_python_client",
+        "generate",
+        "--path",
+        str(spec),
+        "--output-path",
+        str(output),
+        "--config",
+        str(config),
         "--overwrite",
     ]
     subprocess.run(cmd, check=True)

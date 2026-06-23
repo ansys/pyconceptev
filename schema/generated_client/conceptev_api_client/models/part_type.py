@@ -1,6 +1,8 @@
 from typing import Literal
 
-PartType = Literal["architecture", "component", "configuration", "drive_cycle", "job", "requirement"]
+PartType = Literal[
+    "architecture", "component", "configuration", "drive_cycle", "job", "requirement"
+]
 
 PART_TYPE_VALUES: set[PartType] = {
     "architecture",

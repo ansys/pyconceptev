@@ -38,12 +38,19 @@ class ConceptInput:
     design_instance_id: None | str | Unset = UNSET
     file_items: list[FileItemOutput] | Unset = UNSET
     components: (
-        list[BatteryFixedVoltagesInput | BatteryLookupTableInput | MotorLabInput | TransmissionLossCoefficientsInput]
+        list[
+            BatteryFixedVoltagesInput
+            | BatteryLookupTableInput
+            | MotorLabInput
+            | TransmissionLossCoefficientsInput
+        ]
         | Unset
     ) = UNSET
     configurations: list[AeroInput | MassInput | WheelInput] | Unset = UNSET
     architectures: list[ArchitectureInput] | Unset = UNSET
-    requirements: list[DriveCycleRequirementInput | DynamicRequirementInput | StaticRequirementInput] | Unset = UNSET
+    requirements: (
+        list[DriveCycleRequirementInput | DynamicRequirementInput | StaticRequirementInput] | Unset
+    ) = UNSET
     drive_cycles: list[DriveCycleInput] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -242,7 +249,10 @@ class ConceptInput:
         _components = d.pop("components", UNSET)
         components: (
             list[
-                BatteryFixedVoltagesInput | BatteryLookupTableInput | MotorLabInput | TransmissionLossCoefficientsInput
+                BatteryFixedVoltagesInput
+                | BatteryLookupTableInput
+                | MotorLabInput
+                | TransmissionLossCoefficientsInput
             ]
             | Unset
         ) = UNSET
@@ -335,9 +345,10 @@ class ConceptInput:
                 architectures.append(architectures_item)
 
         _requirements = d.pop("requirements", UNSET)
-        requirements: list[DriveCycleRequirementInput | DynamicRequirementInput | StaticRequirementInput] | Unset = (
-            UNSET
-        )
+        requirements: (
+            list[DriveCycleRequirementInput | DynamicRequirementInput | StaticRequirementInput]
+            | Unset
+        ) = UNSET
         if _requirements is not UNSET:
             requirements = []
             for requirements_item_data in _requirements:

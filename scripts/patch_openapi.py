@@ -18,8 +18,8 @@ Usage:
 import argparse
 import copy
 import json
-import sys
 from pathlib import Path
+import sys
 
 
 def fix_bad_discriminator_mappings(spec: dict) -> list[str]:
@@ -142,7 +142,9 @@ def patch(spec: dict, *, prune_schemas: bool = False) -> tuple[dict, list[str]]:
     if prune_schemas:
         removed = prune_unused_schemas(patched)
         if removed:
-            all_changes.append(f"Pruned {len(removed)} unused schemas: {', '.join(removed[:5])}{'...' if len(removed) > 5 else ''}")
+            all_changes.append(
+                f"Pruned {len(removed)} unused schemas: {', '.join(removed[:5])}{'...' if len(removed) > 5 else ''}"
+            )
 
     return patched, all_changes
 

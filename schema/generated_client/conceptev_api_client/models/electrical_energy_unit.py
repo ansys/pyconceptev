@@ -13,4 +13,6 @@ ELECTRICAL_ENERGY_UNIT_VALUES: set[ElectricalEnergyUnit] = {
 def check_electrical_energy_unit(value: str) -> ElectricalEnergyUnit:
     if value in ELECTRICAL_ENERGY_UNIT_VALUES:
         return value
-    raise TypeError(f"Unexpected value {value!r}. Expected one of {ELECTRICAL_ENERGY_UNIT_VALUES!r}")
+    raise TypeError(
+        f"Unexpected value {value!r}. Expected one of {ELECTRICAL_ENERGY_UNIT_VALUES!r}"
+    )

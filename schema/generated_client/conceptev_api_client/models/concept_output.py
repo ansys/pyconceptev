@@ -52,13 +52,19 @@ class ConceptOutput:
     to an already-saved concept ("dirty" state). """
     components: (
         list[
-            BatteryFixedVoltagesOutput | BatteryLookupTableOutput | MotorLabOutput | TransmissionLossCoefficientsOutput
+            BatteryFixedVoltagesOutput
+            | BatteryLookupTableOutput
+            | MotorLabOutput
+            | TransmissionLossCoefficientsOutput
         ]
         | Unset
     ) = UNSET
     configurations: list[AeroOutput | MassOutput | WheelOutput] | Unset = UNSET
     architectures: list[ArchitectureOutput] | Unset = UNSET
-    requirements: list[DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput] | Unset = UNSET
+    requirements: (
+        list[DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput]
+        | Unset
+    ) = UNSET
     drive_cycles: list[DriveCycleOutput] | Unset = UNSET
     jobs: list[ConceptJobRecord] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -226,7 +232,9 @@ class ConceptOutput:
         from ..models.mass_output import MassOutput
         from ..models.motor_lab_output import MotorLabOutput
         from ..models.static_requirement_output import StaticRequirementOutput
-        from ..models.transmission_loss_coefficients_output import TransmissionLossCoefficientsOutput
+        from ..models.transmission_loss_coefficients_output import (
+            TransmissionLossCoefficientsOutput,
+        )
         from ..models.wheel_output import WheelOutput
 
         d = dict(src_dict)
@@ -348,7 +356,9 @@ class ConceptOutput:
             configurations = []
             for configurations_item_data in _configurations:
 
-                def _parse_configurations_item(data: object) -> AeroOutput | MassOutput | WheelOutput:
+                def _parse_configurations_item(
+                    data: object,
+                ) -> AeroOutput | MassOutput | WheelOutput:
                     try:
                         if not isinstance(data, dict):
                             raise TypeError()
@@ -385,16 +395,19 @@ class ConceptOutput:
                 architectures.append(architectures_item)
 
         _requirements = d.pop("requirements", UNSET)
-        requirements: list[DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput] | Unset = (
-            UNSET
-        )
+        requirements: (
+            list[DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput]
+            | Unset
+        ) = UNSET
         if _requirements is not UNSET:
             requirements = []
             for requirements_item_data in _requirements:
 
                 def _parse_requirements_item(
                     data: object,
-                ) -> DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput:
+                ) -> (
+                    DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput
+                ):
                     try:
                         if not isinstance(data, dict):
                             raise TypeError()

@@ -129,7 +129,9 @@ class MotorState:
                 return data
             return cast(float | None | Unset, data)
 
-        stator_winding_temp_peak = _parse_stator_winding_temp_peak(d.pop("stator_winding_temp_peak", UNSET))
+        stator_winding_temp_peak = _parse_stator_winding_temp_peak(
+            d.pop("stator_winding_temp_peak", UNSET)
+        )
 
         def _parse_rotor_temp(data: object) -> float | None | Unset:
             if data is None:

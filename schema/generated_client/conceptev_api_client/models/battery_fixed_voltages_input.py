@@ -139,9 +139,13 @@ class BatteryFixedVoltagesInput:
 
         cost = d.pop("cost", UNSET)
 
-        component_type = cast(Literal["BatteryFixedVoltages"] | Unset, d.pop("component_type", UNSET))
+        component_type = cast(
+            Literal["BatteryFixedVoltages"] | Unset, d.pop("component_type", UNSET)
+        )
         if component_type != "BatteryFixedVoltages" and not isinstance(component_type, Unset):
-            raise ValueError(f"component_type must match const 'BatteryFixedVoltages', got '{component_type}'")
+            raise ValueError(
+                f"component_type must match const 'BatteryFixedVoltages', got '{component_type}'"
+            )
 
         voltage_max = d.pop("voltage_max", UNSET)
 
@@ -161,7 +165,9 @@ class BatteryFixedVoltagesInput:
                 return data
             return cast(float | None | Unset, data)
 
-        charge_acceptance_limit = _parse_charge_acceptance_limit(d.pop("charge_acceptance_limit", UNSET))
+        charge_acceptance_limit = _parse_charge_acceptance_limit(
+            d.pop("charge_acceptance_limit", UNSET)
+        )
 
         def _parse_charge_release_limit(data: object) -> float | None | Unset:
             if data is None:

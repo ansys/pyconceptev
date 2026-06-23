@@ -25,7 +25,9 @@ class GetInfoUnitChoicesInfoGetResponseGetInfoUnitChoicesInfoGet:
         d = dict(src_dict)
         get_info_unit_choices_info_get_response_get_info_unit_choices_info_get = cls()
 
-        get_info_unit_choices_info_get_response_get_info_unit_choices_info_get.additional_properties = d
+        get_info_unit_choices_info_get_response_get_info_unit_choices_info_get.additional_properties = (
+            d
+        )
         return get_info_unit_choices_info_get_response_get_info_unit_choices_info_get
 
     @property

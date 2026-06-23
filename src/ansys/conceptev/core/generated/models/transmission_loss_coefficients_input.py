@@ -122,9 +122,15 @@ class TransmissionLossCoefficientsInput:
 
         cost = d.pop("cost", UNSET)
 
-        component_type = cast(Literal["TransmissionLossCoefficients"] | Unset, d.pop("component_type", UNSET))
-        if component_type != "TransmissionLossCoefficients" and not isinstance(component_type, Unset):
-            raise ValueError(f"component_type must match const 'TransmissionLossCoefficients', got '{component_type}'")
+        component_type = cast(
+            Literal["TransmissionLossCoefficients"] | Unset, d.pop("component_type", UNSET)
+        )
+        if component_type != "TransmissionLossCoefficients" and not isinstance(
+            component_type, Unset
+        ):
+            raise ValueError(
+                f"component_type must match const 'TransmissionLossCoefficients', got '{component_type}'"
+            )
 
         gear_ratios = cast(list[float], d.pop("gear_ratios", UNSET))
 

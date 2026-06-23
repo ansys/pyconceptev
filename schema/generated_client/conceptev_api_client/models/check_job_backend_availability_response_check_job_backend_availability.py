@@ -25,7 +25,9 @@ class CheckJobBackendAvailabilityResponseCheckJobBackendAvailability:
         d = dict(src_dict)
         check_job_backend_availability_response_check_job_backend_availability = cls()
 
-        check_job_backend_availability_response_check_job_backend_availability.additional_properties = d
+        check_job_backend_availability_response_check_job_backend_availability.additional_properties = (
+            d
+        )
         return check_job_backend_availability_response_check_job_backend_availability
 
     @property

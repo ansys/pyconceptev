@@ -20,7 +20,7 @@ class UnitChoices:
     """Unit Choice for the analysis.
 
     We might not need all of these.
-    We might want to create preset groups of these (eg. MKS, Imperial ect)
+    We might want to create preset groups of these (eg. MKS, Imperial etc)
 
     """
 

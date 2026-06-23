@@ -108,7 +108,9 @@ class BatteryLookupTableOutput:
 
         component_type = cast(Literal["BatteryLookupData"] | Unset, d.pop("component_type", UNSET))
         if component_type != "BatteryLookupData" and not isinstance(component_type, Unset):
-            raise ValueError(f"component_type must match const 'BatteryLookupData', got '{component_type}'")
+            raise ValueError(
+                f"component_type must match const 'BatteryLookupData', got '{component_type}'"
+            )
 
         _state = d.pop("state", UNSET)
         state: BatteryState | Unset

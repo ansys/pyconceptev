@@ -13,4 +13,6 @@ VOLUMETRIC_FLOW_RATE_UNIT_VALUES: set[VolumetricFlowRateUnit] = {
 def check_volumetric_flow_rate_unit(value: str) -> VolumetricFlowRateUnit:
     if value in VOLUMETRIC_FLOW_RATE_UNIT_VALUES:
         return value
-    raise TypeError(f"Unexpected value {value!r}. Expected one of {VOLUMETRIC_FLOW_RATE_UNIT_VALUES!r}")
+    raise TypeError(
+        f"Unexpected value {value!r}. Expected one of {VOLUMETRIC_FLOW_RATE_UNIT_VALUES!r}"
+    )

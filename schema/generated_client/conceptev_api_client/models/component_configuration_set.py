@@ -58,7 +58,9 @@ class ComponentConfigurationSet:
             configurations = []
             for configurations_item_data in _configurations:
 
-                def _parse_configurations_item(data: object) -> BatteryConfiguration | MotorConfiguration:
+                def _parse_configurations_item(
+                    data: object,
+                ) -> BatteryConfiguration | MotorConfiguration:
                     try:
                         if not isinstance(data, dict):
                             raise TypeError()

@@ -15,8 +15,9 @@ from pathlib import Path
 
 import httpx
 
-#DEFAULT_OPENAPI_URL = "https://dev-conceptev.awsansys3np.onscale.com/api/openapi.json"
+# DEFAULT_OPENAPI_URL = "https://dev-conceptev.awsansys3np.onscale.com/api/openapi.json"
 DEFAULT_OPENAPI_URL = "http://127.0.0.1:8080/api/openapi.json"
+
 
 def fetch_spec(url: str) -> dict:
     """Fetch and return the OpenAPI spec from the given URL."""

@@ -121,7 +121,9 @@ class BatteryLookupTableData:
                     return data
                 return cast(float | None, data)
 
-            power_limit_discharge_item = _parse_power_limit_discharge_item(power_limit_discharge_item_data)
+            power_limit_discharge_item = _parse_power_limit_discharge_item(
+                power_limit_discharge_item_data
+            )
 
             power_limit_discharge.append(power_limit_discharge_item)
 
@@ -131,9 +133,15 @@ class BatteryLookupTableData:
 
         internal_resistance = cast(list[float], d.pop("internal_resistance", UNSET))
 
-        component_file_type = cast(Literal["BatteryLookupTable"] | Unset, d.pop("component_file_type", UNSET))
-        if component_file_type != "BatteryLookupTable" and not isinstance(component_file_type, Unset):
-            raise ValueError(f"component_file_type must match const 'BatteryLookupTable', got '{component_file_type}'")
+        component_file_type = cast(
+            Literal["BatteryLookupTable"] | Unset, d.pop("component_file_type", UNSET)
+        )
+        if component_file_type != "BatteryLookupTable" and not isinstance(
+            component_file_type, Unset
+        ):
+            raise ValueError(
+                f"component_file_type must match const 'BatteryLookupTable', got '{component_file_type}'"
+            )
 
         battery_lookup_table_data = cls(
             voltage=voltage,

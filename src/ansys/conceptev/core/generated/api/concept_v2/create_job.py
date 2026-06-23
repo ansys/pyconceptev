@@ -39,7 +39,9 @@ def _get_kwargs(
     return _kwargs
 
 
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Any | ConceptJobRecord | None:
+def _parse_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Any | ConceptJobRecord | None:
     if response.status_code == 200:
         response_200 = ConceptJobRecord.from_dict(response.json())
 

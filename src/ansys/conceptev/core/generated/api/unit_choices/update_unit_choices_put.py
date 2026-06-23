@@ -76,7 +76,7 @@ def sync_detailed(
         body (UnitChoices): Unit Choice for the analysis.
 
             We might not need all of these.
-            We might want to create preset groups of these (eg. MKS, Imperial ect)
+            We might want to create preset groups of these (eg. MKS, Imperial etc)
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -110,7 +110,7 @@ def sync(
         body (UnitChoices): Unit Choice for the analysis.
 
             We might not need all of these.
-            We might want to create preset groups of these (eg. MKS, Imperial ect)
+            We might want to create preset groups of these (eg. MKS, Imperial etc)
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -139,7 +139,7 @@ async def asyncio_detailed(
         body (UnitChoices): Unit Choice for the analysis.
 
             We might not need all of these.
-            We might want to create preset groups of these (eg. MKS, Imperial ect)
+            We might want to create preset groups of these (eg. MKS, Imperial etc)
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -171,7 +171,7 @@ async def asyncio(
         body (UnitChoices): Unit Choice for the analysis.
 
             We might not need all of these.
-            We might want to create preset groups of these (eg. MKS, Imperial ect)
+            We might want to create preset groups of these (eg. MKS, Imperial etc)
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

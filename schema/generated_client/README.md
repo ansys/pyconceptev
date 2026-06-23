@@ -15,7 +15,9 @@ If the endpoints you're going to hit require authentication, use `AuthenticatedC
 ```python
 from conceptev_api_client import AuthenticatedClient
 
-client = AuthenticatedClient(base_url="https://api.example.com", token="SuperSecretToken")
+client = AuthenticatedClient(
+    base_url="https://api.example.com", token="SuperSecretToken"
+)
 ```
 
 Now call your endpoint and use your models:
@@ -40,14 +42,16 @@ from conceptev_api_client.types import Response
 
 async with client as client:
     my_data: MyDataModel = await get_my_data_model.asyncio(client=client)
-    response: Response[MyDataModel] = await get_my_data_model.asyncio_detailed(client=client)
+    response: Response[MyDataModel] = await get_my_data_model.asyncio_detailed(
+        client=client
+    )
 ```
 
 By default, when you're calling an HTTPS API it will attempt to verify that SSL is working correctly. Using certificate verification is highly recommended most of the time, but sometimes you may need to authenticate to a server (especially an internal server) using a custom certificate bundle.
 
 ```python
 client = AuthenticatedClient(
-    base_url="https://internal_api.example.com", 
+    base_url="https://internal_api.example.com",
     token="SuperSecretToken",
     verify_ssl="/path/to/certificate_bundle.pem",
 )
@@ -57,9 +61,9 @@ You can also disable certificate validation altogether, but beware that **this i
 
 ```python
 client = AuthenticatedClient(
-    base_url="https://internal_api.example.com", 
-    token="SuperSecretToken", 
-    verify_ssl=False
+    base_url="https://internal_api.example.com",
+    token="SuperSecretToken",
+    verify_ssl=False,
 )
 ```
 
@@ -81,12 +85,17 @@ There are more settings on the generated `Client` class which let you control mo
 ```python
 from conceptev_api_client import Client
 
+
 def log_request(request):
     print(f"Request event hook: {request.method} {request.url} - Waiting for response")
 
+
 def log_response(response):
     request = response.request
-    print(f"Response event hook: {request.method} {request.url} - Status {response.status_code}")
+    print(
+        f"Response event hook: {request.method} {request.url} - Status {response.status_code}"
+    )
+
 
 client = Client(
     base_url="https://api.example.com",
@@ -106,7 +115,9 @@ client = Client(
     base_url="https://api.example.com",
 )
 # Note that base_url needs to be re-set, as would any shared cookies, headers, etc.
-client.set_httpx_client(httpx.Client(base_url="https://api.example.com", proxies="http://localhost:8030"))
+client.set_httpx_client(
+    httpx.Client(base_url="https://api.example.com", proxies="http://localhost:8030")
+)
 ```
 
 ## Building / publishing this package

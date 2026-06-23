@@ -232,7 +232,9 @@ class StaticRequirementOutput:
         if isinstance(_component_configurations, Unset):
             component_configurations = UNSET
         else:
-            component_configurations = ComponentConfigurationSet.from_dict(_component_configurations)
+            component_configurations = ComponentConfigurationSet.from_dict(
+                _component_configurations
+            )
 
         ambient_temperature = d.pop("ambient_temperature", UNSET)
 
@@ -255,9 +257,13 @@ class StaticRequirementOutput:
 
         steady_state = d.pop("steady_state", UNSET)
 
-        requirement_input_type = cast(Literal["static"] | Unset, d.pop("requirement_input_type", UNSET))
+        requirement_input_type = cast(
+            Literal["static"] | Unset, d.pop("requirement_input_type", UNSET)
+        )
         if requirement_input_type != "static" and not isinstance(requirement_input_type, Unset):
-            raise ValueError(f"requirement_input_type must match const 'static', got '{requirement_input_type}'")
+            raise ValueError(
+                f"requirement_input_type must match const 'static', got '{requirement_input_type}'"
+            )
 
         static_requirement_output = cls(
             id=id,

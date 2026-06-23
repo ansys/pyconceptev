@@ -14968,7 +14968,7 @@
         },
         "type": "object",
         "title": "UnitChoices",
-        "description": "Unit Choice for the analysis.\n\nWe might not need all of these.\nWe might want to create preset groups of these (eg. MKS, Imperial ect)"
+        "description": "Unit Choice for the analysis.\n\nWe might not need all of these.\nWe might want to create preset groups of these (eg. MKS, Imperial etc)"
       },
       "UploadedFile": {
         "properties": {

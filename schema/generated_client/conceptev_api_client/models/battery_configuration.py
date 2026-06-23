@@ -46,9 +46,13 @@ class BatteryConfiguration:
         from ..models.battery_state import BatteryState
 
         d = dict(src_dict)
-        component_config_type = cast(Literal["battery"] | Unset, d.pop("component_config_type", UNSET))
+        component_config_type = cast(
+            Literal["battery"] | Unset, d.pop("component_config_type", UNSET)
+        )
         if component_config_type != "battery" and not isinstance(component_config_type, Unset):
-            raise ValueError(f"component_config_type must match const 'battery', got '{component_config_type}'")
+            raise ValueError(
+                f"component_config_type must match const 'battery', got '{component_config_type}'"
+            )
 
         _state = d.pop("state", UNSET)
         state: BatteryState | Unset

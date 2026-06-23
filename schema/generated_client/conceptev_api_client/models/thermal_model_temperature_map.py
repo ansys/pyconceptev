@@ -7,7 +7,9 @@ from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 if TYPE_CHECKING:
-    from ..models.thermal_model_temperature_map_additional_property import ThermalModelTemperatureMapAdditionalProperty
+    from ..models.thermal_model_temperature_map_additional_property import (
+        ThermalModelTemperatureMapAdditionalProperty,
+    )
 
 
 T = TypeVar("T", bound="ThermalModelTemperatureMap")

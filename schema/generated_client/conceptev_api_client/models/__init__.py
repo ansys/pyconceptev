@@ -88,7 +88,9 @@ from .thermal_model import ThermalModel
 from .thermal_model_loss_map import ThermalModelLossMap
 from .thermal_model_loss_map_additional_property import ThermalModelLossMapAdditionalProperty
 from .thermal_model_temperature_map import ThermalModelTemperatureMap
-from .thermal_model_temperature_map_additional_property import ThermalModelTemperatureMapAdditionalProperty
+from .thermal_model_temperature_map_additional_property import (
+    ThermalModelTemperatureMapAdditionalProperty,
+)
 from .thermal_network import ThermalNetwork
 from .thermal_network_edges import ThermalNetworkEdges
 from .thermal_network_flow_rate_dict import ThermalNetworkFlowRateDict

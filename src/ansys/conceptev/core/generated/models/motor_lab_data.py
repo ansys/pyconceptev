@@ -53,7 +53,9 @@ class MotorLabData:
 
         component_file_type = cast(Literal["MotorLab"] | Unset, d.pop("component_file_type", UNSET))
         if component_file_type != "MotorLab" and not isinstance(component_file_type, Unset):
-            raise ValueError(f"component_file_type must match const 'MotorLab', got '{component_file_type}'")
+            raise ValueError(
+                f"component_file_type must match const 'MotorLab', got '{component_file_type}'"
+            )
 
         motor_lab_data = cls(
             lab_file_dict=lab_file_dict,

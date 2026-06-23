@@ -40,18 +40,20 @@ def _get_kwargs(
     part_type: PartType,
     part_id: str,
     *,
-    body: AeroInput
-    | ArchitectureInput
-    | BatteryFixedVoltagesInput
-    | BatteryLookupTableInput
-    | DriveCycleInput
-    | DriveCycleRequirementInput
-    | DynamicRequirementInput
-    | MassInput
-    | MotorLabInput
-    | StaticRequirementInput
-    | TransmissionLossCoefficientsInput
-    | WheelInput,
+    body: (
+        AeroInput
+        | ArchitectureInput
+        | BatteryFixedVoltagesInput
+        | BatteryLookupTableInput
+        | DriveCycleInput
+        | DriveCycleRequirementInput
+        | DynamicRequirementInput
+        | MassInput
+        | MotorLabInput
+        | StaticRequirementInput
+        | TransmissionLossCoefficientsInput
+        | WheelInput
+    ),
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
@@ -285,18 +287,20 @@ def sync_detailed(
     part_id: str,
     *,
     client: AuthenticatedClient | Client,
-    body: AeroInput
-    | ArchitectureInput
-    | BatteryFixedVoltagesInput
-    | BatteryLookupTableInput
-    | DriveCycleInput
-    | DriveCycleRequirementInput
-    | DynamicRequirementInput
-    | MassInput
-    | MotorLabInput
-    | StaticRequirementInput
-    | TransmissionLossCoefficientsInput
-    | WheelInput,
+    body: (
+        AeroInput
+        | ArchitectureInput
+        | BatteryFixedVoltagesInput
+        | BatteryLookupTableInput
+        | DriveCycleInput
+        | DriveCycleRequirementInput
+        | DynamicRequirementInput
+        | MassInput
+        | MotorLabInput
+        | StaticRequirementInput
+        | TransmissionLossCoefficientsInput
+        | WheelInput
+    ),
 ) -> Response[
     AeroOutput
     | ArchitectureOutput
@@ -353,18 +357,20 @@ def sync(
     part_id: str,
     *,
     client: AuthenticatedClient | Client,
-    body: AeroInput
-    | ArchitectureInput
-    | BatteryFixedVoltagesInput
-    | BatteryLookupTableInput
-    | DriveCycleInput
-    | DriveCycleRequirementInput
-    | DynamicRequirementInput
-    | MassInput
-    | MotorLabInput
-    | StaticRequirementInput
-    | TransmissionLossCoefficientsInput
-    | WheelInput,
+    body: (
+        AeroInput
+        | ArchitectureInput
+        | BatteryFixedVoltagesInput
+        | BatteryLookupTableInput
+        | DriveCycleInput
+        | DriveCycleRequirementInput
+        | DynamicRequirementInput
+        | MassInput
+        | MotorLabInput
+        | StaticRequirementInput
+        | TransmissionLossCoefficientsInput
+        | WheelInput
+    ),
 ) -> (
     AeroOutput
     | ArchitectureOutput
@@ -417,18 +423,20 @@ async def asyncio_detailed(
     part_id: str,
     *,
     client: AuthenticatedClient | Client,
-    body: AeroInput
-    | ArchitectureInput
-    | BatteryFixedVoltagesInput
-    | BatteryLookupTableInput
-    | DriveCycleInput
-    | DriveCycleRequirementInput
-    | DynamicRequirementInput
-    | MassInput
-    | MotorLabInput
-    | StaticRequirementInput
-    | TransmissionLossCoefficientsInput
-    | WheelInput,
+    body: (
+        AeroInput
+        | ArchitectureInput
+        | BatteryFixedVoltagesInput
+        | BatteryLookupTableInput
+        | DriveCycleInput
+        | DriveCycleRequirementInput
+        | DynamicRequirementInput
+        | MassInput
+        | MotorLabInput
+        | StaticRequirementInput
+        | TransmissionLossCoefficientsInput
+        | WheelInput
+    ),
 ) -> Response[
     AeroOutput
     | ArchitectureOutput
@@ -483,18 +491,20 @@ async def asyncio(
     part_id: str,
     *,
     client: AuthenticatedClient | Client,
-    body: AeroInput
-    | ArchitectureInput
-    | BatteryFixedVoltagesInput
-    | BatteryLookupTableInput
-    | DriveCycleInput
-    | DriveCycleRequirementInput
-    | DynamicRequirementInput
-    | MassInput
-    | MotorLabInput
-    | StaticRequirementInput
-    | TransmissionLossCoefficientsInput
-    | WheelInput,
+    body: (
+        AeroInput
+        | ArchitectureInput
+        | BatteryFixedVoltagesInput
+        | BatteryLookupTableInput
+        | DriveCycleInput
+        | DriveCycleRequirementInput
+        | DynamicRequirementInput
+        | MassInput
+        | MotorLabInput
+        | StaticRequirementInput
+        | TransmissionLossCoefficientsInput
+        | WheelInput
+    ),
 ) -> (
     AeroOutput
     | ArchitectureOutput

@@ -13,4 +13,6 @@ ANGULAR_ACCELERATION_UNIT_VALUES: set[AngularAccelerationUnit] = {
 def check_angular_acceleration_unit(value: str) -> AngularAccelerationUnit:
     if value in ANGULAR_ACCELERATION_UNIT_VALUES:
         return value
-    raise TypeError(f"Unexpected value {value!r}. Expected one of {ANGULAR_ACCELERATION_UNIT_VALUES!r}")
+    raise TypeError(
+        f"Unexpected value {value!r}. Expected one of {ANGULAR_ACCELERATION_UNIT_VALUES!r}"
+    )

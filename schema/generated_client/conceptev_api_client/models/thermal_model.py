@@ -78,9 +78,13 @@ class ThermalModel:
 
         temperature_map = ThermalModelTemperatureMap.from_dict(d.pop("temperature_map"))
 
-        component_file_type = cast(Literal["ThermalModel"] | Unset, d.pop("component_file_type", UNSET))
+        component_file_type = cast(
+            Literal["ThermalModel"] | Unset, d.pop("component_file_type", UNSET)
+        )
         if component_file_type != "ThermalModel" and not isinstance(component_file_type, Unset):
-            raise ValueError(f"component_file_type must match const 'ThermalModel', got '{component_file_type}'")
+            raise ValueError(
+                f"component_file_type must match const 'ThermalModel', got '{component_file_type}'"
+            )
 
         thermal_model = cls(
             network=network,

@@ -157,7 +157,9 @@ class MotorLabOutput:
 
         component_type = cast(Literal["MotorLabModel"] | Unset, d.pop("component_type", UNSET))
         if component_type != "MotorLabModel" and not isinstance(component_type, Unset):
-            raise ValueError(f"component_type must match const 'MotorLabModel', got '{component_type}'")
+            raise ValueError(
+                f"component_type must match const 'MotorLabModel', got '{component_type}'"
+            )
 
         def _parse_lab_data(data: object) -> MotorLabData | None | Unset:
             if data is None:

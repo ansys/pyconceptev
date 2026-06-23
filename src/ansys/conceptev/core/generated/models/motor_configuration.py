@@ -57,9 +57,13 @@ class MotorConfiguration:
         from ..models.motor_state import MotorState
 
         d = dict(src_dict)
-        component_config_type = cast(Literal["motor"] | Unset, d.pop("component_config_type", UNSET))
+        component_config_type = cast(
+            Literal["motor"] | Unset, d.pop("component_config_type", UNSET)
+        )
         if component_config_type != "motor" and not isinstance(component_config_type, Unset):
-            raise ValueError(f"component_config_type must match const 'motor', got '{component_config_type}'")
+            raise ValueError(
+                f"component_config_type must match const 'motor', got '{component_config_type}'"
+            )
 
         _axle = d.pop("axle", UNSET)
         axle: ComponentAxle | Unset

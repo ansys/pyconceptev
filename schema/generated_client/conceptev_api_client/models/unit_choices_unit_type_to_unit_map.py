@@ -8,7 +8,10 @@ from attrs import field as _attrs_field
 
 from ..models.acceleration_unit import AccelerationUnit, check_acceleration_unit
 from ..models.angle_unit import AngleUnit, check_angle_unit
-from ..models.angular_acceleration_unit import AngularAccelerationUnit, check_angular_acceleration_unit
+from ..models.angular_acceleration_unit import (
+    AngularAccelerationUnit,
+    check_angular_acceleration_unit,
+)
 from ..models.angular_speed_unit import AngularSpeedUnit, check_angular_speed_unit
 from ..models.area_unit import AreaUnit, check_area_unit
 from ..models.current_unit import CurrentUnit, check_current_unit
@@ -33,7 +36,10 @@ from ..models.time_unit import TimeUnit, check_time_unit
 from ..models.torque_unit import TorqueUnit, check_torque_unit
 from ..models.voltage_unit import VoltageUnit, check_voltage_unit
 from ..models.volume_unit import VolumeUnit, check_volume_unit
-from ..models.volumetric_flow_rate_unit import VolumetricFlowRateUnit, check_volumetric_flow_rate_unit
+from ..models.volumetric_flow_rate_unit import (
+    VolumetricFlowRateUnit,
+    check_volumetric_flow_rate_unit,
+)
 
 T = TypeVar("T", bound="UnitChoicesUnitTypeToUnitMap")
 
@@ -445,34 +451,36 @@ class UnitChoicesUnitTypeToUnitMap:
     def __setitem__(
         self,
         key: str,
-        value: AccelerationUnit
-        | AngleUnit
-        | AngularAccelerationUnit
-        | AngularSpeedUnit
-        | AreaUnit
-        | CurrentUnit
-        | DensityUnit
-        | ElectricalEnergyUnit
-        | ElectricalPowerUnit
-        | ElectricChargeUnit
-        | EnergyUnit
-        | ForceUnit
-        | FrequencyUnit
-        | InertiaUnit
-        | LengthUnit
-        | MassUnit
-        | PowerUnit
-        | PressureUnit
-        | RatioUnit
-        | ResistanceUnit
-        | RoadEfficiencyUnit
-        | SpeedUnit
-        | TemperatureUnit
-        | TimeUnit
-        | TorqueUnit
-        | VoltageUnit
-        | VolumetricFlowRateUnit
-        | VolumeUnit,
+        value: (
+            AccelerationUnit
+            | AngleUnit
+            | AngularAccelerationUnit
+            | AngularSpeedUnit
+            | AreaUnit
+            | CurrentUnit
+            | DensityUnit
+            | ElectricalEnergyUnit
+            | ElectricalPowerUnit
+            | ElectricChargeUnit
+            | EnergyUnit
+            | ForceUnit
+            | FrequencyUnit
+            | InertiaUnit
+            | LengthUnit
+            | MassUnit
+            | PowerUnit
+            | PressureUnit
+            | RatioUnit
+            | ResistanceUnit
+            | RoadEfficiencyUnit
+            | SpeedUnit
+            | TemperatureUnit
+            | TimeUnit
+            | TorqueUnit
+            | VoltageUnit
+            | VolumetricFlowRateUnit
+            | VolumeUnit
+        ),
     ) -> None:
         self.additional_properties[key] = value
 

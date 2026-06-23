@@ -270,7 +270,9 @@ class DynamicRequirementOutput:
         if isinstance(_component_configurations, Unset):
             component_configurations = UNSET
         else:
-            component_configurations = ComponentConfigurationSet.from_dict(_component_configurations)
+            component_configurations = ComponentConfigurationSet.from_dict(
+                _component_configurations
+            )
 
         ambient_temperature = d.pop("ambient_temperature", UNSET)
 
@@ -313,9 +315,13 @@ class DynamicRequirementOutput:
 
         front_axle_split = _parse_front_axle_split(d.pop("front_axle_split", UNSET))
 
-        requirement_input_type = cast(Literal["dynamic"] | Unset, d.pop("requirement_input_type", UNSET))
+        requirement_input_type = cast(
+            Literal["dynamic"] | Unset, d.pop("requirement_input_type", UNSET)
+        )
         if requirement_input_type != "dynamic" and not isinstance(requirement_input_type, Unset):
-            raise ValueError(f"requirement_input_type must match const 'dynamic', got '{requirement_input_type}'")
+            raise ValueError(
+                f"requirement_input_type must match const 'dynamic', got '{requirement_input_type}'"
+            )
 
         dynamic_requirement_output = cls(
             id=id,

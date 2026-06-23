@@ -7,7 +7,9 @@ from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 if TYPE_CHECKING:
-    from ..models.thermal_model_loss_map_additional_property import ThermalModelLossMapAdditionalProperty
+    from ..models.thermal_model_loss_map_additional_property import (
+        ThermalModelLossMapAdditionalProperty,
+    )
 
 
 T = TypeVar("T", bound="ThermalModelLossMap")
@@ -15,7 +17,9 @@ T = TypeVar("T", bound="ThermalModelLossMap")
 
 @_attrs_define
 class ThermalModelLossMap:
-    additional_properties: dict[str, ThermalModelLossMapAdditionalProperty] = _attrs_field(init=False, factory=dict)
+    additional_properties: dict[str, ThermalModelLossMapAdditionalProperty] = _attrs_field(
+        init=False, factory=dict
+    )
 
     def to_dict(self) -> dict[str, Any]:
 
@@ -27,7 +31,9 @@ class ThermalModelLossMap:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.thermal_model_loss_map_additional_property import ThermalModelLossMapAdditionalProperty
+        from ..models.thermal_model_loss_map_additional_property import (
+            ThermalModelLossMapAdditionalProperty,
+        )
 
         d = dict(src_dict)
         thermal_model_loss_map = cls()

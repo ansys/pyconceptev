@@ -116,7 +116,9 @@ class WheelInput:
 
         rolling_resistance_coefficient = d.pop("rolling_resistance_coefficient", UNSET)
 
-        def _parse_rolling_resistance_key(data: object) -> None | Unset | WheelRollingResistanceConfigs:
+        def _parse_rolling_resistance_key(
+            data: object,
+        ) -> None | Unset | WheelRollingResistanceConfigs:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -131,11 +133,15 @@ class WheelInput:
                 pass
             return cast(None | Unset | WheelRollingResistanceConfigs, data)
 
-        rolling_resistance_key = _parse_rolling_resistance_key(d.pop("rolling_resistance_key", UNSET))
+        rolling_resistance_key = _parse_rolling_resistance_key(
+            d.pop("rolling_resistance_key", UNSET)
+        )
 
         traction_coefficient = d.pop("traction_coefficient", UNSET)
 
-        def _parse_traction_coefficient_key(data: object) -> None | SurfaceConditionTractionConfigs | Unset:
+        def _parse_traction_coefficient_key(
+            data: object,
+        ) -> None | SurfaceConditionTractionConfigs | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -150,7 +156,9 @@ class WheelInput:
                 pass
             return cast(None | SurfaceConditionTractionConfigs | Unset, data)
 
-        traction_coefficient_key = _parse_traction_coefficient_key(d.pop("traction_coefficient_key", UNSET))
+        traction_coefficient_key = _parse_traction_coefficient_key(
+            d.pop("traction_coefficient_key", UNSET)
+        )
 
         config_type = cast(Literal["wheel"] | Unset, d.pop("config_type", UNSET))
         if config_type != "wheel" and not isinstance(config_type, Unset):

@@ -241,7 +241,9 @@ class DriveCycleRequirementOutput:
         if isinstance(_component_configurations, Unset):
             component_configurations = UNSET
         else:
-            component_configurations = ComponentConfigurationSet.from_dict(_component_configurations)
+            component_configurations = ComponentConfigurationSet.from_dict(
+                _component_configurations
+            )
 
         ambient_temperature = d.pop("ambient_temperature", UNSET)
 
@@ -253,13 +255,21 @@ class DriveCycleRequirementOutput:
 
         stop_at_temperature_limit = d.pop("stop_at_temperature_limit", UNSET)
 
-        requirement_input_type = cast(Literal["drive_cycle"] | Unset, d.pop("requirement_input_type", UNSET))
-        if requirement_input_type != "drive_cycle" and not isinstance(requirement_input_type, Unset):
-            raise ValueError(f"requirement_input_type must match const 'drive_cycle', got '{requirement_input_type}'")
+        requirement_input_type = cast(
+            Literal["drive_cycle"] | Unset, d.pop("requirement_input_type", UNSET)
+        )
+        if requirement_input_type != "drive_cycle" and not isinstance(
+            requirement_input_type, Unset
+        ):
+            raise ValueError(
+                f"requirement_input_type must match const 'drive_cycle', got '{requirement_input_type}'"
+            )
 
         requirement_type = cast(Literal["drive_cycle"] | Unset, d.pop("requirement_type", UNSET))
         if requirement_type != "drive_cycle" and not isinstance(requirement_type, Unset):
-            raise ValueError(f"requirement_type must match const 'drive_cycle', got '{requirement_type}'")
+            raise ValueError(
+                f"requirement_type must match const 'drive_cycle', got '{requirement_type}'"
+            )
 
         solver_id = d.pop("solver_id", UNSET)
 
