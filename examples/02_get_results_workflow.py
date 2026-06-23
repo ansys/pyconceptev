@@ -53,7 +53,7 @@ from ansys.conceptev.core.generated.api.concept_v2 import get_concept, get_job, 
 # ------
 # Change the following variables to match your data.
 
-get_results_off_server = True  # Generates an output file that can be read later.
+get_results_off_server = False  # Set True to fetch live results from a running server.
 output_filename = "results.xlsx"  # Output filename for results.
 
 # %%
@@ -106,7 +106,9 @@ def get_results_for_concept(client, concept_id: str) -> dict:
 # Load concept IDs and collect results
 # ------------------------------------
 
-concept_ids_df = pd.read_csv("resources/design_instance_ids.csv", header=None, names=["design_instance_id"])
+concept_ids_df = pd.read_csv(
+    "resources/design_instance_ids.csv", header=None, names=["design_instance_id"]
+)
 concept_ids = concept_ids_df["design_instance_id"].tolist()
 
 if get_results_off_server:
