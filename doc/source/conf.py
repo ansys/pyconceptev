@@ -140,14 +140,18 @@ sphinx_gallery_conf = {
     "image_scrapers": ("matplotlib"),
     "ignore_pattern": "flycheck*",
     "thumbnail_size": (350, 350),
-    # All examples require a running local ConceptEV service and are expected
-    # to fail in CI / doc builds where no server is available.  Listing them
-    # here tells sphinx-gallery to treat connection failures as anticipated
-    # rather than raising a final Extension error.
+    # All examples require either a running local server (v1) or a live
+    # ConceptEV dev environment with valid credentials (v2).  Neither is
+    # available during CI doc builds, so all are listed as expected failures
+    # to prevent sphinx-gallery from treating connection errors as build failures.
     "abort_on_example_error": False,
     "expected_failing_examples": [
         "../../examples/01_simple_workflow.py",
+        "../../examples/02_get_results_workflow.py",
         "../../examples/03_bulk_job_submit.py",
+        "../../examples/04_v2_simple_workflow.py",
+        "../../examples/05_v2_get_results_workflow.py",
+        "../../examples/06_v2_bulk_job_submit.py",
     ],
 }
 

@@ -173,4 +173,8 @@ shell_test_out.txt
 
 # Local secret / credential files
 CONCEPTEV_PASSWORD
+conceptev_password
 token_cache.bin
+examples/project_results.json
+examples/results.xlsx
+examples/created_designs.xlsx
