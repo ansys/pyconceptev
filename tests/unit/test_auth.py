@@ -115,11 +115,9 @@ def test_auth_initialization_creates_msal_app(mocker):
 
 
 def test_auth_flow_adds_authorization_header(mocker, httpx_mock: HTTPXMock):
-    mock_get_ansyId_token = mocker.patch(
-        "ansys.conceptev.core.auth.get_ansyId_token", return_value="auth_class_token"
-    )
+    mocker.patch("ansys.conceptev.core.auth.get_ansyId_token", return_value="auth_class_token")
     auth_instance = auth.AnsysIDAuth()
-    httpx_mock.add_response(url=f"http://example.com")
+    httpx_mock.add_response(url="http://example.com")
     client = httpx.Client(auth=auth_instance)
     response = client.get("http://example.com")
     assert response.request.headers["Authorization"] == "auth_class_token"

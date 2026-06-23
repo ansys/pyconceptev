@@ -194,10 +194,10 @@ def copy_examples(app):
         size = directory_size(destination_dir)
         logger.info(f"Directory {destination_dir} ({size} MB) already exist, removing it.")
         shutil.rmtree(destination_dir)
-        logger.info(f"Directory removed.")
+        logger.info("Directory removed.")
 
     shutil.copytree(EXAMPLES_DIRECTORY, destination_dir)
-    logger.info(f"Copy performed")
+    logger.info("Copy performed")
 
 
 def remove_examples(app, exception):
@@ -207,7 +207,7 @@ def remove_examples(app, exception):
     size = directory_size(destination_dir)
     logger.info(f"Removing directory {destination_dir} ({size} MB).")
     shutil.rmtree(destination_dir, ignore_errors=True)
-    logger.info(f"Directory removed.")
+    logger.info("Directory removed.")
 
 
 def setup(app: sphinx.application.Sphinx):

@@ -567,7 +567,7 @@ def test_returns_final_status_when_present(httpx_mock, final_status, last_status
     )
 
     if final_status is None and last_status is None:
-        with pytest.raises(ResponseError) as exc:
+        with pytest.raises(ResponseError):
             result = app.get_status(job_info, token)
         return True
     else:

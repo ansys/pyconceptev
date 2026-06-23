@@ -38,8 +38,8 @@ the v2 API against a locally running ConceptEV service.
 # Perform Required imports
 # ------------------------
 
-import time
 from pathlib import Path
+import time
 
 import matplotlib.pyplot as plt
 

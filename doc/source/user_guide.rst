@@ -5,7 +5,7 @@ User guide
 
 This section explains how to use PyConceptEV.
 
-Create a client (local server — v2 API)
+Create a client (local server, v2 API)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use ``get_local_client`` to connect to a locally running ConceptEV service at
@@ -43,34 +43,51 @@ client is a typed generated client that works directly with the v2 API modules.
 
        # Add configurations
        aero = create_concept_part.sync(
-           id=concept_id, part_type="configuration", client=client,
+           id=concept_id,
+           part_type="configuration",
+           client=client,
            body=AeroInput(name="Aero", drag_coefficient=0.3, cross_sectional_area=2.0),
        )
        mass = create_concept_part.sync(
-           id=concept_id, part_type="configuration", client=client,
+           id=concept_id,
+           part_type="configuration",
+           client=client,
            body=MassInput(name="Mass", mass=2000.0),
        )
        wheel = create_concept_part.sync(
-           id=concept_id, part_type="configuration", client=client,
+           id=concept_id,
+           part_type="configuration",
+           client=client,
            body=WheelInput(name="Wheel", rolling_radius=0.3),
        )
 
        # Add components
        transmission = create_concept_part.sync(
-           id=concept_id, part_type="component", client=client,
+           id=concept_id,
+           part_type="component",
+           client=client,
            body=TransmissionLossCoefficientsInput(
-               name="Transmission", gear_ratios=[5.0], headline_efficiencies=[0.95],
-               max_torque=500.0, max_speed=2000.0, static_drags=[0.5], friction_ratios=[60.0],
+               name="Transmission",
+               gear_ratios=[5.0],
+               headline_efficiencies=[0.95],
+               max_torque=500.0,
+               max_speed=2000.0,
+               static_drags=[0.5],
+               friction_ratios=[60.0],
            ),
        )
        battery = create_concept_part.sync(
-           id=concept_id, part_type="component", client=client,
+           id=concept_id,
+           part_type="component",
+           client=client,
            body=BatteryFixedVoltagesInput(name="Battery", voltage_max=400.0),
        )
 
        # Add architecture
        arch = create_concept_part.sync(
-           id=concept_id, part_type="architecture", client=client,
+           id=concept_id,
+           part_type="architecture",
+           client=client,
            body=ArchitectureInput(
                battery_id=battery.id,
                number_of_front_motors=1,
@@ -80,21 +97,29 @@ client is a typed generated client that works directly with the v2 API modules.
 
        # Add requirement and submit job
        req = create_concept_part.sync(
-           id=concept_id, part_type="requirement", client=client,
+           id=concept_id,
+           part_type="requirement",
+           client=client,
            body=DynamicRequirementInput(
-               name="Req 1", aero_id=aero.id, mass_id=mass.id, wheel_id=wheel.id,
+               name="Req 1",
+               aero_id=aero.id,
+               mass_id=mass.id,
+               wheel_id=wheel.id,
            ),
        )
        job = create_job.sync(
-           concept_id=concept_id, client=client,
+           concept_id=concept_id,
+           client=client,
            body=JobRequest(
-               name="My Job", requirement_ids=[req.id], architecture_id=arch.id,
+               name="My Job",
+               requirement_ids=[req.id],
+               architecture_id=arch.id,
            ),
        )
        print(f"Job submitted: {job.id}, status: {job.status}")
 
 
-Create a client (cloud service — legacy API)
+Create a client (cloud service, legacy API)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For the hosted Ansys ConceptEV cloud service, use ``get_http_client`` (legacy
@@ -141,7 +166,9 @@ component:
        )
 
    motor = create_concept_part.sync(
-       id=concept_id, part_type="component", client=client,
+       id=concept_id,
+       part_type="component",
+       client=client,
        body=MotorLabInput(
            name="e9 Motor",
            lab_data_id=file_resp.id,

@@ -191,7 +191,7 @@ def test_msal_app(msal_app):
 def test_auth_app(token):
     """Test that the optislang integration works."""
     assert isinstance(token, str)
-    claims = jwt.decode(token, options={"verify_signature": False})
+    jwt.decode(token, options={"verify_signature": False})
     # Step 1: Fetch JWKS
     jwks = httpx.get(auth.settings.authority + "/discovery/v2.0/keys").json()
 

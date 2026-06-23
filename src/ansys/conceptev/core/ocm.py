@@ -62,7 +62,7 @@ def get_product_id(token: str) -> str:
     """Get the product ID."""
     products = create_ocm_client(token).get("/product/list")
     if products.status_code != 200:
-        raise ProductIdsError(f"Failed to get product id.")
+        raise ProductIdsError("Failed to get product id.")
     product_id = [
         product["productId"] for product in products.json() if product["productName"] == "CONCEPTEV"
     ][0]
@@ -270,7 +270,7 @@ def get_job_file(token, job_id, filename, simulation_id=None, encrypted=False):
 
 def get_job_info(token, job_id):
     """Get the job info from the OnScale Cloud Manager."""
-    response = create_ocm_client(token).post(url=f"/job/load", json={"jobId": job_id})
+    response = create_ocm_client(token).post(url="/job/load", json={"jobId": job_id})
     response = process_response(response)
     job_info = {
         "job_id": job_id,

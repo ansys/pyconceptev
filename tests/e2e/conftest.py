@@ -265,10 +265,10 @@ def e2e_concept(session_token, session_account_id, session_hpc_id):
     """
     from ansys.conceptev.core import ocm as _ocm
     from ansys.conceptev.core.generated.api.concept_v2 import (
-        create_concept as _create_concept_v2,
         create_concept_part as _create_concept_part,
-        create_file_item as _create_file_item,
     )
+    from ansys.conceptev.core.generated.api.concept_v2 import create_concept as _create_concept_v2
+    from ansys.conceptev.core.generated.api.concept_v2 import create_file_item as _create_file_item
     from ansys.conceptev.core.generated.models.aero_input import AeroInput
     from ansys.conceptev.core.generated.models.architecture_input import ArchitectureInput
     from ansys.conceptev.core.generated.models.battery_fixed_voltages_input import (
@@ -553,7 +553,7 @@ def install_pyconceptev(request):
             f"pip install '{src}' failed (exit {result.returncode}).\n" f"stderr: {result.stderr}"
         )
 
-    print(f"[install-pyconceptev] installation succeeded")
+    print("[install-pyconceptev] installation succeeded")
     yield src
 
 
@@ -675,4 +675,4 @@ def inject_integration(request, install_pyconceptev):  # noqa: ARG001
     if conceptev_dst_backup is not None and conceptev_dst_backup.exists():
         shutil.move(str(conceptev_dst_backup), str(conceptev_dst))
         print(f"[inject-integration] restored {conceptev_dst} from backup")
-    print(f"[inject-integration] teardown complete")
+    print("[inject-integration] teardown complete")

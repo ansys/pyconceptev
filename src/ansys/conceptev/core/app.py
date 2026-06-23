@@ -482,7 +482,7 @@ def get_results(
 
 def get_component_id_map(client, design_instance_id):
     """Get a map of component name to component id."""
-    ###TODO move to results file so its self contained.
+    # TODO: move to results file so it's self-contained.
     components = client.get(f"/concepts/{design_instance_id}/components")
     components = process_response(components)
     components.append({"name": "N/A", "id": None})

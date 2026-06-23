@@ -49,14 +49,11 @@ from ansys.conceptev.core.app import get_local_client
 from ansys.conceptev.core.generated.api.concept_v2 import (
     create_concept,
     create_concept_part,
+    create_job,
     delete_concept,
     get_concept,
-    create_job,
 )
-from ansys.conceptev.core.generated.models import (
-    ArchitectureInput,
-    ConceptInput,
-)
+from ansys.conceptev.core.generated.models import ArchitectureInput, ConceptInput
 from ansys.conceptev.core.generated.models.job_request import JobRequest
 
 # %%
@@ -102,9 +99,9 @@ combinations = pd.read_csv(filename, na_filter=False).to_dict("records")
 # Validate that every required column exists.
 required_columns = set(component_order.values())
 file_columns = set(combinations[0].keys()) if combinations else set()
-assert required_columns <= file_columns, (
-    f"Missing columns in combinations file: {required_columns - file_columns}"
-)
+assert (
+    required_columns <= file_columns
+), f"Missing columns in combinations file: {required_columns - file_columns}"
 
 with get_local_client() as client:
     base_concept = get_concept.sync(id=base_concept_id, client=client)
@@ -156,18 +153,26 @@ with get_local_client() as client:
                 client=client,
                 body=ArchitectureInput(
                     battery_id=battery_id,
-                    number_of_front_wheels=base_concept.architectures[0].number_of_front_wheels
-                    if base_concept.architectures
-                    else 2,
-                    number_of_front_motors=base_concept.architectures[0].number_of_front_motors
-                    if base_concept.architectures
-                    else 1,
-                    number_of_rear_wheels=base_concept.architectures[0].number_of_rear_wheels
-                    if base_concept.architectures
-                    else 2,
-                    number_of_rear_motors=base_concept.architectures[0].number_of_rear_motors
-                    if base_concept.architectures
-                    else 0,
+                    number_of_front_wheels=(
+                        base_concept.architectures[0].number_of_front_wheels
+                        if base_concept.architectures
+                        else 2
+                    ),
+                    number_of_front_motors=(
+                        base_concept.architectures[0].number_of_front_motors
+                        if base_concept.architectures
+                        else 1
+                    ),
+                    number_of_rear_wheels=(
+                        base_concept.architectures[0].number_of_rear_wheels
+                        if base_concept.architectures
+                        else 2
+                    ),
+                    number_of_rear_motors=(
+                        base_concept.architectures[0].number_of_rear_motors
+                        if base_concept.architectures
+                        else 0
+                    ),
                     **arch_kwargs,
                 ),
             )

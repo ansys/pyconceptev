@@ -46,13 +46,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from ansys.conceptev.core.app import get_local_client
-from ansys.conceptev.core.generated.api.concept_v2 import (
-    create_job,
-    get_concept,
-    get_job,
-    list_jobs,
-)
-from ansys.conceptev.core.generated.models.job_request import JobRequest
+from ansys.conceptev.core.generated.api.concept_v2 import get_concept, get_job, list_jobs
 
 # %%
 # Inputs
@@ -86,9 +80,7 @@ def get_results_for_concept(client, concept_id: str) -> dict:
     """Return results for the first completed job of a concept."""
     concept = get_concept.sync(id=concept_id, client=client)
 
-    jobs = list_jobs.sync(
-        concept_id=concept_id, client=client
-    )
+    jobs = list_jobs.sync(concept_id=concept_id, client=client)
     if not jobs:
         raise RuntimeError(f"No jobs found for concept {concept_id}")
 
