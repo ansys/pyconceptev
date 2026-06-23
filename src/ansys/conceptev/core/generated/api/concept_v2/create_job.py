@@ -16,6 +16,8 @@ def _get_kwargs(
     *,
     body: JobRequest,
 ) -> dict[str, Any]:
+    from ...types import UNSET
+
     headers: dict[str, Any] = {}
 
     _kwargs: dict[str, Any] = {
@@ -24,6 +26,10 @@ def _get_kwargs(
             concept_id=quote(str(concept_id), safe=""),
         ),
     }
+
+    # The v2 endpoint requires account_id as a query parameter; mirror it from the body.
+    if body.account_id is not UNSET and body.account_id is not None:
+        _kwargs["params"] = {"account_id": body.account_id}
 
     _kwargs["json"] = body.to_dict()
 
@@ -80,7 +86,8 @@ def sync_detailed(
 
     Args:
         concept_id (str):
-        body (JobRequest): Request body for creating a job.
+        body (JobRequest): Request body for creating a job.  Set
+            ``body.account_id`` to pass the account ID in the request body.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -118,7 +125,8 @@ def sync(
 
     Args:
         concept_id (str):
-        body (JobRequest): Request body for creating a job.
+        body (JobRequest): Request body for creating a job.  Set
+            ``body.account_id`` to pass the account ID in the request body.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

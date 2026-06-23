@@ -18,6 +18,8 @@ class JobRequest:
     name: str
     requirement_ids: list[str]
     architecture_id: str
+    account_id: str | Unset = UNSET
+    design_instance_id: str | Unset = UNSET
     version: str | Unset = "latest"
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -27,6 +29,10 @@ class JobRequest:
         requirement_ids = self.requirement_ids
 
         architecture_id = self.architecture_id
+
+        account_id = self.account_id
+
+        design_instance_id = self.design_instance_id
 
         version = self.version
 
@@ -39,6 +45,10 @@ class JobRequest:
                 "architecture_id": architecture_id,
             }
         )
+        if account_id is not UNSET:
+            field_dict["account_id"] = account_id
+        if design_instance_id is not UNSET:
+            field_dict["design_instance_id"] = design_instance_id
         if version is not UNSET:
             field_dict["version"] = version
 
@@ -53,12 +63,18 @@ class JobRequest:
 
         architecture_id = d.pop("architecture_id")
 
+        account_id = d.pop("account_id", UNSET)
+
+        design_instance_id = d.pop("design_instance_id", UNSET)
+
         version = d.pop("version", UNSET)
 
         job_request = cls(
             name=name,
             requirement_ids=requirement_ids,
             architecture_id=architecture_id,
+            account_id=account_id,
+            design_instance_id=design_instance_id,
             version=version,
         )
 
