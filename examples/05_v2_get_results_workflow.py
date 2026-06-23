@@ -55,11 +55,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from ansys.conceptev.core.app import get_conceptev_client
-from ansys.conceptev.core.generated.api.concept_v2 import (
-    get_concept,
-    get_job,
-    list_jobs,
-)
+from ansys.conceptev.core.generated.api.concept_v2 import get_concept, get_job, list_jobs
 
 # %%
 # Inputs

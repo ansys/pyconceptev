@@ -43,8 +43,8 @@ settings.  Before running, supply the account password via the
 # Perform Required imports
 # ------------------------
 
-import time
 from pathlib import Path
+import time
 
 import matplotlib.pyplot as plt
 
