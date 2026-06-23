@@ -140,6 +140,9 @@ sphinx_gallery_conf = {
     "image_scrapers": ("matplotlib"),
     "ignore_pattern": "flycheck*",
     "thumbnail_size": (350, 350),
+    # Examples require a running ConceptEV service and cannot execute in CI.
+    # Show the code without failing the build when the server is unavailable.
+    "abort_on_example_error": False,
 }
 
 linkcheck_exclude_documents = ["index"]
