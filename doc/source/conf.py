@@ -138,21 +138,15 @@ sphinx_gallery_conf = {
     # Modules for which function level galleries are created.  In
     "doc_module": "ansys-conceptev-core",
     "image_scrapers": ("matplotlib"),
-    "ignore_pattern": "flycheck*",
+    # Exclude flycheck temp files and v2 examples (require dev credentials not
+    # available during the production doc build).
+    "ignore_pattern": r"flycheck|0[456]_v2_",
     "thumbnail_size": (350, 350),
-    # All examples require either a running local server (v1) or a live
-    # ConceptEV dev environment with valid credentials (v2).  Neither is
-    # available during CI doc builds, so all are listed as expected failures
-    # to prevent sphinx-gallery from treating connection errors as build failures.
+    # v1 examples (01-03) run against production using the conceptev_testing
+    # service account.  They are expected to succeed; abort_on_example_error
+    # is kept False so a single transient failure doesn't break the whole build.
     "abort_on_example_error": False,
-    "expected_failing_examples": [
-        "../../examples/01_simple_workflow.py",
-        "../../examples/02_get_results_workflow.py",
-        "../../examples/03_bulk_job_submit.py",
-        "../../examples/04_v2_simple_workflow.py",
-        "../../examples/05_v2_get_results_workflow.py",
-        "../../examples/06_v2_bulk_job_submit.py",
-    ],
+    "expected_failing_examples": [],
 }
 
 linkcheck_exclude_documents = ["index"]
