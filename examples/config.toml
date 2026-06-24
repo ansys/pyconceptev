@@ -1,9 +1,12 @@
+# Production configuration for the v1 API examples (01–03).
+# The password for conceptev_testing@ansys.com must be supplied via the
+# CONCEPTEV_PASSWORD environment variable or a local 'conceptev_password' file.
 OCM_URL = "https://prod.portal.onscale.com/api"
 OCM_SOCKET_URL = "wss://sockets.prod.portal.onscale.com/socket"
 CONCEPTEV_URL = "https://conceptev.ansys.com/api"
-client_id = '515a5511-a53c-45d9-a41a-93979f132c0b'
-authority = 'https://ansysaccount.b2clogin.com/ansysaccount.onmicrosoft.com/B2C_1A_ANSYSID_SIGNUP_SIGNIN_TEST'
-scope ='https://ansysaccount.onmicrosoft.com/AnsysID/Authentication'
+client_id = "515a5511-a53c-45d9-a41a-93979f132c0b"
+authority = "https://ansysaccount.b2clogin.com/ansysaccount.onmicrosoft.com/B2C_1A_ANSYSID_SIGNUP_SIGNIN_TEST"
+scope = "https://ansysaccount.onmicrosoft.com/AnsysID/Authentication"
 conceptev_username = "conceptev_testing@ansys.com"
 account_name = "Burst Test Account 3 - PROD"
-job_timeout= 3600
+job_timeout = 3600

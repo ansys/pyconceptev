@@ -89,7 +89,7 @@ def generate_and_run_templates(client, account_id, hpc_id):
             project_id["projectId"], f"New Concept {datetime.datetime.now()}", token
         )
         concept = app.copy_concept(template_id, design_instance_id, client)
-        job_info = app.create_submit_job(
+        app.create_submit_job(
             client,
             concept,
             account_id,

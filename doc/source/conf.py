@@ -138,8 +138,15 @@ sphinx_gallery_conf = {
     # Modules for which function level galleries are created.  In
     "doc_module": "ansys-conceptev-core",
     "image_scrapers": ("matplotlib"),
-    "ignore_pattern": "flycheck*",
+    # Exclude flycheck temp files and v2 examples (require dev credentials not
+    # available during the production doc build).
+    "ignore_pattern": r"flycheck|0[456]_v2_",
     "thumbnail_size": (350, 350),
+    # v1 examples (01-03) run against production using the conceptev_testing
+    # service account.  They are expected to succeed; abort_on_example_error
+    # is kept False so a single transient failure doesn't break the whole build.
+    "abort_on_example_error": False,
+    "expected_failing_examples": [],
 }
 
 linkcheck_exclude_documents = ["index"]
@@ -194,10 +201,10 @@ def copy_examples(app):
         size = directory_size(destination_dir)
         logger.info(f"Directory {destination_dir} ({size} MB) already exist, removing it.")
         shutil.rmtree(destination_dir)
-        logger.info(f"Directory removed.")
+        logger.info("Directory removed.")
 
     shutil.copytree(EXAMPLES_DIRECTORY, destination_dir)
-    logger.info(f"Copy performed")
+    logger.info("Copy performed")
 
 
 def remove_examples(app, exception):
@@ -207,7 +214,7 @@ def remove_examples(app, exception):
     size = directory_size(destination_dir)
     logger.info(f"Removing directory {destination_dir} ({size} MB).")
     shutil.rmtree(destination_dir, ignore_errors=True)
-    logger.info(f"Directory removed.")
+    logger.info("Directory removed.")
 
 
 def setup(app: sphinx.application.Sphinx):
