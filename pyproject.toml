@@ -130,6 +130,13 @@ pygobject = {version = "<3.56.4", platform = "linux"}
 markers = [
     "e2e: end-to-end tests requiring optiSLang and the ConceptEV test environment",
 ]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+log_cli_date_format = "%H:%M:%S"
+log_level = "DEBUG"
+log_format = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+log_date_format = "%H:%M:%S"
 
 [tool.black]
 line-length = 100

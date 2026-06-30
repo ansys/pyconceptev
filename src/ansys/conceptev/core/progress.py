@@ -28,6 +28,7 @@ import ssl
 import sys
 
 import certifi
+import httpx
 from msal import PublicClientApplication
 from websockets.asyncio.client import connect
 
@@ -114,6 +115,17 @@ async def get_job_messages(
                 websocket_client = connect_to_ocm(user_id, token)
                 async with websocket_client as websocket:
                     print("Connected to OCM Websockets.")
+                    # Guard: re-poll REST in case the job completed while connecting.
+                    _r = httpx.Client(
+                        base_url=settings.ocm_url,
+                        verify=ssl_context,
+                        headers={"Authorization": token},
+                    ).post("/job/load", json={"jobId": job_id})
+                    if _r.status_code == 200:
+                        _d = _r.json()
+                        _s = _d.get("finalStatus") or _d.get("lastStatus")
+                        if _s and check_status(_s.upper()):
+                            return
                     async for message in websocket:
                         yield message
                 token = get_ansyId_token(app)
