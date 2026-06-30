@@ -22,6 +22,7 @@
 
 """Simple API client for the Ansys ConceptEV service."""
 import datetime
+from time import sleep
 from typing import Literal
 
 import httpx
@@ -259,6 +260,61 @@ def read_file(filename: str) -> str:
     return content
 
 
+def wait_for_job_completed(
+    job_info: dict,
+    client: httpx.Client,
+    poll_interval: float = 15,
+    timeout: float = JOB_TIMEOUT,
+) -> str:
+    """Poll the OCM REST API until the job reaches a terminal state.
+
+    Replaces the websocket-based wait previously used in :func:`read_results`.
+    The websocket approach suffers from a race condition: if the job completes
+    before the websocket connection is established the completion broadcast is
+    missed and the call hangs for the full *timeout* duration (default 1 hour).
+    Pure REST polling avoids this entirely.
+
+    Parameters
+    ----------
+    job_info:
+        Job information dictionary as returned by :func:`create_submit_job`.
+    client:
+        Authenticated HTTP client used to refresh the bearer token.
+    poll_interval:
+        Seconds between status polls (default 15).
+    timeout:
+        Maximum seconds to wait before raising (default ``JOB_TIMEOUT``).
+
+    Returns
+    -------
+    str
+        Terminal status string, e.g. ``"COMPLETED"`` or ``"FINISHED"``.
+    """
+    job_id = job_info.get("job_id", "?")
+    t0 = datetime.datetime.now()
+
+    while True:
+        elapsed = (datetime.datetime.now() - t0).total_seconds()
+        if elapsed > timeout:
+            raise Exception(
+                f"Timeout Error: Job ({job_id}) is taking too long to complete "
+                f"(>{timeout:.0f} seconds)."
+            )
+        token = auth.get_token(client)
+        try:
+            status = get_status(job_info, token)
+            if check_status(status):
+                return status
+            # QUEUED, RUNNING, or other in-progress state — keep polling
+        except Exception as exc:
+            # get_status raises ResponseError when the job is in CREATED state
+            # and OCM has not yet populated lastStatus or finalStatus.
+            # Treat this as "not yet complete" and keep polling.
+            if "Failed to get job status" not in str(exc):
+                raise
+        sleep(poll_interval)
+
+
 def read_results(
     client,
     job_info: dict,
@@ -268,20 +324,10 @@ def read_results(
     msal_app: auth.PublicClientApplication | None = None,
 ) -> dict:
     """Read job results."""
-    job_id = job_info["job_id"]
+    wait_for_job_completed(job_info, client, timeout=timeout)
     token = auth.get_token(client)
-    user_id = get_user_id(token)
-    initial_status = get_status(job_info, token)
-    if check_status(initial_status):  # Job already completed
-        return get_results(client, job_info, calculate_units, filtered)
-    else:  # Job is still running
-        if msal_app is None:
-            msal_app = auth.create_msal_app()
-        monitor_job_progress(job_id, user_id, token, msal_app, timeout)  # Wait for completion
-
-        token = auth.get_ansyId_token(msal_app)
-        client.headers["Authorization"] = token  # Update the token
-        return get_results(client, job_info, calculate_units, filtered)
+    client.headers["Authorization"] = token
+    return get_results(client, job_info, calculate_units, filtered)
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
