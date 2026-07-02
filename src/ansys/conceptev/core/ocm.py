@@ -252,6 +252,44 @@ def get_job_file_signed_url(token, job_id, filename):
     return json.loads(s3_response.content)
 
 
+def get_requirements_from_job_files(token, job_id, version_number, filtered=False):
+    """Fetch the requirements list embedded in the job output file via a signed S3 URL.
+
+    Uses ``get_job_file_signed_url`` to download the output file for ``job_id``
+    directly from S3, then extracts the ``requirements`` key from the first result
+    item.  This is useful when only a ``job_id`` is available (e.g. from the
+    optiSLang integration) and a separate ConceptEV API call would be inconvenient.
+
+    Parameters
+    ----------
+    token : str
+        Bearer token for OCM authentication.
+    job_id : str
+        OCM job identifier.
+    version_number : int or str
+        Data-format version used to build the filename (e.g. ``3`` →
+        ``output_file_v3.json``).
+    filtered : bool, optional
+        When ``True``, reads ``filtered_output_v{version_number}.json`` instead
+        of the full output file.
+
+    Returns
+    -------
+    list
+        The ``requirements`` list extracted from the first result item, or an
+        empty list if the key is absent (e.g. on an older output format).
+    """
+    if filtered:
+        filename = f"filtered_output_v{version_number}.json"
+    else:
+        filename = f"output_file_v{version_number}.json"
+
+    results = get_job_file_signed_url(token, job_id, filename)
+    if not isinstance(results, list) or not results:
+        return []
+    return results[0].get("requirements", [])
+
+
 def get_job_file(token, job_id, filename, simulation_id=None, encrypted=False):
     """Get the job file from the OnScale Cloud Manager."""
     encrypted_part = "decrypted/" if encrypted else ""

@@ -414,6 +414,7 @@ def test_read_results(read_results):
     assert isinstance(read_results, list)
     assert len(read_results) > 0, "Results should not be empty"
     assert isinstance(read_results[0]["feasible"], bool)
+    assert "requirements" in read_results[0], "Each result item must contain 'requirements' key"
 
 
 def test_console_log(read_results, console_log):

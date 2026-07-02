@@ -139,12 +139,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
     parser.addoption(
         "--account-name",
-        default="Burst Test Account",
+        default="Burst Test Account 3 - PROD",
         metavar="NAME",
         help=(
             "ConceptEV account name used for project creation and the optiSLang node. "
             "Overrides the account_name from the active settings. "
-            "(default: 'Burst Test Account')"
+            "(default: 'Burst Test Account 3 - PROD')"
         ),
     )
     parser.addoption(

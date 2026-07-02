@@ -47,6 +47,7 @@ from ansys.conceptev.core.ocm import (
     get_product_id,
     get_project_id,
     get_project_ids,
+    get_requirements_from_job_files,
     get_status,
     get_user_id,
 )
@@ -65,6 +66,7 @@ __all__ = [
     "get_default_hpc",
     "get_job_file",
     "get_job_file_signed_url",
+    "get_requirements_from_job_files",
     "get_job_info",
     "get_design_of_job",
     "get_design_title",
@@ -419,6 +421,10 @@ def get_results(
 
     When ``calculate_units=True`` (default), falls back to the API server's
     ``/jobs:result`` endpoint which performs server-side unit calculation.
+
+    In both cases, if the ``requirements`` key is absent from each result item
+    (removed by an API change), it is patched back in by fetching from
+    ``GET /concepts/{design_instance_id}/requirements``.
     """
     version_number = get(client, "/utilities:data_format_version")
     if filtered:
@@ -435,10 +441,21 @@ def get_results(
                 "calculate_units": calculate_units,
             },
         )
-        return process_response(response)
+        results = process_response(response)
+    else:
+        token = auth.get_token(client)
+        results = get_job_file_signed_url(token, job_info["job_id"], filename)
 
-    token = auth.get_token(client)
-    return get_job_file_signed_url(token, job_info["job_id"], filename)
+    # Patch: re-inject 'requirements' into each result item.
+    # An API change removed this key from the output file; restore it by fetching
+    # from the ConceptEV API so downstream consumers are unaffected.
+    if isinstance(results, list) and results and "requirements" not in results[0]:
+        design_instance_id = client.params.get("design_instance_id")
+        requirements = get(client, f"/concepts/{design_instance_id}/requirements")
+        for item in results:
+            item["requirements"] = requirements
+
+    return results
 
 
 def get_component_id_map(client, design_instance_id):

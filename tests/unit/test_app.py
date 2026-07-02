@@ -353,9 +353,12 @@ def mock_job_results(mocker):
 
 
 def test_read_results_without_units(httpx_mock: HTTPXMock, client: httpx.Client):
-    """When calculate_units=False, results are fetched via S3 signed URL."""
+    """When calculate_units=False, results are fetched via S3 signed URL with requirements patched in."""
+    design_instance_id = "123"
     example_job_info = {"job": "mocked_job", "job_id": "123"}
-    example_results = [{"requirement": {"name": "test"}, "capability_curve": {}}]
+    example_requirements = [{"name": "req1", "requirement_type": "static_acceleration"}]
+    # S3 file does not contain 'requirements' (API change)
+    s3_results = [{"requirement": {"name": "test"}, "capability_curve": {}}]
     signed_url = "https://s3.example.com/bucket/output_file_v3.json?signed=token"
     httpx_mock.add_response(
         url=f"{conceptev_url}/utilities:data_format_version?design_instance_id=123",
@@ -374,20 +377,31 @@ def test_read_results_without_units(httpx_mock: HTTPXMock, client: httpx.Client)
             }
         ],
     )
-    httpx_mock.add_response(url=signed_url, method="get", json=example_results)
+    httpx_mock.add_response(url=signed_url, method="get", json=s3_results)
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/concepts/{design_instance_id}/requirements"
+        f"?design_instance_id={design_instance_id}",
+        method="get",
+        json=example_requirements,
+    )
     httpx_mock.add_response(
         url=ocm_url + "/job/load",
         method="post",
         json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
     )
     results = app.read_results(client, example_job_info, calculate_units=False)
-    assert example_results == results
+    assert isinstance(results, list)
+    assert results[0]["requirements"] == example_requirements
+    assert results[0]["requirement"] == {"name": "test"}
 
 
 def test_read_results_with_units(httpx_mock: HTTPXMock, client: httpx.Client):
-    """When calculate_units=True (default), results are fetched via /jobs:result."""
+    """When calculate_units=True (default), results are fetched via /jobs:result with requirements patched in."""
+    design_instance_id = "123"
     example_job_info = {"job": "mocked_job", "job_id": "123"}
-    example_results = {"results": "with_units"}
+    example_requirements = [{"name": "req1", "requirement_type": "static_acceleration"}]
+    # API response does not contain 'requirements' (API change); it returns a list
+    api_results = [{"requirement": {"name": "test"}, "feasible": True}]
     httpx_mock.add_response(
         url=f"{conceptev_url}/utilities:data_format_version?design_instance_id=123",
         method="get",
@@ -398,7 +412,13 @@ def test_read_results_with_units(httpx_mock: HTTPXMock, client: httpx.Client):
         f"results_file_name=output_file_v3.json&calculate_units=true",
         method="post",
         match_json=example_job_info,
-        json=example_results,
+        json=api_results,
+    )
+    httpx_mock.add_response(
+        url=f"{conceptev_url}/concepts/{design_instance_id}/requirements"
+        f"?design_instance_id={design_instance_id}",
+        method="get",
+        json=example_requirements,
     )
     httpx_mock.add_response(
         url=ocm_url + "/job/load",
@@ -406,7 +426,8 @@ def test_read_results_with_units(httpx_mock: HTTPXMock, client: httpx.Client):
         json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
     )
     results = app.read_results(client, example_job_info, calculate_units=True)
-    assert example_results == results
+    assert isinstance(results, list)
+    assert results[0]["requirements"] == example_requirements
 
 
 def test_post_file(mocker, httpx_mock: HTTPXMock, client: httpx.Client):
