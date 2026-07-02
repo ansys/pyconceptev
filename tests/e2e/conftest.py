@@ -93,9 +93,19 @@ CEV_ENV = _read_cev_env_early()
 # OptiSLang integration injection
 # ---------------------------------------------------------------------------
 
-_OSL_INTEGRATIONS_DIR = Path("C:/Program Files/ANSYS Inc/v271/optiSLang/scripting/integrations")
+_OSL_INTEGRATIONS_DIR = Path(
+    os.environ.get(
+        "OSL_INTEGRATIONS_DIR",
+        "C:/Program Files/ANSYS Inc/v271/optiSLang/scripting/integrations",
+    )
+)
 # Python interpreter bundled with optiSLang — used to upgrade packages in-place.
-_OSL_PYTHON = Path("C:/Program Files/ANSYS Inc/v271/optiSLang/lib/python3.10/python.exe")
+_OSL_PYTHON = Path(
+    os.environ.get(
+        "OSL_PYTHON",
+        "C:/Program Files/ANSYS Inc/v271/optiSLang/lib/python3.10/python.exe",
+    )
+)
 
 # Configure PYCONCEPTEV_SETTINGS before any ansys.conceptev.core import.
 # In prod mode we deliberately leave it unset so pyconceptev uses its bundled
@@ -139,12 +149,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
     parser.addoption(
         "--account-name",
-        default="Burst Test Account 3 - PROD",
+        default=None,
         metavar="NAME",
         help=(
             "ConceptEV account name used for project creation and the optiSLang node. "
-            "Overrides the account_name from the active settings. "
-            "(default: 'Burst Test Account 3 - PROD')"
+            "Also read from the CEV_ACCOUNT_NAME environment variable. "
+            "Required: the test is skipped when neither is provided."
         ),
     )
     parser.addoption(
@@ -223,8 +233,18 @@ def session_token():
 
 @pytest.fixture(scope="session")
 def account_name(request: pytest.FixtureRequest) -> str:
-    """The ConceptEV account name used for project creation and the optiSLang node."""
-    return request.config.getoption("--account-name")
+    """The ConceptEV account name used for project creation and the optiSLang node.
+
+    Resolved from (in order): ``--account-name`` CLI option, ``CEV_ACCOUNT_NAME``
+    environment variable.  The test session is skipped when neither is set.
+    """
+    name = request.config.getoption("--account-name") or os.environ.get("CEV_ACCOUNT_NAME")
+    if not name:
+        pytest.skip(
+            "No ConceptEV account name provided. "
+            "Pass --account-name NAME or set the CEV_ACCOUNT_NAME environment variable."
+        )
+    return name
 
 
 @pytest.fixture(scope="session")
@@ -456,7 +476,7 @@ def install_pyconceptev(request):
             f"pip install '{src}' failed (exit {result.returncode}).\n" f"stderr: {result.stderr}"
         )
 
-    print(f"[install-pyconceptev] installation succeeded")
+    print("[install-pyconceptev] installation succeeded")
     yield src
 
 

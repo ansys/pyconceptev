@@ -22,7 +22,6 @@
 
 import glob
 import json
-import logging
 import os
 import shutil
 import traceback
@@ -35,63 +34,6 @@ from conftest import _OSL_INTEGRATIONS_DIR
 import pytest
 
 from ansys.conceptev.core.settings import Settings
-
-
-class QueryHandler(logging.Handler):
-    def __init__(self, log_filepath=None):
-        super().__init__()
-        self._collected_messages = []
-        self.log_filepath = log_filepath
-
-    def emit(self, record):
-        self._collected_messages.append(record.getMessage())
-        if self.log_filepath is not None:
-            with open(str(self.log_filepath), "a") as f:
-                f.write(record.getMessage() + "\n")
-
-    def get_messages(self):
-        collected_messages = [msg for msg in self._collected_messages]
-        self._collected_messages = []
-        return collected_messages
-
-
-class LogFilter(logging.Filter):
-    def __init__(self, level):
-        super().__init__()
-        self._level = level
-
-    def filter(self, record):
-        return record.levelno <= self._level
-
-
-def prepare_logging_facilities(osl_object, working_dir):
-    osl_object.log.setLevel(logging.DEBUG)
-    error_handler = QueryHandler(os.path.join(working_dir, "stderr.txt"))
-    error_handler.setLevel(logging.WARNING)
-    std_handler = QueryHandler(os.path.join(working_dir, "stdout.txt"))
-    std_handler.setLevel(logging.DEBUG)
-    std_handler.addFilter(LogFilter(logging.INFO))
-
-    osl_object.log.addHandler(std_handler)
-    osl_object.log.addHandler(error_handler)
-
-    return std_handler, error_handler
-
-
-def register_parameter(node, name):
-    location = get_input_location_by_name(node, name)
-    node.register_location_as_parameter(
-        location=location,
-        name=name,
-    )
-
-
-def get_input_location_by_name(node, name):
-    input_locations = node.get_available_input_locations()
-    for loc in input_locations:
-        if loc["location"]["name"] == name:
-            return loc["location"]
-    raise KeyError(f"Input location '{name}' not found.")
 
 
 def get_output_location_by_name(node, name):
@@ -361,31 +303,6 @@ def export_optislang_project_file(osl: Optislang, debug_dir: str, label: str) ->
     return project_copy_path
 
 
-def export_project_snapshot(osl: Optislang, debug_dir: str, label: str) -> dict[str, str]:
-    project = osl.application.project
-    snapshot = {
-        "label": label,
-        "osl_version": osl.osl_version_string,
-        "project_status": project.get_status(),
-        "project_working_dir": str(project.get_working_dir()),
-        "basic_project_info": osl.osl_server.get_basic_project_info(),
-        "project_tree": osl.osl_server.get_full_project_tree_with_properties(),
-    }
-    artifacts = {
-        "snapshot": write_json_debug(debug_dir, f"project_snapshot_{label}", snapshot),
-        "project_tree": write_json_debug(
-            debug_dir, f"project_tree_{label}", snapshot["project_tree"]
-        ),
-        "project_file": export_optislang_project_file(osl, debug_dir, label),
-    }
-    print(
-        f"[debug] project snapshot '{label}': "
-        f"status={snapshot['project_status']}, "
-        f"working_dir={snapshot['project_working_dir']}"
-    )
-    return artifacts
-
-
 def export_node_snapshot(
     osl: Optislang, node: Any, debug_dir: str, label: str, node_name: str
 ) -> str:
@@ -413,8 +330,6 @@ def export_node_snapshot(
 def write_debug_summary(
     debug_dir: str,
     label: str,
-    stdout: str,
-    stderr: str,
     artifacts: dict[str, str],
     error: Exception | None = None,
 ) -> str:
@@ -428,10 +343,6 @@ def write_debug_summary(
         summary_file.write("\nartifacts:\n")
         for artifact_name, artifact_path in artifacts.items():
             summary_file.write(f"- {artifact_name}: {artifact_path}\n")
-        summary_file.write("\noptislang stdout:\n")
-        summary_file.write(stdout or "<empty>\n")
-        summary_file.write("\noptislang stderr:\n")
-        summary_file.write(stderr or "<empty>\n")
     print(f"[debug] wrote {summary_path}")
     return summary_path
 
@@ -568,17 +479,12 @@ def test_optislang_connection(
     node_name = "conceptev"
 
     osl = None
-    std_handler = None
-    err_handler = None
     debug_artifacts: dict[str, str] = {}
     caught_error: Exception | None = None
 
     try:
         osl = e2e_optislang(osl_project_path)
         _log_osl_runtime_versions(osl, debug_dir, inject_integration=inject_integration)
-        std_handler, err_handler = prepare_logging_facilities(osl, working_dir)
-
-        debug_artifacts.update(export_project_snapshot(osl, debug_dir, "initialized"))
 
         root_system = osl.application.project.root_system
         sensitivity = root_system.create_node(type_=node_types.Sensitivity)
@@ -591,9 +497,6 @@ def test_optislang_connection(
             type_=concept_ev_node_type,
             name=node_name,
             design_flow=DesignFlow.RECEIVE_SEND,
-        )
-        debug_artifacts["node_created"] = export_node_snapshot(
-            osl, cev_node, debug_dir, "created", node_name
         )
 
         non_modifying_settings = cev_node.get_property("NonModifyingSettings")
@@ -608,15 +511,14 @@ def test_optislang_connection(
             f"account={non_modifying_settings['cev_account_name']}"
         )
         cev_node.load()
+        # Snapshot after load: confirms the concept was found and input/output
+        # locations are populated (86 inputs, 147+ outputs for the test concept).
         debug_artifacts["node_loaded"] = export_node_snapshot(
             osl, cev_node, debug_dir, "loaded", node_name
         )
-        debug_artifacts.update(export_project_snapshot(osl, debug_dir, "after_load"))
 
         # Verify the injected integration is active by querying INTEGRATION_VERSION
         # from the installed .pye file via optiSLang's own Python subprocess.
-        # Performed here — after the node exists — so the integration has been
-        # picked up by optiSLang before we assert.
         if inject_integration:
             integration_version = _query_integration_version(osl)
             print(
@@ -635,16 +537,10 @@ def test_optislang_connection(
         # reference design — exactly one ConceptEV job call.
         register_response(cev_node, "_02__summary__cost")
 
-        debug_artifacts["node_configured"] = export_node_snapshot(
-            osl, cev_node, debug_dir, "configured", node_name
-        )
-        debug_artifacts.update(export_project_snapshot(osl, debug_dir, "configured"))
-
         osl.application.save()
         print(f"[debug] project status before run: {osl.application.project.get_status()}")
         osl.application.project.start()
         print(f"[debug] project status after run: {osl.application.project.get_status()}")
-        debug_artifacts.update(export_project_snapshot(osl, debug_dir, "after_run"))
         debug_artifacts["node_finished"] = export_node_snapshot(
             osl, cev_node, debug_dir, "finished", node_name
         )
@@ -657,12 +553,7 @@ def test_optislang_connection(
         osl.application.save()
     except Exception as exc:
         caught_error = exc
-        print(f"[debug] test failed at stage with error: {exc!r}")
-        if osl is not None:
-            try:
-                debug_artifacts.update(export_project_snapshot(osl, debug_dir, "on_failure"))
-            except Exception as export_exc:
-                print(f"[debug] failed to export project snapshot on failure: {export_exc!r}")
+        print(f"[debug] test failed with error: {exc!r}")
         try:
             debug_artifacts.update(
                 collect_opd_debug_artifacts(working_dir, debug_dir, "on_failure")
@@ -671,9 +562,7 @@ def test_optislang_connection(
             print(f"[debug] failed to collect opd artifacts on failure: {collect_exc!r}")
         raise
     finally:
-        stdout = "".join(std_handler.get_messages()) if std_handler is not None else ""
-        stderr = "".join(err_handler.get_messages()) if err_handler is not None else ""
         summary_label = "on_failure" if caught_error is not None else "completed"
-        write_debug_summary(debug_dir, summary_label, stdout, stderr, debug_artifacts, caught_error)
+        write_debug_summary(debug_dir, summary_label, debug_artifacts, caught_error)
         # optiSLang session lifecycle (incl. disposal of launched instances) is owned
         # by the e2e_optislang fixture.
