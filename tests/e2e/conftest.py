@@ -40,7 +40,6 @@ Options
   --cev-env prod|test   ConceptEV environment (default: prod). 'prod' uses
                         pyconceptev's bundled config; 'test' uses
                         tests/integration/config.toml.
-  --account-name NAME   ConceptEV account name.
 
 optiSLang location is taken from OSL_HOST / OSL_PORT (connect) or OSL_EXECUTABLE
 (launch) env vars; see the ``e2e_optislang`` fixture.
@@ -148,16 +147,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     parser.addoption(
-        "--account-name",
-        default=None,
-        metavar="NAME",
-        help=(
-            "ConceptEV account name used for project creation and the optiSLang node. "
-            "Also read from the CEV_ACCOUNT_NAME environment variable. "
-            "Required: the test is skipped when neither is provided."
-        ),
-    )
-    parser.addoption(
         "--integration-dir",
         default=None,
         metavar="PATH",
@@ -232,17 +221,18 @@ def session_token():
 
 
 @pytest.fixture(scope="session")
-def account_name(request: pytest.FixtureRequest) -> str:
-    """The ConceptEV account name used for project creation and the optiSLang node.
+def account_name(e2e_settings) -> str:
+    """The ConceptEV account name, read from the active pyconceptev settings.
 
-    Resolved from (in order): ``--account-name`` CLI option, ``CEV_ACCOUNT_NAME``
-    environment variable.  The test session is skipped when neither is set.
+    Set ``account_name`` in the config file pointed to by ``PYCONCEPTEV_SETTINGS``
+    (or ``tests/integration/config.toml`` when ``--cev-env test`` is used).
+    The session is skipped when the value is absent or empty.
     """
-    name = request.config.getoption("--account-name") or os.environ.get("CEV_ACCOUNT_NAME")
+    name = e2e_settings.account_name
     if not name:
         pytest.skip(
-            "No ConceptEV account name provided. "
-            "Pass --account-name NAME or set the CEV_ACCOUNT_NAME environment variable."
+            "No account_name in the active pyconceptev settings. "
+            "Add 'account_name = \"<your account>\"' to your config.toml."
         )
     return name
 
