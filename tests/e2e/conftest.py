@@ -31,26 +31,16 @@ be installed in optiSLang already.
 The ``e2e_optislang`` fixture connects to a running optiSLang instance (or
 launches one) and skips gracefully if neither is possible.
 
-Both the pytest-side data setup and optiSLang run against the same ConceptEV
-environment: PYCONCEPTEV_SETTINGS is set once here (per --cev-env) and inherited
-by the optiSLang subprocess.
-
-Options
--------
-  --cev-env prod|test   ConceptEV environment (default: prod). 'prod' uses
-                        pyconceptev's bundled config; 'test' uses
-                        tests/integration/config.toml.
+Settings are loaded from ``tests/e2e/config.toml`` (``PYCONCEPTEV_SETTINGS`` is
+set to that file before any pyconceptev import).  Edit that file to change the
+target environment, credentials, or account name.
 
 optiSLang location is taken from OSL_HOST / OSL_PORT (connect) or OSL_EXECUTABLE
 (launch) env vars; see the ``e2e_optislang`` fixture.
 
-Example invocations
--------------------
-# Production (default):
+Example invocation
+------------------
     pytest tests/e2e -vv
-
-# Test environment:
-    pytest tests/e2e -vv --cev-env test
 """
 
 from contextlib import closing
@@ -59,34 +49,11 @@ from pathlib import Path
 import shutil
 import socket
 import subprocess
-import sys
 
-_TESTS_DIR = Path(__file__).resolve().parent.parent
-E2E_CONFIG = _TESTS_DIR / "integration" / "config.toml"
+_E2E_DIR = Path(__file__).resolve().parent
+_TESTS_DIR = _E2E_DIR.parent
+E2E_CONFIG = _E2E_DIR / "config.toml"
 DATA_DIR = _TESTS_DIR / "integration"
-
-
-def _read_cev_env_early() -> str:
-    """Resolve the target ConceptEV environment before pytest parses argv.
-
-    Must run before any ansys.conceptev.core import because settings.py reads
-    PYCONCEPTEV_SETTINGS at class-definition (module import) time.  Regular
-    pytest CLI options are only available in fixtures/hooks — too late.
-
-    Resolution order:
-      1. --cev-env <value> on the command line
-      2. CEV_E2E_ENV environment variable
-      3. "prod" (default)
-    """
-    for i, arg in enumerate(sys.argv):
-        if arg == "--cev-env" and i + 1 < len(sys.argv):
-            return sys.argv[i + 1].lower()
-        if arg.startswith("--cev-env="):
-            return arg.split("=", 1)[1].lower()
-    return os.environ.get("CEV_E2E_ENV", "prod").lower()
-
-
-CEV_ENV = _read_cev_env_early()
 
 # ---------------------------------------------------------------------------
 # OptiSLang integration injection
@@ -106,15 +73,9 @@ _OSL_PYTHON = Path(
     )
 )
 
-# Configure PYCONCEPTEV_SETTINGS before any ansys.conceptev.core import.
-# In prod mode we deliberately leave it unset so pyconceptev uses its bundled
-# default production config — exactly what a real user gets.
-# In test mode we point it at the shared integration config.toml.
-if CEV_ENV == "test":
-    os.environ["PYCONCEPTEV_SETTINGS"] = str(E2E_CONFIG)
-else:
-    os.environ.pop("PYCONCEPTEV_SETTINGS", None)
-
+# Point PYCONCEPTEV_SETTINGS at tests/e2e/config.toml before any pyconceptev
+# import so that Settings() loads the right values from the start.
+os.environ["PYCONCEPTEV_SETTINGS"] = str(E2E_CONFIG)
 os.environ.setdefault("PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT", "true")
 
 import pytest  # noqa: E402
@@ -126,26 +87,7 @@ DEFAULT_OSL_HOST = "127.0.0.1"
 DEFAULT_OSL_PORT = 5310
 
 
-def pytest_configure(config) -> None:
-    """Re-affirm env setup in case another plugin imported settings first."""
-    if CEV_ENV == "test":
-        os.environ["PYCONCEPTEV_SETTINGS"] = str(E2E_CONFIG)
-    os.environ.setdefault("PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT", "true")
-
-
 def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption(
-        "--cev-env",
-        default="prod",
-        choices=["prod", "test"],
-        help=(
-            "ConceptEV environment for both the pytest-side data setup and optiSLang. "
-            "'prod' uses pyconceptev's bundled production config (default). "
-            "'test' uses tests/integration/config.toml. "
-            "NOTE: this is read from sys.argv at import time — the value here is "
-            "informational and used for validation only."
-        ),
-    )
     parser.addoption(
         "--integration-dir",
         default=None,
@@ -181,12 +123,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 @pytest.fixture(scope="session")
 def e2e_settings():
-    """Return the active pyconceptev settings for this session.
-
-    The settings object was loaded at import time from PYCONCEPTEV_SETTINGS (test
-    env) or from pyconceptev's bundled default (prod). Both this fixture and the
-    optiSLang plugin subprocess inherit the same environment, so they always target
-    the same ConceptEV API.
+    """Return the pyconceptev settings loaded from tests/e2e/config.toml.
 
     Also exports CONCEPTEV_PASSWORD to the process environment so optiSLang's
     bundled Python subprocess can pick it up regardless of its working directory
@@ -195,11 +132,9 @@ def e2e_settings():
     if _loaded_settings.conceptev_password and not os.environ.get("CONCEPTEV_PASSWORD"):
         os.environ["CONCEPTEV_PASSWORD"] = _loaded_settings.conceptev_password
 
-    pycv_settings = os.environ.get("PYCONCEPTEV_SETTINGS", "<pyconceptev default>")
     password_set = bool(_loaded_settings.conceptev_password or os.environ.get("CONCEPTEV_PASSWORD"))
     print(
-        f"\n[e2e-settings] env={CEV_ENV!r}\n"
-        f"  PYCONCEPTEV_SETTINGS={pycv_settings}\n"
+        f"\n[e2e-settings] config={E2E_CONFIG}\n"
         f"  CONCEPTEV_URL={_loaded_settings.conceptev_url}\n"
         f"  ACCOUNT_NAME={_loaded_settings.account_name}\n"
         f"  USERNAME={_loaded_settings.conceptev_username}\n"
@@ -222,21 +157,16 @@ def session_token():
 
 @pytest.fixture(scope="session")
 def account_name(e2e_settings) -> str:
-    """The ConceptEV account name used for project creation and the optiSLang node.
+    """The ConceptEV account name from tests/e2e/config.toml.
 
-    Resolved from (in order):
-
-    1. ``account_name`` in the active pyconceptev config file (``PYCONCEPTEV_SETTINGS``
-       or ``tests/integration/config.toml`` when ``--cev-env test`` is used).
-    2. ``CEV_ACCOUNT_NAME`` environment variable.
-
-    The session is skipped when neither source provides a value.
+    Set ``account_name = \"<your account>\"`` in that file.  The session is
+    skipped when the value is absent or empty.
     """
-    name = os.environ.get("CEV_ACCOUNT_NAME") or e2e_settings.account_name
+    name = e2e_settings.account_name
     if not name:
         pytest.skip(
-            "No ConceptEV account name provided. "
-            "Set 'account_name' in your config.toml or the CEV_ACCOUNT_NAME env var."
+            "account_name is not set in tests/e2e/config.toml. "
+            "Add 'account_name = \"<your account>\"' to that file."
         )
     return name
 
