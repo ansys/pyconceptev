@@ -222,17 +222,21 @@ def session_token():
 
 @pytest.fixture(scope="session")
 def account_name(e2e_settings) -> str:
-    """The ConceptEV account name, read from the active pyconceptev settings.
+    """The ConceptEV account name used for project creation and the optiSLang node.
 
-    Set ``account_name`` in the config file pointed to by ``PYCONCEPTEV_SETTINGS``
-    (or ``tests/integration/config.toml`` when ``--cev-env test`` is used).
-    The session is skipped when the value is absent or empty.
+    Resolved from (in order):
+
+    1. ``account_name`` in the active pyconceptev config file (``PYCONCEPTEV_SETTINGS``
+       or ``tests/integration/config.toml`` when ``--cev-env test`` is used).
+    2. ``CEV_ACCOUNT_NAME`` environment variable.
+
+    The session is skipped when neither source provides a value.
     """
-    name = e2e_settings.account_name
+    name = os.environ.get("CEV_ACCOUNT_NAME") or e2e_settings.account_name
     if not name:
         pytest.skip(
-            "No account_name in the active pyconceptev settings. "
-            "Add 'account_name = \"<your account>\"' to your config.toml."
+            "No ConceptEV account name provided. "
+            "Set 'account_name' in your config.toml or the CEV_ACCOUNT_NAME env var."
         )
     return name
 
