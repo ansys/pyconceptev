@@ -271,34 +271,10 @@ def wait_for_job_completed(
 ) -> str:
     """Wait for a job to reach a terminal state.
 
-    Tries websockets first.  The websocket handler already polls the REST API
-    immediately after connecting, so a job that finished before the connection
-    was established is still detected without hanging (race-condition guard).
-
-    Falls back to pure REST polling only when the websocket connection cannot
-    be established (e.g. network policy blocks the socket URL).  A timeout
-    error from the websocket is **not** retried via polling — the full timeout
-    budget has already been spent.
-
-    Parameters
-    ----------
-    job_info:
-        Job information dictionary as returned by :func:`create_submit_job`.
-    client:
-        Authenticated HTTP client used to refresh the bearer token.
-    poll_interval:
-        Seconds between REST status polls in the fallback path (default 15).
-    timeout:
-        Maximum seconds to wait before raising (default ``JOB_TIMEOUT``).
-    msal_app:
-        MSAL ``PublicClientApplication`` used by the websocket path to renew
-        the bearer token between reconnect attempts.  Defaults to the
-        module-level ``app`` instance when ``None``.
-
-    Returns
-    -------
-    str
-        Terminal status string, e.g. ``"COMPLETED"`` or ``"FINISHED"``.
+    Tries websockets first; the handler polls REST immediately after connecting
+    so a job that finished before the socket opened is still detected (no hang).
+    Falls back to REST polling only when the websocket cannot be established.
+    A timeout from the websocket path is re-raised immediately — the budget is spent.
     """
     job_id = job_info.get("job_id", "?")
     _msal = msal_app or app
