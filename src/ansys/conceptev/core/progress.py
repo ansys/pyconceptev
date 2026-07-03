@@ -23,9 +23,13 @@
 """Progress monitoring with websockets."""
 
 import asyncio
+import datetime
 import json
+import logging
+import os
 import ssl
 import sys
+from pathlib import Path
 
 import certifi
 import httpx
@@ -45,6 +49,27 @@ STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "FAILED"
 OCM_SOCKET_URL = settings.ocm_socket_url
 JOB_TIMEOUT = settings.job_timeout
+
+logger = logging.getLogger(__name__)
+# Optional file path for capturing progress messages from subprocesses where
+# stdout is suppressed (e.g. optiSLang integration plugin).  Set the
+# CONCEPTEV_PROGRESS_LOG environment variable to an absolute file path before
+# launching the subprocess and the messages will be appended there.
+_PROGRESS_LOG_FILE = os.environ.get("CONCEPTEV_PROGRESS_LOG")
+
+
+def _log(message: str) -> None:
+    """Log a progress message via the standard logger and optionally to a file."""
+    logger.info(message)
+    if _PROGRESS_LOG_FILE:
+        try:
+            Path(_PROGRESS_LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
+            with open(_PROGRESS_LOG_FILE, "a", encoding="utf-8") as fh:
+                fh.write(f"{datetime.datetime.now()}: {message}\n")
+        except OSError:
+            pass
+    else:
+        print(message)
 
 
 def generate_ssl_context() -> ssl.SSLContext:
@@ -86,14 +111,14 @@ def get_status(message: str, job_id: str):
         if message_type and message_type.lower() == "status":
             status = message_data.get("status", None)
             if status:
-                print(f"Status:{status}")
+                _log(f"Status:{status}")
                 return status.upper()
         elif message_type and message_type.lower() == "progress":
             progress = message_data.get("progress", None)
-            print(f"Progress:{progress}")
+            _log(f"Progress:{progress}")
         elif message_type and message_type.lower() == "error":
             error = message_data.get("message", None)
-            print(f"Error:{error}")
+            _log(f"Error:{error}")
 
 
 def get_values(message: str, job_id: str) -> dict:
@@ -106,7 +131,7 @@ def get_values(message: str, job_id: str) -> dict:
         )
         if message_type and message_type.lower() == "progress" and message_data.get("progress", None) == 1:
             calculated_values = message_data.get("calculated_values", None)
-            print(f"Calculated Values:{calculated_values}")
+            _log(f"Calculated Values:{calculated_values}")
             return calculated_values
 
 
@@ -119,7 +144,7 @@ async def get_job_messages(
             while True:
                 websocket_client = connect_to_ocm(user_id, token)
                 async with websocket_client as websocket:
-                    print("Connected to OCM Websockets.")
+                    _log("Connected to OCM Websockets.")
                     # Guard: re-poll REST in case the job completed while connecting.
                     _r = httpx.Client(
                         base_url=settings.ocm_url,

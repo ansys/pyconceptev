@@ -77,6 +77,12 @@ _OSL_PYTHON = Path(
 # import so that Settings() loads the right values from the start.
 os.environ["PYCONCEPTEV_SETTINGS"] = str(E2E_CONFIG)
 os.environ.setdefault("PYOPTISLANG_DISABLE_OPTISLANG_OUTPUT", "true")
+# Forward websocket progress messages from the optiSLang subprocess to a log
+# file in the test artifacts directory (subprocess stdout is suppressed above).
+os.environ.setdefault(
+    "CONCEPTEV_PROGRESS_LOG",
+    str(_TESTS_DIR.parent / "test_working_dir" / "debug" / "progress.log"),
+)
 
 import pytest  # noqa: E402
 
