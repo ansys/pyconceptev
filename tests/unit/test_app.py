@@ -353,7 +353,7 @@ def mock_job_results(mocker):
 
 
 def test_read_results_without_units(httpx_mock: HTTPXMock, client: httpx.Client):
-    """When calculate_units=False, results are fetched via S3 signed URL with requirements patched in."""
+    """Fetch results via S3 signed URL; requirements are patched in from the ConceptEV API."""
     design_instance_id = "123"
     example_job_info = {"job": "mocked_job", "job_id": "123"}
     example_requirements = [{"name": "req1", "requirement_type": "static_acceleration"}]
@@ -401,7 +401,7 @@ def test_read_results_without_units(httpx_mock: HTTPXMock, client: httpx.Client)
 
 
 def test_read_results_with_units(httpx_mock: HTTPXMock, client: httpx.Client):
-    """When calculate_units=True (default), results are fetched via /jobs:result with requirements patched in."""
+    """Fetch results via /jobs:result; requirements are patched in from the ConceptEV API."""
     design_instance_id = "123"
     example_job_info = {"job": "mocked_job", "job_id": "123"}
     example_requirements = [{"name": "req1", "requirement_type": "static_acceleration"}]

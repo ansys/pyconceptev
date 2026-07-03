@@ -79,8 +79,7 @@ def assert_integration_results(
         log_text = fh.read()
 
     succeeded_get_results = any(
-        "get_results" in line and "Succeeded." in line
-        for line in log_text.splitlines()
+        "get_results" in line and "Succeeded." in line for line in log_text.splitlines()
     )
     assert succeeded_get_results, (
         f"No successful get_results call found in {debug_log_path}. "
@@ -110,8 +109,7 @@ def assert_integration_results(
             all_results.extend(json.load(fh))
 
     assert all_results, (
-        "job_results.json files exist but are all empty. "
-        f"Files checked: {result_files}"
+        "job_results.json files exist but are all empty. " f"Files checked: {result_files}"
     )
 
     print(
@@ -398,7 +396,9 @@ def collect_opd_debug_artifacts(
     for path in sorted(
         glob.glob(os.path.join(sensitivity_dir, "Design*", "conceptev", "job_results.json"))
     ):
-        result_dirs.append((os.path.basename(os.path.dirname(os.path.dirname(path))), os.path.dirname(path)))
+        result_dirs.append(
+            (os.path.basename(os.path.dirname(os.path.dirname(path))), os.path.dirname(path))
+        )
 
     print(f"[opd-check] found {len(result_dirs)} result location(s)")
 
@@ -544,9 +544,7 @@ def test_optislang_connection(
         debug_artifacts["node_finished"] = export_node_snapshot(
             osl, cev_node, debug_dir, "finished", node_name
         )
-        debug_artifacts.update(
-            collect_opd_debug_artifacts(working_dir, debug_dir, "after_run")
-        )
+        debug_artifacts.update(collect_opd_debug_artifacts(working_dir, debug_dir, "after_run"))
 
         assert_integration_results(working_dir, debug_dir)
 

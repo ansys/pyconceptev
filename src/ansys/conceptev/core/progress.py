@@ -27,9 +27,9 @@ import datetime
 import json
 import logging
 import os
+from pathlib import Path
 import ssl
 import sys
-from pathlib import Path
 
 import certifi
 import httpx
@@ -129,7 +129,11 @@ def get_values(message: str, job_id: str) -> dict:
         message_type = next(
             (v for k, v in message_data.items() if k.lower() == "messagetype"), None
         )
-        if message_type and message_type.lower() == "progress" and message_data.get("progress", None) == 1:
+        if (
+            message_type
+            and message_type.lower() == "progress"
+            and message_data.get("progress", None) == 1
+        ):
             calculated_values = message_data.get("calculated_values", None)
             _log(f"Calculated Values:{calculated_values}")
             return calculated_values

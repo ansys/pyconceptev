@@ -296,11 +296,7 @@ def test_diagnose_status_transport(job_info, token):
     print(f"\n=== REST /job/load  (HTTP {raw.status_code}) ===")
     payload = raw.json()
     # Print only the status-related keys to keep output concise
-    status_keys = {
-        k: v
-        for k, v in payload.items()
-        if "status" in k.lower() or "Status" in k
-    }
+    status_keys = {k: v for k, v in payload.items() if "status" in k.lower() or "Status" in k}
     print("Status-related keys:")
     pprint.pprint(status_keys)
     print("All top-level keys:", sorted(payload.keys()))
@@ -353,7 +349,7 @@ def test_diagnose_status_transport(job_info, token):
         except Exception as exc:
             print(f"--- message {i}: could not parse JSON — {exc} ---")
             print(repr(msg))
-            issues_found.append(f"message {i}: unparseable")
+            issues_found.append(f"message {i}: unparsable")
             continue
 
         print(f"\n--- message {i} (raw) ---")
@@ -365,14 +361,13 @@ def test_diagnose_status_transport(job_info, token):
         # Check 1: does this message carry a jobId at all?
         if "jobId" not in parsed:
             issues_found.append(
-                f"message {i}: missing 'jobId' — code checks `message_data.get('jobId', 'Unknown') == job_id`"
+                f"message {i}: missing 'jobId' — "
+                f"code checks `message_data.get('jobId', 'Unknown') == job_id`"
             )
 
         # Check 2: is messagetype present?
         if "messagetype" not in parsed:
-            issues_found.append(
-                f"message {i}: missing 'messagetype' — code routes on this field"
-            )
+            issues_found.append(f"message {i}: missing 'messagetype' — code routes on this field")
 
         # Check 3: per-type field validation (only for messages belonging to our job)
         if msg_job_id == job_id:
@@ -392,7 +387,8 @@ def test_diagnose_status_transport(job_info, token):
                 # Extra check: status messages must have a non-None status so .upper() won't crash
                 if msg_type == "status" and parsed.get("status") is None:
                     issues_found.append(
-                        f"message {i}: 'status' is None — code calls .upper() on it without a None guard"
+                        f"message {i}: 'status' is None — "
+                        "code calls .upper() on it without a None guard"
                     )
         else:
             print(f"    -> belongs to a different job ({msg_job_id}), skipping field check")
