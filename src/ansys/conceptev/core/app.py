@@ -448,9 +448,10 @@ def get_results(
         results = get_job_file_signed_url(token, job_info["job_id"], filename)
 
     # Patch: re-inject 'requirements' into each result item.
-    # An API change removed this key from the output file; restore it by fetching
-    # from the ConceptEV API so downstream consumers are unaffected.
-    if isinstance(results, list) and results and "requirements" not in results[0]:
+    # Requirements are no longer present (or are empty) in the output file;
+    # fetch from GET /concepts/{design_instance_id}/requirements on the
+    # ConceptEV API and populate so downstream consumers are unaffected.
+    if isinstance(results, list) and results and not results[0].get("requirements"):
         design_instance_id = client.params.get("design_instance_id")
         requirements = get(client, f"/concepts/{design_instance_id}/requirements")
         for item in results:
