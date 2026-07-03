@@ -80,7 +80,9 @@ def get_status(message: str, job_id: str):
     message_data = json.loads(message)
 
     if message_data.get("jobId", "Unknown") == job_id:
-        message_type = message_data.get("messagetype", None)
+        message_type = next(
+            (v for k, v in message_data.items() if k.lower() == "messagetype"), None
+        )
         if message_type and message_type.lower() == "status":
             status = message_data.get("status", None)
             if status:
@@ -99,7 +101,9 @@ def get_values(message: str, job_id: str) -> dict:
     message_data = json.loads(message)
 
     if message_data.get("jobId", "Unknown") == job_id:
-        message_type = message_data.get("messagetype", None)
+        message_type = next(
+            (v for k, v in message_data.items() if k.lower() == "messagetype"), None
+        )
         if message_type and message_type.lower() == "progress" and message_data.get("progress", None) == 1:
             calculated_values = message_data.get("calculated_values", None)
             print(f"Calculated Values:{calculated_values}")
