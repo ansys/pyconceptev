@@ -80,16 +80,18 @@ def get_status(message: str, job_id: str):
     message_data = json.loads(message)
 
     if message_data.get("jobId", "Unknown") == job_id:
-        message_type = (message_data.get("messagetype") or "").lower()
-        if message_type == "status":
-            status = message_data.get("status")
+        message_type = message_data.get("messagetype", None)
+        if message_type and message_type.lower() == "status":
+            status = message_data.get("status", None)
             if status:
                 print(f"Status:{status}")
                 return status.upper()
-        elif message_type == "progress":
-            print(f"Progress:{message_data.get('progress')}")
-        elif message_type == "error":
-            print(f"Error:{message_data.get('message')}")
+        elif message_type and message_type.lower() == "progress":
+            progress = message_data.get("progress", None)
+            print(f"Progress:{progress}")
+        elif message_type and message_type.lower() == "error":
+            error = message_data.get("message", None)
+            print(f"Error:{error}")
 
 
 def get_values(message: str, job_id: str) -> dict:
@@ -97,9 +99,9 @@ def get_values(message: str, job_id: str) -> dict:
     message_data = json.loads(message)
 
     if message_data.get("jobId", "Unknown") == job_id:
-        message_type = (message_data.get("messagetype") or "").lower()
-        if message_type == "progress" and message_data.get("progress") == 1:
-            calculated_values = message_data.get("calculated_values")
+        message_type = message_data.get("messagetype", None)
+        if message_type and message_type.lower() == "progress" and message_data.get("progress", None) == 1:
+            calculated_values = message_data.get("calculated_values", None)
             print(f"Calculated Values:{calculated_values}")
             return calculated_values
 
@@ -156,7 +158,7 @@ async def get_calculated_values(
 
 def check_status(status: str):
     """Check if the status is complete or finished."""
-    if not status:
+    if status is None:
         return False
     s = status.upper()
     if s in (STATUS_COMPLETE, STATUS_FINISHED):
