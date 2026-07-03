@@ -267,14 +267,18 @@ def wait_for_job_completed(
     client: httpx.Client,
     poll_interval: float = 15,
     timeout: float = JOB_TIMEOUT,
+    msal_app: "auth.PublicClientApplication | None" = None,
 ) -> str:
-    """Poll the OCM REST API until the job reaches a terminal state.
+    """Wait for a job to reach a terminal state.
 
-    Replaces the websocket-based wait previously used in :func:`read_results`.
-    The websocket approach suffers from a race condition: if the job completes
-    before the websocket connection is established the completion broadcast is
-    missed and the call hangs for the full *timeout* duration (default 1 hour).
-    Pure REST polling avoids this entirely.
+    Tries websockets first.  The websocket handler already polls the REST API
+    immediately after connecting, so a job that finished before the connection
+    was established is still detected without hanging (race-condition guard).
+
+    Falls back to pure REST polling only when the websocket connection cannot
+    be established (e.g. network policy blocks the socket URL).  A timeout
+    error from the websocket is **not** retried via polling — the full timeout
+    budget has already been spent.
 
     Parameters
     ----------
@@ -283,9 +287,13 @@ def wait_for_job_completed(
     client:
         Authenticated HTTP client used to refresh the bearer token.
     poll_interval:
-        Seconds between status polls (default 15).
+        Seconds between REST status polls in the fallback path (default 15).
     timeout:
         Maximum seconds to wait before raising (default ``JOB_TIMEOUT``).
+    msal_app:
+        MSAL ``PublicClientApplication`` used by the websocket path to renew
+        the bearer token between reconnect attempts.  Defaults to the
+        module-level ``app`` instance when ``None``.
 
     Returns
     -------
@@ -293,8 +301,26 @@ def wait_for_job_completed(
         Terminal status string, e.g. ``"COMPLETED"`` or ``"FINISHED"``.
     """
     job_id = job_info.get("job_id", "?")
-    t0 = datetime.datetime.now()
+    _msal = msal_app or app
 
+    # --- Websocket path (primary) ------------------------------------------
+    try:
+        token = auth.get_token(client)
+        user_id = get_user_id(token)
+        status = monitor_job_progress(job_id, user_id, token, _msal, timeout=timeout)
+        # monitor_job_progress returns None when the race-condition guard fires
+        # (job was already complete when we connected) — still a success.
+        return status or "COMPLETED"
+    except Exception as ws_exc:
+        if "Timeout Error" in str(ws_exc):
+            raise  # full budget spent — don't retry
+        print(
+            f"[wait] websocket unavailable ({type(ws_exc).__name__}: {ws_exc}), "
+            "falling back to REST polling"
+        )
+
+    # --- REST polling fallback (websocket connection failed) -----------------
+    t0 = datetime.datetime.now()
     while True:
         elapsed = (datetime.datetime.now() - t0).total_seconds()
         if elapsed > timeout:
@@ -311,7 +337,6 @@ def wait_for_job_completed(
         except Exception as exc:
             # get_status raises ResponseError when the job is in CREATED state
             # and OCM has not yet populated lastStatus or finalStatus.
-            # Treat this as "not yet complete" and keep polling.
             if "Failed to get job status" not in str(exc):
                 raise
         sleep(poll_interval)
@@ -326,7 +351,7 @@ def read_results(
     msal_app: auth.PublicClientApplication | None = None,
 ) -> dict:
     """Read job results."""
-    wait_for_job_completed(job_info, client, timeout=timeout)
+    wait_for_job_completed(job_info, client, timeout=timeout, msal_app=msal_app)
     token = auth.get_token(client)
     client.headers["Authorization"] = token
     return get_results(client, job_info, calculate_units, filtered)

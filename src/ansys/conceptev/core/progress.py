@@ -81,14 +81,15 @@ def get_status(message: str, job_id: str):
 
     if message_data.get("jobId", "Unknown") == job_id:
         message_type = message_data.get("messagetype", None)
-        if message_type == "status":
+        if message_type and message_type.lower() == "status":
             status = message_data.get("status", None)
-            print(f"Status:{status}")
-            return status.upper()
-        elif message_type == "progress":
+            if status:
+                print(f"Status:{status}")
+                return status.upper()
+        elif message_type and message_type.lower() == "progress":
             progress = message_data.get("progress", None)
             print(f"Progress:{progress}")
-        elif message_type == "error":
+        elif message_type and message_type.lower() == "error":
             error = message_data.get("message", None)
             print(f"Error:{error}")
 
@@ -157,9 +158,12 @@ async def get_calculated_values(
 
 def check_status(status: str):
     """Check if the status is complete or finished."""
-    if status == STATUS_COMPLETE or status == STATUS_FINISHED:
+    if status is None:
+        return False
+    s = status.upper()
+    if s == STATUS_COMPLETE or s == STATUS_FINISHED:
         return True
-    elif status == STATUS_ERROR:
+    elif s == STATUS_ERROR:
         raise Exception("Job Failed")
     else:
         return False

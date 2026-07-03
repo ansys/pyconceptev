@@ -385,6 +385,11 @@ def test_read_results_without_units(httpx_mock: HTTPXMock, client: httpx.Client)
         json=example_requirements,
     )
     httpx_mock.add_response(
+        url=ocm_url + "/user/details",
+        method="post",
+        json={"userId": "test-user-id"},
+    )
+    httpx_mock.add_response(
         url=ocm_url + "/job/load",
         method="post",
         json={"finalStatus": "COMPLETED", "jobStatus": [{"jobStatus": "complete"}]},
@@ -419,6 +424,11 @@ def test_read_results_with_units(httpx_mock: HTTPXMock, client: httpx.Client):
         f"?design_instance_id={design_instance_id}",
         method="get",
         json=example_requirements,
+    )
+    httpx_mock.add_response(
+        url=ocm_url + "/user/details",
+        method="post",
+        json={"userId": "test-user-id"},
     )
     httpx_mock.add_response(
         url=ocm_url + "/job/load",
