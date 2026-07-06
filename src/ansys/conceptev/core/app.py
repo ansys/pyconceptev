@@ -423,9 +423,8 @@ def get_results(
     When ``calculate_units=True`` (default), falls back to the API server's
     ``/jobs:result`` endpoint which performs server-side unit calculation.
 
-    In both cases, if the ``requirements`` key is absent from each result item
-    (removed by an API change), it is patched back in by fetching from
-    ``GET /concepts/{design_instance_id}/requirements``.
+    In both cases, if a result item is missing the ``requirements`` key it is
+    set to an empty list so downstream consumers can iterate it safely.
     """
     version_number = get(client, "/utilities:data_format_version")
     if filtered:
@@ -447,15 +446,10 @@ def get_results(
         token = auth.get_token(client)
         results = get_job_file_signed_url(token, job_info["job_id"], filename)
 
-    # Patch: re-inject 'requirements' into each result item.
-    # Requirements are no longer present (or are empty) in the output file;
-    # fetch from GET /concepts/{design_instance_id}/requirements on the
-    # ConceptEV API and populate so downstream consumers are unaffected.
-    if isinstance(results, list) and results and not results[0].get("requirements"):
-        design_instance_id = client.params.get("design_instance_id")
-        requirements = get(client, f"/concepts/{design_instance_id}/requirements")
+    if isinstance(results, list):
         for item in results:
-            item["requirements"] = requirements
+            if "requirements" not in item:
+                item["requirements"] = []
 
     return results
 
