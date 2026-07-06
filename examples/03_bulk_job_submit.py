@@ -50,7 +50,7 @@ from ansys.conceptev.core.exceptions import ResponseError
 # Component Order is dictionary that maps the column names in the combinations file to the
 # component names in the API.
 filename = "resources/combinations.csv"  # See example file for format.
-base_concept_id = "2465235f-ad2e-4923 - 9125-e2e69ccf5816"  # Truck template.
+base_concept_id = "2465235f-ad2e-4923-9125-e2e69ccf5816"  # Truck template.
 component_order = {
     "front_transmission_id": "Front Transmission",
     "front_motor_id": "Front Motor",
