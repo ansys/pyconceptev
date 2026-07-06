@@ -72,8 +72,6 @@ watchfiles = ">=1.0.5"
 python-calamine = ">=0.4.0"
 rpds-py = ">=0.24.0"
 
-
-
 # Optional documentation dependencies
 [tool.poetry.group.doc]
 optional = true
@@ -118,8 +116,6 @@ optional = true
 build = "^1.0.3"
 twine = ">=5,<7"
 
-
-
 [tool.poetry.group.linux-encryption]
 optional = true
 
@@ -158,13 +154,13 @@ title_format = "`{version} <https://github.com/ansys/pyconceptev/releases/tag/v{
 issue_format = "`#{issue} <https://github.com/ansys/pyconceptev/pull/{issue}>`_"
 
 [[tool.towncrier.type]]
-directory = "added"
-name = "Added"
+directory = "breaking"
+name = "Breaking"
 showcontent = true
 
 [[tool.towncrier.type]]
-directory = "changed"
-name = "Changed"
+directory = "added"
+name = "Added"
 showcontent = true
 
 [[tool.towncrier.type]]
@@ -173,18 +169,13 @@ name = "Fixed"
 showcontent = true
 
 [[tool.towncrier.type]]
-directory = "dependencies"
-name = "Dependencies"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "miscellaneous"
-name = "Miscellaneous"
-showcontent = true
-
-[[tool.towncrier.type]]
 directory = "documentation"
 name = "Documentation"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "dependencies"
+name = "Dependencies"
 showcontent = true
 
 [[tool.towncrier.type]]
@@ -193,6 +184,17 @@ name = "Maintenance"
 showcontent = true
 
 [[tool.towncrier.type]]
+directory = "miscellaneous"
+name = "Miscellaneous"
+showcontent = true
+
+[[tool.towncrier.type]]
 directory = "test"
 name = "Test"
 showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
