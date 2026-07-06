@@ -16,3 +16,4 @@ cache_filepath
 ssl_cert_file
 config
 certifi
+Synopsys
