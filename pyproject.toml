@@ -96,6 +96,7 @@ sphinx-gallery = ">=0.18,<0.22"
 matplotlib = "^3.10.8"
 fonttools = ">=4.62.0"
 pandas = {extras = ["excel"], version = "^2.2.3"}
+pyzmq = ">=26.3.0"
 
 [tool.poetry.group.tests] # Optional testing dependencies
 optional = true
