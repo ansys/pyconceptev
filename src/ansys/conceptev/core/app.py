@@ -47,7 +47,6 @@ from ansys.conceptev.core.ocm import (
     get_product_id,
     get_project_id,
     get_project_ids,
-    get_requirements_from_job_files,
     get_status,
     get_user_id,
 )
