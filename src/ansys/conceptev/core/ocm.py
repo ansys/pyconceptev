@@ -54,6 +54,7 @@ def create_ocm_client(token) -> httpx.Client:
         headers={
             "Authorization": token,
         },
+        timeout=30,
     )
     return client
 
