@@ -20,7 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
 from pathlib import Path
+import pprint
 import re
 
 import httpx
@@ -267,11 +269,148 @@ def test_submit_job(job_info):
     assert "job_id" in job_info
 
 
+def test_get_status(job_info, token):
+    """Smoke-test that ocm.get_status returns a non-empty uppercase string for a submitted job."""
+    from ansys.conceptev.core import ocm
+
+    status = ocm.get_status(job_info, token)
+    assert isinstance(status, str)
+    assert status  # non-empty
+    assert status == status.upper()
+
+
+def test_diagnose_status_transport(job_info, token):
+    """Diagnostic: print the raw OCM REST status fields and a sample of WebSocket messages.
+
+    Run with ``pytest -s`` to see printed output.  This test always passes — its
+    purpose is to expose the exact field names / message shapes returned by OCM
+    so any contract change (e.g. renamed status fields) is immediately visible.
+    """
+    from ansys.conceptev.core import ocm, progress
+
+    job_id = job_info["job_id"]
+
+    # ------------------------------------------------------------------ REST --
+    client = ocm.create_ocm_client(token)
+    raw = client.post(url="/job/load", json={"jobId": job_id})
+    print(f"\n=== REST /job/load  (HTTP {raw.status_code}) ===")
+    payload = raw.json()
+    # Print only the status-related keys to keep output concise
+    status_keys = {k: v for k, v in payload.items() if "status" in k.lower() or "Status" in k}
+    print("Status-related keys:")
+    pprint.pprint(status_keys)
+    print("All top-level keys:", sorted(payload.keys()))
+
+    # ------------------------------------------------------- WebSocket sample --
+    user_id = ocm.get_user_id(token)
+
+    async def _collect(n=10, timeout=60):
+        """Connect once and collect up to *n* messages within *timeout* seconds."""
+        collected = []
+        try:
+            async with asyncio.timeout(timeout):
+                async with progress.connect_to_ocm(user_id, token) as ws:
+                    print("\n=== WebSocket connected ===")
+                    async for raw_msg in ws:
+                        collected.append(raw_msg)
+                        if len(collected) >= n:
+                            break
+        except TimeoutError:
+            print(f"WebSocket: timed out after {timeout}s (collected {len(collected)} messages)")
+        except Exception as exc:
+            print(f"WebSocket: connection ended — {type(exc).__name__}: {exc}")
+        return collected
+
+    messages = asyncio.run(_collect())
+
+    # ----------------------------------------- compare messages to code expectations --
+    import json
+
+    # What progress.get_status / get_values reads from each WebSocket message:
+    #   jobId        — must equal job_id to be processed at all
+    #   messagetype  — "status" | "progress" | "error"
+    #   status       — present on messagetype=="status", called with .upper()
+    #   progress     — present on messagetype=="progress"
+    #   message      — present on messagetype=="error"
+    #   calculated_values — present on messagetype=="progress" when progress==1
+
+    EXPECTED_FIELDS_BY_TYPE = {
+        "status": ["jobId", "messagetype", "status"],
+        "progress": ["jobId", "messagetype", "progress"],
+        "error": ["jobId", "messagetype", "message"],
+    }
+
+    print(f"\n=== WebSocket messages received: {len(messages)} ===")
+    issues_found = []
+
+    for i, msg in enumerate(messages, start=1):
+        try:
+            parsed = json.loads(msg)
+        except Exception as exc:
+            print(f"--- message {i}: could not parse JSON — {exc} ---")
+            print(repr(msg))
+            issues_found.append(f"message {i}: unparsable")
+            continue
+
+        print(f"\n--- message {i} (raw) ---")
+        pprint.pprint(parsed)
+
+        msg_job_id = parsed.get("jobId")
+        msg_type = parsed.get("messagetype")
+
+        # Check 1: does this message carry a jobId at all?
+        if "jobId" not in parsed:
+            issues_found.append(
+                f"message {i}: missing 'jobId' — "
+                f"code checks `message_data.get('jobId', 'Unknown') == job_id`"
+            )
+
+        # Check 2: is messagetype present?
+        if "messagetype" not in parsed:
+            issues_found.append(f"message {i}: missing 'messagetype' — code routes on this field")
+
+        # Check 3: per-type field validation (only for messages belonging to our job)
+        if msg_job_id == job_id:
+            print(f"    -> belongs to our job ({job_id})")
+            expected = EXPECTED_FIELDS_BY_TYPE.get(msg_type)
+            if expected is None:
+                issues_found.append(
+                    f"message {i}: unrecognised messagetype={msg_type!r} "
+                    f"(code handles 'status', 'progress', 'error')"
+                )
+            else:
+                for field in expected:
+                    if field not in parsed:
+                        issues_found.append(
+                            f"message {i} (type={msg_type!r}): missing expected field {field!r}"
+                        )
+                # Extra check: status messages must have a non-None status so .upper() won't crash
+                if msg_type == "status" and parsed.get("status") is None:
+                    issues_found.append(
+                        f"message {i}: 'status' is None — "
+                        "code calls .upper() on it without a None guard"
+                    )
+        else:
+            print(f"    -> belongs to a different job ({msg_job_id}), skipping field check")
+
+    print("\n=== Comparison summary ===")
+    if issues_found:
+        print("MISMATCHES vs current code expectations:")
+        for issue in issues_found:
+            print(f"  !! {issue}")
+    else:
+        print("All received messages are compatible with current code expectations.")
+
+    # Always pass — this is a diagnostic/introspection test only
+    assert True
+
+
 def test_read_results(read_results):
     """Test reading results from the job."""
     assert isinstance(read_results, list)
     assert len(read_results) > 0, "Results should not be empty"
     assert isinstance(read_results[0]["feasible"], bool)
+    assert "requirements" in read_results[0], "Each result item must contain 'requirements' key"
 
 
 def test_console_log(read_results, console_log):

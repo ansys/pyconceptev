@@ -167,8 +167,16 @@ ci_*_full.txt
 ci_failing_job_logs_*.txt
 *_pytest_output*.txt
 e2e_pytest_*.txt
+e2e_run_output.txt
 poetry_lock_output.txt
 shell_test_out.txt
+
+# Sphinx-Gallery auto-generated output
+doc/source/auto_examples/
+doc/source/sg_execution_times.rst
+
+# Example run artefacts
+examples/results.xlsx
 
 # Local secret / credential files
 CONCEPTEV_PASSWORD

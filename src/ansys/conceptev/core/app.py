@@ -22,6 +22,7 @@
 
 """Simple API client for the Ansys ConceptEV service."""
 import datetime
+from time import sleep
 from typing import Literal
 
 import httpx
@@ -64,6 +65,7 @@ __all__ = [
     "get_default_hpc",
     "get_job_file",
     "get_job_file_signed_url",
+    "get_requirements_from_job_files",
     "get_job_info",
     "get_design_of_job",
     "get_design_title",
@@ -259,6 +261,62 @@ def read_file(filename: str) -> str:
     return content
 
 
+def wait_for_job_completed(
+    job_info: dict,
+    client: httpx.Client,
+    poll_interval: float = 15,
+    timeout: float = JOB_TIMEOUT,
+    msal_app: "auth.PublicClientApplication | None" = None,
+) -> str:
+    """Wait for a job to reach a terminal state.
+
+    Tries websockets first; the handler polls REST immediately after connecting
+    so a job that finished before the socket opened is still detected (no hang).
+    Falls back to REST polling only when the websocket cannot be established.
+    A timeout from the websocket path is re-raised immediately — the budget is spent.
+    """
+    job_id = job_info.get("job_id", "?")
+    _msal = msal_app or app
+
+    # --- Websocket path (primary) ------------------------------------------
+    try:
+        token = auth.get_token(client)
+        user_id = get_user_id(token)
+        status = monitor_job_progress(job_id, user_id, token, _msal, timeout=timeout)
+        # monitor_job_progress returns None when the race-condition guard fires
+        # (job was already complete when we connected) — still a success.
+        return status or "COMPLETED"
+    except Exception as ws_exc:
+        if "Timeout Error" in str(ws_exc):
+            raise  # full budget spent — don't retry
+        print(
+            f"[wait] websocket unavailable ({type(ws_exc).__name__}: {ws_exc}), "
+            "falling back to REST polling"
+        )
+
+    # --- REST polling fallback (websocket connection failed) -----------------
+    t0 = datetime.datetime.now()
+    while True:
+        elapsed = (datetime.datetime.now() - t0).total_seconds()
+        if elapsed > timeout:
+            raise Exception(
+                f"Timeout Error: Job ({job_id}) is taking too long to complete "
+                f"(>{timeout:.0f} seconds)."
+            )
+        token = auth.get_token(client)
+        try:
+            status = get_status(job_info, token)
+            if check_status(status):
+                return status
+            # QUEUED, RUNNING, or other in-progress state — keep polling
+        except Exception as exc:
+            # get_status raises ResponseError when the job is in CREATED state
+            # and OCM has not yet populated lastStatus or finalStatus.
+            if "Failed to get job status" not in str(exc):
+                raise
+        sleep(poll_interval)
+
+
 def read_results(
     client,
     job_info: dict,
@@ -268,20 +326,10 @@ def read_results(
     msal_app: auth.PublicClientApplication | None = None,
 ) -> dict:
     """Read job results."""
-    job_id = job_info["job_id"]
+    wait_for_job_completed(job_info, client, timeout=timeout, msal_app=msal_app)
     token = auth.get_token(client)
-    user_id = get_user_id(token)
-    initial_status = get_status(job_info, token)
-    if check_status(initial_status):  # Job already completed
-        return get_results(client, job_info, calculate_units, filtered)
-    else:  # Job is still running
-        if msal_app is None:
-            msal_app = auth.create_msal_app()
-        monitor_job_progress(job_id, user_id, token, msal_app, timeout)  # Wait for completion
-
-        token = auth.get_ansyId_token(msal_app)
-        client.headers["Authorization"] = token  # Update the token
-        return get_results(client, job_info, calculate_units, filtered)
+    client.headers["Authorization"] = token
+    return get_results(client, job_info, calculate_units, filtered)
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
@@ -373,6 +421,9 @@ def get_results(
 
     When ``calculate_units=True`` (default), falls back to the API server's
     ``/jobs:result`` endpoint which performs server-side unit calculation.
+
+    In both cases, if a result item is missing the ``requirements`` key it is
+    set to an empty list so downstream consumers can iterate it safely.
     """
     version_number = get(client, "/utilities:data_format_version")
     if filtered:
@@ -389,10 +440,17 @@ def get_results(
                 "calculate_units": calculate_units,
             },
         )
-        return process_response(response)
+        results = process_response(response)
+    else:
+        token = auth.get_token(client)
+        results = get_job_file_signed_url(token, job_info["job_id"], filename)
 
-    token = auth.get_token(client)
-    return get_job_file_signed_url(token, job_info["job_id"], filename)
+    if isinstance(results, list):
+        for item in results:
+            if "requirements" not in item:
+                item["requirements"] = []
+
+    return results
 
 
 def get_component_id_map(client, design_instance_id):
