@@ -182,6 +182,8 @@ jobs:
     name: Deploy development documentation
     runs-on: ubuntu-latest
     needs: [doc-build, package]
+    permissions:
+      contents: write # Needed to update files on the gh-pages branch
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy the latest documentation
@@ -196,6 +198,8 @@ jobs:
     name: Deploy stable documentation
     runs-on: ubuntu-latest
     needs: [doc-build, package, release]
+    permissions:
+      contents: write # Needed to update files on the gh-pages branch
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     steps:
       - name: Deploy the stable documentation
