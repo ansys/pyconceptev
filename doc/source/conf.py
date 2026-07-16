@@ -33,6 +33,7 @@ html_context = {
     "github_repo": "pyconceptev",
     "github_version": "main",
     "doc_path": "doc/source",
+    "pyansys_tags": ["Electronics"],
 }
 
 # specify the location of your github repo

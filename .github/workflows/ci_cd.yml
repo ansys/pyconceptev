@@ -8,12 +8,14 @@ on:
       - main
 
 env:
-  MAIN_PYTHON_VERSION: '3.13'
+  MAIN_PYTHON_VERSION: '3.14'
   PACKAGE_NAME: 'ansys-conceptev-core'
   DOCUMENTATION_CNAME: 'conceptev.docs.pyansys.com'
   MEILISEARCH_API_KEY: ${{ secrets.MEILISEARCH_API_KEY }}
   MEILISEARCH_HOST_URL: ${{ vars.MEILISEARCH_HOST_URL }}
   MEILISEARCH_PUBLIC_API_KEY: ${{ secrets.MEILISEARCH_PUBLIC_API_KEY }}
+
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,42 +28,44 @@ jobs:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: write # Needed to update the changelog file in the repository
+      pull-requests: write # Needed to create a pull request with the changelog update
     steps:
-      - uses: ansys/actions/doc-deploy-changelog@v10
+      - uses: ansys/actions/doc-deploy-changelog@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
           bot-user: ${{ secrets.PYANSYS_CI_BOT_USERNAME }}
           bot-email: ${{ secrets.PYANSYS_CI_BOT_EMAIL }}
 
-  # vulnerabilities:
-  #   name: Vulnerabilities
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: PyAnsys vulnerability check (on main)
-  #       if: github.ref == 'refs/heads/main'
-  #       uses: ansys/actions/check-vulnerabilities@v6
-  #       with:
-  #         python-version: ${{ env.MAIN_PYTHON_VERSION }}
-  #         python-package-name: ${{ env.PACKAGE_NAME }}
-  #         token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
+  check-vulnerabilities:
+    name: "Check library vulnerabilities"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ansys/actions/check-vulnerabilities@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
+        with:
+          python-version: ${{ env.MAIN_PYTHON_VERSION }}
+          token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
+          python-package-name: 'ansys-conceptev-core'
+          dev-mode: ${{ github.ref != 'refs/heads/main' }}
+          use-uv: False
 
-  #     - name: PyAnsys vulnerability check (on dev mode)
-  #       if: github.ref != 'refs/heads/main'
-  #       uses: ansys/actions/check-vulnerabilities@v6
-  #       with:
-  #         python-version: ${{ env.MAIN_PYTHON_VERSION }}
-  #         python-package-name: ${{ env.PACKAGE_NAME }}
-  #         token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
-  #         dev-mode: true
+  actions-security:
+    name: "Check actions security"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ansys/actions/check-actions-security@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
+        with:
+          generate-summary: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          auditing-level: 'high'
+          trust-ansys-actions: true
 
   code-style:
     name: Code style
     runs-on: ubuntu-latest
     steps:
       - name: PyAnsys code style checks
-        uses: ansys/actions/code-style@v10
+        uses: ansys/actions/code-style@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
@@ -70,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: PyAnsys documentation style checks
-        uses: ansys/actions/doc-style@v10
+        uses: ansys/actions/doc-style@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -82,10 +86,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: [ "3.10", "3.11", "3.12", "3.13"]
+        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Build wheelhouse and perform smoke test
-        uses: ansys/actions/build-wheelhouse@v10
+        uses: ansys/actions/build-wheelhouse@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           library-name: ${{ env.PACKAGE_NAME }}
           operating-system: ${{ matrix.os }}
@@ -99,18 +103,19 @@ jobs:
     strategy:
       matrix:
        os: [ubuntu-latest, windows-latest]
-       python-version: ["3.10","3.11", "3.12", "3.13"]
+       python-version: ["3.10","3.11", "3.12", "3.13", "3.14"]
       fail-fast: false
     steps:
-      - uses: ansys/actions/tests-pytest@v10
+      - uses: ansys/actions/tests-pytest@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
-          pytest-extra-args: "-m 'not integration' --cov=ansys --cov-report=term --cov-report=html:.cov/html"
+          pytest-extra-args: "tests/unit --cov=ansys --cov-report=term --cov-report=html:.cov/html"
+          pytest-postargs: "-vv"
 
       - name: Upload coverage results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.MAIN_PYTHON_VERSION == matrix.python-version
         with:
           name: coverage-tests-${{ matrix.os }}
@@ -118,7 +123,7 @@ jobs:
           retention-days: 7
 
       - name: Upload coverage results (as .coverage)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.MAIN_PYTHON_VERSION == matrix.python-version
         with:
           name: coverage-file-tests-${{ matrix.os }}
@@ -129,14 +134,14 @@ jobs:
     runs-on: ubuntu-latest
     needs : [tests]
     steps:
-      - uses: ansys/actions/tests-pytest@v10
+      - uses: ansys/actions/tests-pytest@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         env:
-          PYCONCEPTEV_SETTINGS: "tests/config.toml"
+          PYCONCEPTEV_SETTINGS: "tests/integration/config.toml"
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
-          pytest-extra-args: "-s -m integration --log-cli-level=INFO"
+          pytest-extra-args: "tests/integration -m 'not e2e'"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
@@ -153,7 +158,7 @@ jobs:
         run: pandoc --version
 
       - name: Build documentation
-        uses: ansys/actions/doc-build@v10
+        uses: ansys/actions/doc-build@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           check-links: false
@@ -161,13 +166,14 @@ jobs:
           group-dependencies-name: "doc"
         env:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
   package:
     name: Package library
     runs-on: ubuntu-latest
     steps:
       - name: Build library source and wheel artifacts
-        uses: ansys/actions/build-library@v10
+        uses: ansys/actions/build-library@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           library-name: ${{ env.PACKAGE_NAME }}
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
@@ -179,7 +185,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy the latest documentation
-        uses: ansys/actions/doc-deploy-dev@v10
+        uses: ansys/actions/doc-deploy-dev@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -193,7 +199,7 @@ jobs:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     steps:
       - name: Deploy the stable documentation
-        uses: ansys/actions/doc-deploy-stable@v10
+        uses: ansys/actions/doc-deploy-stable@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -208,17 +214,17 @@ jobs:
     # Specifying a GitHub environment is optional, but strongly encouraged
     environment: release
     permissions:
-      id-token: write
-      contents: write
+      id-token: write # Needed to authenticate with PyPI using OpenID Connect
+      contents: write # Needed to create a release in the repository
     steps:
       - name: "Download the library artifacts from build-library step"
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ env.PACKAGE_NAME }}-artifacts
           path: ${{ env.PACKAGE_NAME }}-artifacts
 
       - name: "Upload artifacts to PyPI using trusted publisher"
-        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
         with:
           repository-url: "https://upload.pypi.org/legacy/"
           print-hash: true
@@ -226,7 +232,7 @@ jobs:
           skip-existing: false
 
       - name: Release to GitHub
-        uses: ansys/actions/release-github@v10
+        uses: ansys/actions/release-github@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
           library-name: ${{ env.PACKAGE_NAME }}
           token: ${{ secrets.GITHUB_TOKEN }}

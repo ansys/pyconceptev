@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 Synopsys, Inc. and ANSYS, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
 """Settings specification and reading."""
 import os
 from pathlib import Path
@@ -67,7 +68,7 @@ def load_settings(toml_file) -> Settings:
     """Load settings."""
     with open(toml_file, "rb") as f:
         settings_data = tomllib.load(f)
-    return Settings.model_validate(settings_data)
+    return Settings.model_validate({k.lower(): v for k, v in settings_data.items()})
 
 
 settings = Settings()

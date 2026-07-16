@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 Synopsys, Inc. and ANSYS, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -22,6 +22,7 @@
 
 """Simple API client for the Ansys ConceptEV service."""
 import datetime
+from time import sleep
 from typing import Literal
 
 import httpx
@@ -29,7 +30,7 @@ from tenacity import retry, retry_if_result, stop_after_delay, wait_random_expon
 
 from ansys.conceptev.core import auth
 from ansys.conceptev.core.auth import get_token
-from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError, ResultsError
+from ansys.conceptev.core.exceptions import DeleteError, ProductAccessError
 from ansys.conceptev.core.ocm import (
     create_design_instance,
     create_new_project,
@@ -40,6 +41,7 @@ from ansys.conceptev.core.ocm import (
     get_design_of_job,
     get_design_title,
     get_job_file,
+    get_job_file_signed_url,
     get_job_info,
     get_or_create_project,
     get_product_id,
@@ -53,23 +55,25 @@ from ansys.conceptev.core.responses import is_gateway_error, process_response
 from ansys.conceptev.core.settings import settings
 
 __all__ = [
-    get_or_create_project,
-    create_new_project,
-    create_design_instance,
-    get_product_id,
-    get_user_id,
-    get_account_id,
-    get_account_ids,
-    get_default_hpc,
-    get_job_file,
-    get_job_info,
-    get_design_of_job,
-    get_design_title,
-    get_status,
-    get_project_ids,
-    get_project_id,
-    delete_project,
-    get_token,
+    "get_or_create_project",
+    "create_new_project",
+    "create_design_instance",
+    "get_product_id",
+    "get_user_id",
+    "get_account_id",
+    "get_account_ids",
+    "get_default_hpc",
+    "get_job_file",
+    "get_job_file_signed_url",
+    "get_requirements_from_job_files",
+    "get_job_info",
+    "get_design_of_job",
+    "get_design_title",
+    "get_status",
+    "get_project_ids",
+    "get_project_id",
+    "delete_project",
+    "get_token",
 ]
 
 Router = Literal[
@@ -134,7 +138,7 @@ def get_http_client(
     client.send = retry(
         retry=retry_if_result(is_gateway_error),
         wait=wait_random_exponential(multiplier=1, max=60),
-        stop=stop_after_delay(10),
+        stop=stop_after_delay(120),
     )(client.send)
     return client
 
@@ -189,7 +193,7 @@ def delete(client: httpx.Client, router: Router, id: str, account_id: str | None
     path = "/".join([router, id])
     response = client.delete(url=path, params=params)
     if response.status_code != 204:
-        raise DeleteError(f"Failed to delete from {router} with ID:{id}.")
+        raise DeleteError(f"Failed to delete from {router} with ID:{id}.")  # nosec B608
 
 
 def put(client: httpx.Client, router: Router, id: str, data: dict) -> dict:
@@ -257,6 +261,62 @@ def read_file(filename: str) -> str:
     return content
 
 
+def wait_for_job_completed(
+    job_info: dict,
+    client: httpx.Client,
+    poll_interval: float = 15,
+    timeout: float = JOB_TIMEOUT,
+    msal_app: "auth.PublicClientApplication | None" = None,
+) -> str:
+    """Wait for a job to reach a terminal state.
+
+    Tries websockets first; the handler polls REST immediately after connecting
+    so a job that finished before the socket opened is still detected (no hang).
+    Falls back to REST polling only when the websocket cannot be established.
+    A timeout from the websocket path is re-raised immediately — the budget is spent.
+    """
+    job_id = job_info.get("job_id", "?")
+    _msal = msal_app or app
+
+    # --- Websocket path (primary) ------------------------------------------
+    try:
+        token = auth.get_token(client)
+        user_id = get_user_id(token)
+        status = monitor_job_progress(job_id, user_id, token, _msal, timeout=timeout)
+        # monitor_job_progress returns None when the race-condition guard fires
+        # (job was already complete when we connected) — still a success.
+        return status or "COMPLETED"
+    except Exception as ws_exc:
+        if "Timeout Error" in str(ws_exc):
+            raise  # full budget spent — don't retry
+        print(
+            f"[wait] websocket unavailable ({type(ws_exc).__name__}: {ws_exc}), "
+            "falling back to REST polling"
+        )
+
+    # --- REST polling fallback (websocket connection failed) -----------------
+    t0 = datetime.datetime.now()
+    while True:
+        elapsed = (datetime.datetime.now() - t0).total_seconds()
+        if elapsed > timeout:
+            raise Exception(
+                f"Timeout Error: Job ({job_id}) is taking too long to complete "
+                f"(>{timeout:.0f} seconds)."
+            )
+        token = auth.get_token(client)
+        try:
+            status = get_status(job_info, token)
+            if check_status(status):
+                return status
+            # QUEUED, RUNNING, or other in-progress state — keep polling
+        except Exception as exc:
+            # get_status raises ResponseError when the job is in CREATED state
+            # and OCM has not yet populated lastStatus or finalStatus.
+            if "Failed to get job status" not in str(exc):
+                raise
+        sleep(poll_interval)
+
+
 def read_results(
     client,
     job_info: dict,
@@ -266,20 +326,10 @@ def read_results(
     msal_app: auth.PublicClientApplication | None = None,
 ) -> dict:
     """Read job results."""
-    job_id = job_info["job_id"]
+    wait_for_job_completed(job_info, client, timeout=timeout, msal_app=msal_app)
     token = auth.get_token(client)
-    user_id = get_user_id(token)
-    initial_status = get_status(job_info, token)
-    if check_status(initial_status):  # Job already completed
-        return get_results(client, job_info, calculate_units, filtered)
-    else:  # Job is still running
-        if msal_app is None:
-            msal_app = auth.create_msal_app()
-        monitor_job_progress(job_id, user_id, token, msal_app, timeout)  # Wait for completion
-
-        token = auth.get_ansyId_token(msal_app)
-        client.headers["Authorization"] = token  # Update the token
-        return get_results(client, job_info, calculate_units, filtered)
+    client.headers["Authorization"] = token
+    return get_results(client, job_info, calculate_units, filtered)
 
 
 def post_component_file(client: httpx.Client, filename: str, component_file_type: str) -> dict:
@@ -362,26 +412,45 @@ def get_results(
     calculate_units: bool = True,
     filtered: bool = False,
 ):
-    """Get the results."""
+    """Get the results for a completed job.
+
+    When ``calculate_units=False``, fetches the raw result file directly from S3
+    via the signed URL from the OCM ``/job/files/list/{jobId}`` endpoint — the
+    same flow used by the ConceptEV frontend. This bypasses API server Pydantic
+    validation and works with any solver version.
+
+    When ``calculate_units=True`` (default), falls back to the API server's
+    ``/jobs:result`` endpoint which performs server-side unit calculation.
+
+    In both cases, if a result item is missing the ``requirements`` key it is
+    set to an empty list so downstream consumers can iterate it safely.
+    """
     version_number = get(client, "/utilities:data_format_version")
     if filtered:
         filename = f"filtered_output_v{version_number}.json"
     else:
         filename = f"output_file_v{version_number}.json"
-    response = client.post(
-        url="/jobs:result",
-        json=job_info,
-        params={
-            "results_file_name": filename,
-            "calculate_units": calculate_units,
-        },
-    )
-    if response.status_code == 502 or response.status_code == 504:
-        raise ResultsError(
-            f"Request timed out {response}. "
-            f"Please try using either calculate_units=False or filtered=True."
+
+    if calculate_units:
+        response = client.post(
+            url="/jobs:result",
+            json=job_info,
+            params={
+                "results_file_name": filename,
+                "calculate_units": calculate_units,
+            },
         )
-    return process_response(response)
+        results = process_response(response)
+    else:
+        token = auth.get_token(client)
+        results = get_job_file_signed_url(token, job_info["job_id"], filename)
+
+    if isinstance(results, list):
+        for item in results:
+            if "requirements" not in item:
+                item["requirements"] = []
+
+    return results
 
 
 def get_component_id_map(client, design_instance_id):
