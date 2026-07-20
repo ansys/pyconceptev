@@ -9,6 +9,120 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.10.3 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.3>`_ - July 16, 2026
+=====================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Added
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Feature/optislang integration test
+          - `#261 <https://github.com/ansys/pyconceptev/pull/261>`_
+
+        * - Added pyansys actions for vulnerability checking
+          - `#328 <https://github.com/ansys/pyconceptev/pull/328>`_
+
+
+  .. tab-item:: Fixed
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Fix: resolve doc-build failures in example scripts
+          - `#320 <https://github.com/ansys/pyconceptev/pull/320>`_
+
+        * - Fix/token timeout 2
+          - `#325 <https://github.com/ansys/pyconceptev/pull/325>`_
+
+        * - Fix/job status missing requirements key
+          - `#360 <https://github.com/ansys/pyconceptev/pull/360>`_
+
+
+  .. tab-item:: Documentation
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Chore: update CHANGELOG for v0.10.2
+          - `#302 <https://github.com/ansys/pyconceptev/pull/302>`_
+
+        * - Doc: Getting Started & ecosystem links
+          - `#351 <https://github.com/ansys/pyconceptev/pull/351>`_
+
+
+  .. tab-item:: Dependencies
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE: Bump the production-dependencies group across 1 directory with 7 updates
+          - `#313 <https://github.com/ansys/pyconceptev/pull/313>`_, `#356 <https://github.com/ansys/pyconceptev/pull/356>`_
+
+        * - CHORE: Bump the development-dependencies group across 1 directory with 13 updates
+          - `#327 <https://github.com/ansys/pyconceptev/pull/327>`_
+
+        * - CHORE: Bump the development-dependencies group across 1 directory with 27 updates
+          - `#362 <https://github.com/ansys/pyconceptev/pull/362>`_
+
+        * - CHORE: Bump the development-dependencies group across 1 directory with 3 updates
+          - `#366 <https://github.com/ansys/pyconceptev/pull/366>`_
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - CHORE:   Update missing or outdated files
+          - `#294 <https://github.com/ansys/pyconceptev/pull/294>`_
+
+        * - Docs: Update \`\`CONTRIBUTORS.md\`\` with the latest contributors
+          - `#305 <https://github.com/ansys/pyconceptev/pull/305>`_, `#361 <https://github.com/ansys/pyconceptev/pull/361>`_
+
+        * - Chore: add dependabot cooldown settings
+          - `#312 <https://github.com/ansys/pyconceptev/pull/312>`_
+
+        * - Chore: group GitHub Actions dependabot updates and reduce to weekly
+          - `#319 <https://github.com/ansys/pyconceptev/pull/319>`_
+
+        * - CHORE: Bump the github-actions group with 5 updates
+          - `#323 <https://github.com/ansys/pyconceptev/pull/323>`_
+
+        * - CHORE: Bump the github-actions group across 1 directory with 14 updates
+          - `#358 <https://github.com/ansys/pyconceptev/pull/358>`_
+
+        * - Chore: Update missing or outdated files
+          - `#359 <https://github.com/ansys/pyconceptev/pull/359>`_
+
+        * - CHORE: Bump the github-actions group with 13 updates
+          - `#365 <https://github.com/ansys/pyconceptev/pull/365>`_
+
+
+  .. tab-item:: Miscellaneous
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Docs: update \`\`html_context\`\` with PyAnsys tags
+          - `#278 <https://github.com/ansys/pyconceptev/pull/278>`_
+
+        * - Chore: update CHANGELOG for v0.10.0
+          - `#298 <https://github.com/ansys/pyconceptev/pull/298>`_
+
+        * - CHORE: Bump the development-dependencies group across 1 directory with 24 updates
+          - `#303 <https://github.com/ansys/pyconceptev/pull/303>`_
+
+
 `0.10.2 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.2>`_ - January 08, 2026
 ========================================================================================
 

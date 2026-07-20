@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2026 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2026 Synopsys, Inc. and ANSYS, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -23,11 +23,16 @@
 """Progress monitoring with websockets."""
 
 import asyncio
+import datetime
 import json
+import logging
+import os
+from pathlib import Path
 import ssl
 import sys
 
 import certifi
+import httpx
 from msal import PublicClientApplication
 from websockets.asyncio.client import connect
 
@@ -44,6 +49,27 @@ STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "FAILED"
 OCM_SOCKET_URL = settings.ocm_socket_url
 JOB_TIMEOUT = settings.job_timeout
+
+logger = logging.getLogger(__name__)
+# Optional file path for capturing progress messages from subprocesses where
+# stdout is suppressed (e.g. optiSLang integration plugin).  Set the
+# CONCEPTEV_PROGRESS_LOG environment variable to an absolute file path before
+# launching the subprocess and the messages will be appended there.
+_PROGRESS_LOG_FILE = os.environ.get("CONCEPTEV_PROGRESS_LOG")
+
+
+def _log(message: str) -> None:
+    """Log a progress message via the standard logger and optionally to a file."""
+    logger.info(message)
+    if _PROGRESS_LOG_FILE:
+        try:
+            Path(_PROGRESS_LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
+            with open(_PROGRESS_LOG_FILE, "a", encoding="utf-8") as fh:
+                fh.write(f"{datetime.datetime.now()}: {message}\n")
+        except OSError:
+            pass
+    else:
+        print(message)
 
 
 def generate_ssl_context() -> ssl.SSLContext:
@@ -79,17 +105,20 @@ def get_status(message: str, job_id: str):
     message_data = json.loads(message)
 
     if message_data.get("jobId", "Unknown") == job_id:
-        message_type = message_data.get("messagetype", None)
-        if message_type == "status":
+        message_type = next(
+            (v for k, v in message_data.items() if k.lower() == "messagetype"), None
+        )
+        if message_type and message_type.lower() == "status":
             status = message_data.get("status", None)
-            print(f"Status:{status}")
-            return status.upper()
-        elif message_type == "progress":
+            if status:
+                _log(f"Status:{status}")
+                return status.upper()
+        elif message_type and message_type.lower() == "progress":
             progress = message_data.get("progress", None)
-            print(f"Progress:{progress}")
-        elif message_type == "error":
+            _log(f"Progress:{progress}")
+        elif message_type and message_type.lower() == "error":
             error = message_data.get("message", None)
-            print(f"Error:{error}")
+            _log(f"Error:{error}")
 
 
 def get_values(message: str, job_id: str) -> dict:
@@ -97,10 +126,16 @@ def get_values(message: str, job_id: str) -> dict:
     message_data = json.loads(message)
 
     if message_data.get("jobId", "Unknown") == job_id:
-        message_type = message_data.get("messagetype", None)
-        if message_type == "progress" and message_data.get("progress", None) == 1:
+        message_type = next(
+            (v for k, v in message_data.items() if k.lower() == "messagetype"), None
+        )
+        if (
+            message_type
+            and message_type.lower() == "progress"
+            and message_data.get("progress", None) == 1
+        ):
             calculated_values = message_data.get("calculated_values", None)
-            print(f"Calculated Values:{calculated_values}")
+            _log(f"Calculated Values:{calculated_values}")
             return calculated_values
 
 
@@ -113,7 +148,18 @@ async def get_job_messages(
             while True:
                 websocket_client = connect_to_ocm(user_id, token)
                 async with websocket_client as websocket:
-                    print("Connected to OCM Websockets.")
+                    _log("Connected to OCM Websockets.")
+                    # Guard: re-poll REST in case the job completed while connecting.
+                    _r = httpx.Client(
+                        base_url=settings.ocm_url,
+                        verify=ssl_context,
+                        headers={"Authorization": token},
+                    ).post("/job/load", json={"jobId": job_id})
+                    if _r.status_code == 200:
+                        _d = _r.json()
+                        _s = _d.get("finalStatus") or _d.get("lastStatus")
+                        if _s and check_status(_s.upper()):
+                            return
                     async for message in websocket:
                         yield message
                 token = get_ansyId_token(app)
@@ -145,12 +191,14 @@ async def get_calculated_values(
 
 def check_status(status: str):
     """Check if the status is complete or finished."""
-    if status == STATUS_COMPLETE or status == STATUS_FINISHED:
-        return True
-    elif status == STATUS_ERROR:
-        raise Exception("Job Failed")
-    else:
+    if status is None:
         return False
+    s = status.upper()
+    if s in (STATUS_COMPLETE, STATUS_FINISHED):
+        return True
+    if s == STATUS_ERROR:
+        raise Exception("Job Failed")
+    return False
 
 
 def monitor_job_progress(

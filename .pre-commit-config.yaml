@@ -28,7 +28,10 @@ repos:
   rev: v2.2.6
   hooks:
   - id: codespell
-    args: ["--ignore-words", "doc/styles/config/vocabularies/ANSYS/accept.txt", "-w", "--skip=poetry.lock"]
+    args: ["--ignore-words", "doc/styles/config/vocabularies/ANSYS/accept.txt",
+           "--ignore-words-list", "synopsys",
+           "-w",
+           "--skip=poetry.lock,doc/styles/config/vocabularies/ANSYS/accept.txt"]
 
 - repo: https://github.com/pycqa/pydocstyle
   rev: 6.3.0
@@ -45,7 +48,7 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/ansys/pre-commit-hooks
-  rev: v0.3.1
+  rev: v0.8.0
   hooks:
     - id: add-license-headers
       args:
