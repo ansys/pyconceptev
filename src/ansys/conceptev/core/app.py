@@ -22,6 +22,7 @@
 
 """Simple API client for the Ansys ConceptEV service."""
 import datetime
+import json
 from time import sleep
 from typing import TYPE_CHECKING, Literal
 
@@ -116,6 +117,7 @@ JOB_TIMEOUT = settings.job_timeout
 OCM_URL = settings.ocm_url
 BASE_URL = settings.conceptev_url
 ACCOUNT_NAME = settings.account_name
+LOCAL_CONFIG_PATH = settings.local_config_path
 app = auth.create_msal_app()
 
 
@@ -148,9 +150,7 @@ def get_http_client(
     return client
 
 
-def get_local_client(
-    base_url: str = "http://127.0.0.1:8080/api",
-) -> "generated_client.Client":
+def get_local_client() -> "generated_client.Client":
     """Get a generated API client pointed at a local ConceptEV server.
 
     No authentication is performed — intended for use with a locally running
@@ -169,8 +169,6 @@ def get_local_client(
                 client=client, body=ConceptInput(name="My Study")
             )
 
-    Args:
-        base_url: Base URL of the local ConceptEV API.
 
     Returns:
         A :class:`~ansys.conceptev.core.generated.client.Client` ready for use
@@ -178,7 +176,17 @@ def get_local_client(
     """
     from ansys.conceptev.core.generated.client import Client as _OpcClient  # noqa: PLC0415
 
-    return _OpcClient(base_url=base_url)
+    config_path = LOCAL_CONFIG_PATH
+    if config_path.exists():
+        with open(config_path, "r") as f:
+            local_config = json.load(f)
+        print(local_config)
+    else:
+        raise FileNotFoundError(f"Local ConceptEV config file not found at {config_path}")
+
+    return _OpcClient(
+        base_url=local_config["base_url"], headers={"X-API-Key": local_config["api_key"]}
+    )
 
 
 def get_conceptev_client(

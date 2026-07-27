@@ -39,6 +39,7 @@ SECRETS_DIR = RESOURCE_DIRECTORY
 
 HttpUrlString = Annotated[HttpUrl, AfterValidator(str)]
 WebSocketUrlString = Annotated[WebsocketUrl, AfterValidator(str)]
+RELEASE = "v271"
 
 
 class Settings(BaseSettings):
@@ -55,6 +56,13 @@ class Settings(BaseSettings):
     conceptev_username: EmailStr | None = None  # Only works in testing environment
     conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None
+    local_config_path: Path | None = (
+        Path(os.environ.get("APPDATA"))
+        / "Ansys"
+        / f"{RELEASE}"
+        / "ConceptEV"
+        / "connection_config.json"
+    )
     model_config = SettingsConfigDict(
         env_file=[
             os.environ.get("PYCONCEPTEV_SETTINGS", RESOURCE_DIRECTORY / "config.toml"),
