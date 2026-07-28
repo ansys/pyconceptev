@@ -65,6 +65,11 @@ from ansys.conceptev.core.generated.models import (
 )
 from ansys.conceptev.core.generated.models.job_request import JobRequest
 from ansys.conceptev.core.generated.types import UNSET
+from ansys.conceptev.core.progress import (
+    STATUS_COMPLETE,
+    STATUS_FINISHED,
+    monitor_job_progress_local_sync,
+)
 
 DATA_DIR = Path(__file__).parent
 
@@ -379,3 +384,12 @@ def test_v2_get_job_file_endpoint(client, v2_concept, v2_completed_job):
     # The endpoint may return the JSON body directly or redirect to a signed URL;
     # either way the parsed result should be non-None.
     assert result is not None
+
+
+@pytest.mark.integration
+def test_monitor_job_progress_local_integration(v2_submitted_job, v2_concept):
+    """Integration test: monitor_job_progress_local_sync connects to a running local ConceptEV."""
+    with get_local_client() as client:
+        api_key = client.get_httpx_client().headers["X-API-Key"]
+    result = monitor_job_progress_local_sync(v2_submitted_job.id, api_key, timeout=120)
+    assert result in (STATUS_COMPLETE, STATUS_FINISHED)
