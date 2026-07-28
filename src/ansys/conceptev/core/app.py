@@ -182,11 +182,15 @@ def get_local_client() -> "generated_client.Client":
             local_config = json.load(f)
         print(local_config)
     else:
-        raise FileNotFoundError(f"Local ConceptEV config file not found at {config_path}")
-
-    return _OpcClient(
-        base_url=local_config["base_url"], headers={"X-API-Key": local_config["api_key"]}
-    )
+        raise FileNotFoundError(
+            f"Local ConceptEV config file not found at {config_path}. "
+            f"Check ConceptEV is running locally or add custom config file"
+        )
+    base_url = f"http://localhost:{local_config['port']}/api"
+    headers = {}
+    if local_config.get("api_key"):
+        headers = {"X-API-Key": local_config["api_key"]}
+    return _OpcClient(base_url=base_url, headers=headers)
 
 
 def get_conceptev_client(
