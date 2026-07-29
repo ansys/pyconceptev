@@ -7719,7 +7719,6 @@
           "kW",
           "mW",
           "MW",
-          "hp",
           "hp"
         ],
         "title": "PowerUnit",

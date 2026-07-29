@@ -64,7 +64,7 @@ from ansys.conceptev.core.generated.models import (
     WheelInput,
 )
 from ansys.conceptev.core.generated.models.job_request import JobRequest
-from ansys.conceptev.core.generated.types import UNSET
+from ansys.conceptev.core.generated.types import UNSET, File
 from ansys.conceptev.core.progress import (
     STATUS_COMPLETE,
     STATUS_FINISHED,
@@ -85,12 +85,14 @@ JOB_TIMEOUT = 900  # seconds
 
 @pytest.fixture(params=["local", "dev"], scope="session")
 def client(request, session_token):
-    """Return a ConceptEV client for the dev environment."""
+    """Return a ConceptEV client for the dev environment with strict error handling."""
     if request.param == "local":
-        with get_local_client() as client:
+        client = get_local_client()
+        with client:
             yield client
     else:
-        with get_conceptev_client(session_token) as client:
+        client = get_conceptev_client(token=session_token)
+        with client:
             yield client
 
 
@@ -168,10 +170,20 @@ def v2_concept(client, session_account_id):
         file_response = create_file_item.sync(
             id=concept_id,
             client=client,
-            body=BodyCreateFileItem(file=f.read().decode("latin-1")),
+            body=BodyCreateFileItem(
+                file=File(
+                    payload=f,
+                    file_name=motor_lab_file.name,
+                    mime_type="application/octet-stream",
+                )
+            ),
             name=motor_lab_file.name,
             component_file_type="motor_lab_file",
         )
+
+    if file_response is None:
+        raise Exception("File upload returned None - API call failed silently")
+
     lab_data_id = file_response.id
     max_speed = file_response.calculated_values["max_speed"]
 
@@ -390,6 +402,7 @@ def test_v2_get_job_file_endpoint(client, v2_concept, v2_completed_job):
 def test_monitor_job_progress_local_integration(v2_submitted_job, v2_concept):
     """Integration test: monitor_job_progress_local_sync connects to a running local ConceptEV."""
     with get_local_client() as client:
+        client.raise_on_unexpected_status = True
         api_key = client.get_httpx_client().headers["X-API-Key"]
     result = monitor_job_progress_local_sync(v2_submitted_job.id, api_key, timeout=120)
     assert result in (STATUS_COMPLETE, STATUS_FINISHED)

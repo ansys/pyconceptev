@@ -116,6 +116,7 @@ optional = true
 [tool.poetry.group.build.dependencies]
 build = "^1.0.3"
 twine = ">=5,<7"
+openapi-python-client = {python = ">=3.11,<4.0"}
 
 [tool.poetry.group.linux-encryption]
 optional = true
