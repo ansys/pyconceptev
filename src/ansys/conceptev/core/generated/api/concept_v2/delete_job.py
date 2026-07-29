@@ -63,7 +63,7 @@ def sync_detailed(
     concept_id: str,
     job_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[Any | HTTPValidationError]:
     """Delete Job
 
@@ -97,7 +97,7 @@ def sync(
     concept_id: str,
     job_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Any | HTTPValidationError | None:
     """Delete Job
 
@@ -126,7 +126,7 @@ async def asyncio_detailed(
     concept_id: str,
     job_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[Any | HTTPValidationError]:
     """Delete Job
 
@@ -158,7 +158,7 @@ async def asyncio(
     concept_id: str,
     job_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Any | HTTPValidationError | None:
     """Delete Job
 

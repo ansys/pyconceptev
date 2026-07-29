@@ -7,19 +7,27 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.aero_output import AeroOutput
+from ...models.ancillary_load_output import AncillaryLoadOutput
 from ...models.architecture_output import ArchitectureOutput
 from ...models.battery_fixed_voltages_output import BatteryFixedVoltagesOutput
 from ...models.battery_lookup_table_output import BatteryLookupTableOutput
 from ...models.concept_job_record import ConceptJobRecord
+from ...models.deceleration_limit_output import DecelerationLimitOutput
+from ...models.disconnect_clutch_output import DisconnectClutchOutput
 from ...models.drive_cycle_output import DriveCycleOutput
 from ...models.drive_cycle_requirement_output import DriveCycleRequirementOutput
 from ...models.dynamic_requirement_output import DynamicRequirementOutput
 from ...models.http_validation_error import HTTPValidationError
+from ...models.inverter_analytical_output import InverterAnalyticalOutput
+from ...models.inverter_loss_map_output import InverterLossMapOutput
 from ...models.mass_output import MassOutput
 from ...models.motor_lab_output import MotorLabOutput
+from ...models.motor_loss_map_output import MotorLossMapOutput
+from ...models.motor_torque_curves_output import MotorTorqueCurvesOutput
 from ...models.part_type import PartType
 from ...models.static_requirement_output import StaticRequirementOutput
 from ...models.transmission_loss_coefficients_output import TransmissionLossCoefficientsOutput
+from ...models.transmission_loss_map_output import TransmissionLossMapOutput
 from ...models.wheel_output import WheelOutput
 from ...types import Response
 
@@ -46,17 +54,25 @@ def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> (
     AeroOutput
+    | AncillaryLoadOutput
     | ArchitectureOutput
     | BatteryFixedVoltagesOutput
     | BatteryLookupTableOutput
     | ConceptJobRecord
+    | DecelerationLimitOutput
+    | DisconnectClutchOutput
     | DriveCycleOutput
     | DriveCycleRequirementOutput
     | DynamicRequirementOutput
+    | InverterAnalyticalOutput
+    | InverterLossMapOutput
     | MassOutput
     | MotorLabOutput
+    | MotorLossMapOutput
+    | MotorTorqueCurvesOutput
     | StaticRequirementOutput
     | TransmissionLossCoefficientsOutput
+    | TransmissionLossMapOutput
     | WheelOutput
     | Any
     | HTTPValidationError
@@ -68,17 +84,25 @@ def _parse_response(
             data: object,
         ) -> (
             AeroOutput
+            | AncillaryLoadOutput
             | ArchitectureOutput
             | BatteryFixedVoltagesOutput
             | BatteryLookupTableOutput
             | ConceptJobRecord
+            | DecelerationLimitOutput
+            | DisconnectClutchOutput
             | DriveCycleOutput
             | DriveCycleRequirementOutput
             | DynamicRequirementOutput
+            | InverterAnalyticalOutput
+            | InverterLossMapOutput
             | MassOutput
             | MotorLabOutput
+            | MotorLossMapOutput
+            | MotorTorqueCurvesOutput
             | StaticRequirementOutput
             | TransmissionLossCoefficientsOutput
+            | TransmissionLossMapOutput
             | WheelOutput
         ):
             try:
@@ -92,7 +116,7 @@ def _parse_response(
             try:
                 if not isinstance(data, dict):
                     raise TypeError()
-                response_200_type_0_type_1 = BatteryFixedVoltagesOutput.from_dict(data)
+                response_200_type_0_type_1 = MotorLossMapOutput.from_dict(data)
 
                 return response_200_type_0_type_1
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -100,7 +124,7 @@ def _parse_response(
             try:
                 if not isinstance(data, dict):
                     raise TypeError()
-                response_200_type_0_type_2 = BatteryLookupTableOutput.from_dict(data)
+                response_200_type_0_type_2 = MotorTorqueCurvesOutput.from_dict(data)
 
                 return response_200_type_0_type_2
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -108,9 +132,57 @@ def _parse_response(
             try:
                 if not isinstance(data, dict):
                     raise TypeError()
-                response_200_type_0_type_3 = TransmissionLossCoefficientsOutput.from_dict(data)
+                response_200_type_0_type_3 = BatteryFixedVoltagesOutput.from_dict(data)
 
                 return response_200_type_0_type_3
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_0_type_4 = BatteryLookupTableOutput.from_dict(data)
+
+                return response_200_type_0_type_4
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_0_type_5 = TransmissionLossCoefficientsOutput.from_dict(data)
+
+                return response_200_type_0_type_5
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_0_type_6 = TransmissionLossMapOutput.from_dict(data)
+
+                return response_200_type_0_type_6
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_0_type_7 = InverterAnalyticalOutput.from_dict(data)
+
+                return response_200_type_0_type_7
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_0_type_8 = InverterLossMapOutput.from_dict(data)
+
+                return response_200_type_0_type_8
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_0_type_9 = DisconnectClutchOutput.from_dict(data)
+
+                return response_200_type_0_type_9
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
             try:
@@ -135,6 +207,22 @@ def _parse_response(
                 response_200_type_1_type_2 = WheelOutput.from_dict(data)
 
                 return response_200_type_1_type_2
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_1_type_3 = DecelerationLimitOutput.from_dict(data)
+
+                return response_200_type_1_type_3
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_1_type_4 = AncillaryLoadOutput.from_dict(data)
+
+                return response_200_type_1_type_4
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
             try:
@@ -206,17 +294,25 @@ def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
     AeroOutput
+    | AncillaryLoadOutput
     | ArchitectureOutput
     | BatteryFixedVoltagesOutput
     | BatteryLookupTableOutput
     | ConceptJobRecord
+    | DecelerationLimitOutput
+    | DisconnectClutchOutput
     | DriveCycleOutput
     | DriveCycleRequirementOutput
     | DynamicRequirementOutput
+    | InverterAnalyticalOutput
+    | InverterLossMapOutput
     | MassOutput
     | MotorLabOutput
+    | MotorLossMapOutput
+    | MotorTorqueCurvesOutput
     | StaticRequirementOutput
     | TransmissionLossCoefficientsOutput
+    | TransmissionLossMapOutput
     | WheelOutput
     | Any
     | HTTPValidationError
@@ -237,17 +333,25 @@ def sync_detailed(
     client: AuthenticatedClient | Client,
 ) -> Response[
     AeroOutput
+    | AncillaryLoadOutput
     | ArchitectureOutput
     | BatteryFixedVoltagesOutput
     | BatteryLookupTableOutput
     | ConceptJobRecord
+    | DecelerationLimitOutput
+    | DisconnectClutchOutput
     | DriveCycleOutput
     | DriveCycleRequirementOutput
     | DynamicRequirementOutput
+    | InverterAnalyticalOutput
+    | InverterLossMapOutput
     | MassOutput
     | MotorLabOutput
+    | MotorLossMapOutput
+    | MotorTorqueCurvesOutput
     | StaticRequirementOutput
     | TransmissionLossCoefficientsOutput
+    | TransmissionLossMapOutput
     | WheelOutput
     | Any
     | HTTPValidationError
@@ -266,7 +370,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[AeroOutput | ArchitectureOutput | BatteryFixedVoltagesOutput | BatteryLookupTableOutput | ConceptJobRecord | DriveCycleOutput | DriveCycleRequirementOutput | DynamicRequirementOutput | MassOutput | MotorLabOutput | StaticRequirementOutput | TransmissionLossCoefficientsOutput | WheelOutput | Any | HTTPValidationError]
+        Response[AeroOutput | AncillaryLoadOutput | ArchitectureOutput | BatteryFixedVoltagesOutput | BatteryLookupTableOutput | ConceptJobRecord | DecelerationLimitOutput | DisconnectClutchOutput | DriveCycleOutput | DriveCycleRequirementOutput | DynamicRequirementOutput | InverterAnalyticalOutput | InverterLossMapOutput | MassOutput | MotorLabOutput | MotorLossMapOutput | MotorTorqueCurvesOutput | StaticRequirementOutput | TransmissionLossCoefficientsOutput | TransmissionLossMapOutput | WheelOutput | Any | HTTPValidationError]
     """
 
     kwargs = _get_kwargs(
@@ -290,17 +394,25 @@ def sync(
     client: AuthenticatedClient | Client,
 ) -> (
     AeroOutput
+    | AncillaryLoadOutput
     | ArchitectureOutput
     | BatteryFixedVoltagesOutput
     | BatteryLookupTableOutput
     | ConceptJobRecord
+    | DecelerationLimitOutput
+    | DisconnectClutchOutput
     | DriveCycleOutput
     | DriveCycleRequirementOutput
     | DynamicRequirementOutput
+    | InverterAnalyticalOutput
+    | InverterLossMapOutput
     | MassOutput
     | MotorLabOutput
+    | MotorLossMapOutput
+    | MotorTorqueCurvesOutput
     | StaticRequirementOutput
     | TransmissionLossCoefficientsOutput
+    | TransmissionLossMapOutput
     | WheelOutput
     | Any
     | HTTPValidationError
@@ -320,7 +432,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        AeroOutput | ArchitectureOutput | BatteryFixedVoltagesOutput | BatteryLookupTableOutput | ConceptJobRecord | DriveCycleOutput | DriveCycleRequirementOutput | DynamicRequirementOutput | MassOutput | MotorLabOutput | StaticRequirementOutput | TransmissionLossCoefficientsOutput | WheelOutput | Any | HTTPValidationError
+        AeroOutput | AncillaryLoadOutput | ArchitectureOutput | BatteryFixedVoltagesOutput | BatteryLookupTableOutput | ConceptJobRecord | DecelerationLimitOutput | DisconnectClutchOutput | DriveCycleOutput | DriveCycleRequirementOutput | DynamicRequirementOutput | InverterAnalyticalOutput | InverterLossMapOutput | MassOutput | MotorLabOutput | MotorLossMapOutput | MotorTorqueCurvesOutput | StaticRequirementOutput | TransmissionLossCoefficientsOutput | TransmissionLossMapOutput | WheelOutput | Any | HTTPValidationError
     """
 
     return sync_detailed(
@@ -339,17 +451,25 @@ async def asyncio_detailed(
     client: AuthenticatedClient | Client,
 ) -> Response[
     AeroOutput
+    | AncillaryLoadOutput
     | ArchitectureOutput
     | BatteryFixedVoltagesOutput
     | BatteryLookupTableOutput
     | ConceptJobRecord
+    | DecelerationLimitOutput
+    | DisconnectClutchOutput
     | DriveCycleOutput
     | DriveCycleRequirementOutput
     | DynamicRequirementOutput
+    | InverterAnalyticalOutput
+    | InverterLossMapOutput
     | MassOutput
     | MotorLabOutput
+    | MotorLossMapOutput
+    | MotorTorqueCurvesOutput
     | StaticRequirementOutput
     | TransmissionLossCoefficientsOutput
+    | TransmissionLossMapOutput
     | WheelOutput
     | Any
     | HTTPValidationError
@@ -368,7 +488,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[AeroOutput | ArchitectureOutput | BatteryFixedVoltagesOutput | BatteryLookupTableOutput | ConceptJobRecord | DriveCycleOutput | DriveCycleRequirementOutput | DynamicRequirementOutput | MassOutput | MotorLabOutput | StaticRequirementOutput | TransmissionLossCoefficientsOutput | WheelOutput | Any | HTTPValidationError]
+        Response[AeroOutput | AncillaryLoadOutput | ArchitectureOutput | BatteryFixedVoltagesOutput | BatteryLookupTableOutput | ConceptJobRecord | DecelerationLimitOutput | DisconnectClutchOutput | DriveCycleOutput | DriveCycleRequirementOutput | DynamicRequirementOutput | InverterAnalyticalOutput | InverterLossMapOutput | MassOutput | MotorLabOutput | MotorLossMapOutput | MotorTorqueCurvesOutput | StaticRequirementOutput | TransmissionLossCoefficientsOutput | TransmissionLossMapOutput | WheelOutput | Any | HTTPValidationError]
     """
 
     kwargs = _get_kwargs(
@@ -390,17 +510,25 @@ async def asyncio(
     client: AuthenticatedClient | Client,
 ) -> (
     AeroOutput
+    | AncillaryLoadOutput
     | ArchitectureOutput
     | BatteryFixedVoltagesOutput
     | BatteryLookupTableOutput
     | ConceptJobRecord
+    | DecelerationLimitOutput
+    | DisconnectClutchOutput
     | DriveCycleOutput
     | DriveCycleRequirementOutput
     | DynamicRequirementOutput
+    | InverterAnalyticalOutput
+    | InverterLossMapOutput
     | MassOutput
     | MotorLabOutput
+    | MotorLossMapOutput
+    | MotorTorqueCurvesOutput
     | StaticRequirementOutput
     | TransmissionLossCoefficientsOutput
+    | TransmissionLossMapOutput
     | WheelOutput
     | Any
     | HTTPValidationError
@@ -420,7 +548,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        AeroOutput | ArchitectureOutput | BatteryFixedVoltagesOutput | BatteryLookupTableOutput | ConceptJobRecord | DriveCycleOutput | DriveCycleRequirementOutput | DynamicRequirementOutput | MassOutput | MotorLabOutput | StaticRequirementOutput | TransmissionLossCoefficientsOutput | WheelOutput | Any | HTTPValidationError
+        AeroOutput | AncillaryLoadOutput | ArchitectureOutput | BatteryFixedVoltagesOutput | BatteryLookupTableOutput | ConceptJobRecord | DecelerationLimitOutput | DisconnectClutchOutput | DriveCycleOutput | DriveCycleRequirementOutput | DynamicRequirementOutput | InverterAnalyticalOutput | InverterLossMapOutput | MassOutput | MotorLabOutput | MotorLossMapOutput | MotorTorqueCurvesOutput | StaticRequirementOutput | TransmissionLossCoefficientsOutput | TransmissionLossMapOutput | WheelOutput | Any | HTTPValidationError
     """
 
     return (

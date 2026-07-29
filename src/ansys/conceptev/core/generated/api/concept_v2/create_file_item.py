@@ -38,14 +38,11 @@ def _get_kwargs(
         "params": params,
     }
 
-    # Use the caller-supplied name as the multipart filename so FastAPI
-    # receives a proper UploadFile rather than a plain string field.
-    _kwargs["files"] = [("file", (name, body.file.encode("latin-1"), "application/octet-stream"))]
+    _kwargs["files"] = body.to_multipart()
 
-    # Do NOT set Content-Type manually — httpx generates the correct
-    # multipart boundary automatically when `files` is present.
-    if headers:
-        _kwargs["headers"] = headers
+    headers["Content-Type"] = "multipart/form-data; boundary=+++"
+
+    _kwargs["headers"] = headers
     return _kwargs
 
 

@@ -9,6 +9,8 @@ Known issues patched:
      — caused by LibraryItemTypes union with sub-discriminators.
   2. Path parameters typed as ``str | null`` (None | str)
      — invalid in OpenAPI 3.1 path params; generator rejects the endpoint.
+  3. OpenAPI 3.1 file-upload fields emitted as ``contentMediaType``
+      — normalize to ``format: binary`` for current generator compatibility.
 
 Usage:
     python scripts/patch_openapi.py --input schema/openapi_v2.json
@@ -88,6 +90,49 @@ def fix_nullable_path_params(spec: dict) -> list[str]:
     return changes
 
 
+def fix_oas31_binary_upload_markers(spec: dict) -> list[str]:
+    """Normalize OpenAPI 3.1 binary upload markers for codegen compatibility.
+
+    FastAPI now emits binary upload fields as::
+
+        {"type": "string", "contentMediaType": "application/octet-stream"}
+
+    The current released openapi-python-client versions do not map this shape
+    to file uploads consistently, so multipart body fields can degrade to plain
+    text strings in generated models.
+
+    Temporary compatibility shim. Track upstream here:
+      - https://github.com/openapi-generators/openapi-python-client/issues/1417
+      - https://github.com/openapi-generators/openapi-python-client/pull/1418
+      - https://github.com/openapi-generators/openapi-python-client/pull/1005
+
+    Returns a list of human-readable descriptions of changes made.
+    """
+    changes: list[str] = []
+
+    def _fix(obj: object, path: str) -> None:
+        if isinstance(obj, dict):
+            if (
+                obj.get("type") == "string"
+                and obj.get("contentMediaType") == "application/octet-stream"
+            ):
+                obj.pop("contentMediaType", None)
+                obj["format"] = "binary"
+                changes.append(
+                    f"Normalized binary upload marker at {path} "
+                    "(contentMediaType=application/octet-stream -> format=binary)"
+                )
+
+            for key, value in obj.items():
+                _fix(value, f"{path}.{key}")
+        elif isinstance(obj, list):
+            for index, value in enumerate(obj):
+                _fix(value, f"{path}[{index}]")
+
+    _fix(spec.get("components", {}).get("schemas", {}), "components.schemas")
+    return changes
+
+
 def prune_unused_schemas(spec: dict) -> list[str]:
     """Remove schemas not reachable from any path.  Returns removed schema names."""
     components = spec.get("components", {})
@@ -137,6 +182,9 @@ def patch(spec: dict, *, prune_schemas: bool = False) -> tuple[dict, list[str]]:
     all_changes.extend(changes)
 
     changes = fix_nullable_path_params(patched)
+    all_changes.extend(changes)
+
+    changes = fix_oas31_binary_upload_markers(patched)
     all_changes.extend(changes)
 
     if prune_schemas:

@@ -74,15 +74,14 @@ def sync_detailed(
     job_id: str,
     file_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[Any | HTTPValidationError]:
     """Get Job File
 
      Retrieve a job output file.
 
-    For local backends the file bytes are streamed directly.  For remote
-    backends (e.g. HPS/S3) a 307 redirect to a presigned download URL is
-    returned instead.
+    Local backends stream bytes directly; remote backends (e.g. HPS/S3) return
+    a 307 redirect to a presigned download URL.
 
     Args:
         concept_id (str):
@@ -115,15 +114,14 @@ def sync(
     job_id: str,
     file_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Any | HTTPValidationError | None:
     """Get Job File
 
      Retrieve a job output file.
 
-    For local backends the file bytes are streamed directly.  For remote
-    backends (e.g. HPS/S3) a 307 redirect to a presigned download URL is
-    returned instead.
+    Local backends stream bytes directly; remote backends (e.g. HPS/S3) return
+    a 307 redirect to a presigned download URL.
 
     Args:
         concept_id (str):
@@ -151,15 +149,14 @@ async def asyncio_detailed(
     job_id: str,
     file_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[Any | HTTPValidationError]:
     """Get Job File
 
      Retrieve a job output file.
 
-    For local backends the file bytes are streamed directly.  For remote
-    backends (e.g. HPS/S3) a 307 redirect to a presigned download URL is
-    returned instead.
+    Local backends stream bytes directly; remote backends (e.g. HPS/S3) return
+    a 307 redirect to a presigned download URL.
 
     Args:
         concept_id (str):
@@ -190,15 +187,14 @@ async def asyncio(
     job_id: str,
     file_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Any | HTTPValidationError | None:
     """Get Job File
 
      Retrieve a job output file.
 
-    For local backends the file bytes are streamed directly.  For remote
-    backends (e.g. HPS/S3) a 307 redirect to a presigned download URL is
-    returned instead.
+    Local backends stream bytes directly; remote backends (e.g. HPS/S3) return
+    a 307 redirect to a presigned download URL.
 
     Args:
         concept_id (str):

@@ -12,6 +12,4 @@ WHEEL_ROLLING_RESISTANCE_CONFIGS_VALUES: set[WheelRollingResistanceConfigs] = {
 def check_wheel_rolling_resistance_configs(value: str) -> WheelRollingResistanceConfigs:
     if value in WHEEL_ROLLING_RESISTANCE_CONFIGS_VALUES:
         return value
-    raise TypeError(
-        f"Unexpected value {value!r}. Expected one of {WHEEL_ROLLING_RESISTANCE_CONFIGS_VALUES!r}"
-    )
+    raise TypeError(f"Unexpected value {value!r}. Expected one of {WHEEL_ROLLING_RESISTANCE_CONFIGS_VALUES!r}")

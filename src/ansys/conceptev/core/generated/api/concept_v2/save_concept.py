@@ -8,7 +8,6 @@ from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.concept_output import ConceptOutput
 from ...models.concept_save_request import ConceptSaveRequest
-from ...models.http_validation_error import HTTPValidationError
 from ...types import Response
 
 
@@ -36,24 +35,23 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | ConceptOutput | HTTPValidationError | None:
+) -> Any | ConceptOutput | None:
     if response.status_code == 200:
         response_200 = ConceptOutput.from_dict(response.json())
 
         return response_200
-
-    if response.status_code == 400:
-        response_400 = cast(Any, None)
-        return response_400
 
     if response.status_code == 404:
         response_404 = cast(Any, None)
         return response_404
 
     if response.status_code == 422:
-        response_422 = HTTPValidationError.from_dict(response.json())
-
+        response_422 = cast(Any, None)
         return response_422
+
+    if response.status_code == 501:
+        response_501 = cast(Any, None)
+        return response_501
 
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
@@ -63,7 +61,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | ConceptOutput | HTTPValidationError]:
+) -> Response[Any | ConceptOutput]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -77,13 +75,15 @@ def sync_detailed(
     *,
     client: AuthenticatedClient | Client,
     body: ConceptSaveRequest,
-) -> Response[Any | ConceptOutput | HTTPValidationError]:
+) -> Response[Any | ConceptOutput]:
     """Save Concept
 
      Save a concept to a specified file path (filesystem backend only).
 
-    Copies the ``.cev`` archive to the given path, re-registers the concept
-    at that location, and sets ``save_state`` to ``SaveState.SAVED``.
+    Moves the ``.cev`` archive to the given path, re-registers the concept
+    at that location, and sets ``save_state`` to ``SaveState.SAVED``. If
+    ``save_state`` is already ``SaveState.SAVED``, the concept will be cloned and
+    not moved (i.e. acting as a 'Save as').
 
     Args:
         id (str):
@@ -94,7 +94,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | ConceptOutput | HTTPValidationError]
+        Response[Any | ConceptOutput]
     """
 
     kwargs = _get_kwargs(
@@ -114,13 +114,15 @@ def sync(
     *,
     client: AuthenticatedClient | Client,
     body: ConceptSaveRequest,
-) -> Any | ConceptOutput | HTTPValidationError | None:
+) -> Any | ConceptOutput | None:
     """Save Concept
 
      Save a concept to a specified file path (filesystem backend only).
 
-    Copies the ``.cev`` archive to the given path, re-registers the concept
-    at that location, and sets ``save_state`` to ``SaveState.SAVED``.
+    Moves the ``.cev`` archive to the given path, re-registers the concept
+    at that location, and sets ``save_state`` to ``SaveState.SAVED``. If
+    ``save_state`` is already ``SaveState.SAVED``, the concept will be cloned and
+    not moved (i.e. acting as a 'Save as').
 
     Args:
         id (str):
@@ -131,7 +133,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | ConceptOutput | HTTPValidationError
+        Any | ConceptOutput
     """
 
     return sync_detailed(
@@ -146,13 +148,15 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient | Client,
     body: ConceptSaveRequest,
-) -> Response[Any | ConceptOutput | HTTPValidationError]:
+) -> Response[Any | ConceptOutput]:
     """Save Concept
 
      Save a concept to a specified file path (filesystem backend only).
 
-    Copies the ``.cev`` archive to the given path, re-registers the concept
-    at that location, and sets ``save_state`` to ``SaveState.SAVED``.
+    Moves the ``.cev`` archive to the given path, re-registers the concept
+    at that location, and sets ``save_state`` to ``SaveState.SAVED``. If
+    ``save_state`` is already ``SaveState.SAVED``, the concept will be cloned and
+    not moved (i.e. acting as a 'Save as').
 
     Args:
         id (str):
@@ -163,7 +167,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | ConceptOutput | HTTPValidationError]
+        Response[Any | ConceptOutput]
     """
 
     kwargs = _get_kwargs(
@@ -181,13 +185,15 @@ async def asyncio(
     *,
     client: AuthenticatedClient | Client,
     body: ConceptSaveRequest,
-) -> Any | ConceptOutput | HTTPValidationError | None:
+) -> Any | ConceptOutput | None:
     """Save Concept
 
      Save a concept to a specified file path (filesystem backend only).
 
-    Copies the ``.cev`` archive to the given path, re-registers the concept
-    at that location, and sets ``save_state`` to ``SaveState.SAVED``.
+    Moves the ``.cev`` archive to the given path, re-registers the concept
+    at that location, and sets ``save_state`` to ``SaveState.SAVED``. If
+    ``save_state`` is already ``SaveState.SAVED``, the concept will be cloned and
+    not moved (i.e. acting as a 'Save as').
 
     Args:
         id (str):
@@ -198,7 +204,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | ConceptOutput | HTTPValidationError
+        Any | ConceptOutput
     """
 
     return (

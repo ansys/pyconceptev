@@ -33,9 +33,7 @@ def _get_kwargs(
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | ConceptJobRecord | None:
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Any | ConceptJobRecord | None:
     if response.status_code == 200:
         response_200 = ConceptJobRecord.from_dict(response.json())
 
@@ -69,7 +67,7 @@ def _build_response(
 def sync_detailed(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
     body: JobRequest,
 ) -> Response[Any | ConceptJobRecord]:
     """Create Job
@@ -107,7 +105,7 @@ def sync_detailed(
 def sync(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
     body: JobRequest,
 ) -> Any | ConceptJobRecord | None:
     """Create Job
@@ -140,7 +138,7 @@ def sync(
 async def asyncio_detailed(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
     body: JobRequest,
 ) -> Response[Any | ConceptJobRecord]:
     """Create Job
@@ -176,7 +174,7 @@ async def asyncio_detailed(
 async def asyncio(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
     body: JobRequest,
 ) -> Any | ConceptJobRecord | None:
     """Create Job

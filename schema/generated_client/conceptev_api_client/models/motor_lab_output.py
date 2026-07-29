@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ..models.motor_lab_data import MotorLabData
     from ..models.motor_state import MotorState
     from ..models.motor_thermal_limits import MotorThermalLimits
-    from ..models.thermal_model import ThermalModel
+    from ..models.thermal_model_solver import ThermalModelSolver
 
 
 T = TypeVar("T", bound="MotorLabOutput")
@@ -37,7 +37,7 @@ class MotorLabOutput:
     """ Variables that define state of a motor.
 
     Essentially these are mostly all inputs to a Lab operating point calculation. """
-    thermal_model: None | ThermalModel | Unset = UNSET
+    thermal_model: None | ThermalModelSolver | Unset = UNSET
     thermal_limits: MotorThermalLimits | Unset = UNSET
     """ Thermal limits for motor components. """
     part_type: Literal["component"] | Unset = "component"
@@ -45,7 +45,7 @@ class MotorLabOutput:
 
     def to_dict(self) -> dict[str, Any]:
         from ..models.motor_lab_data import MotorLabData
-        from ..models.thermal_model import ThermalModel
+        from ..models.thermal_model_solver import ThermalModelSolver
 
         id = self.id
 
@@ -82,7 +82,7 @@ class MotorLabOutput:
         thermal_model: dict[str, Any] | None | Unset
         if isinstance(self.thermal_model, Unset):
             thermal_model = UNSET
-        elif isinstance(self.thermal_model, ThermalModel):
+        elif isinstance(self.thermal_model, ThermalModelSolver):
             thermal_model = self.thermal_model.to_dict()
         else:
             thermal_model = self.thermal_model
@@ -134,7 +134,7 @@ class MotorLabOutput:
         from ..models.motor_lab_data import MotorLabData
         from ..models.motor_state import MotorState
         from ..models.motor_thermal_limits import MotorThermalLimits
-        from ..models.thermal_model import ThermalModel
+        from ..models.thermal_model_solver import ThermalModelSolver
 
         d = dict(src_dict)
         id = d.pop("id")
@@ -157,9 +157,7 @@ class MotorLabOutput:
 
         component_type = cast(Literal["MotorLabModel"] | Unset, d.pop("component_type", UNSET))
         if component_type != "MotorLabModel" and not isinstance(component_type, Unset):
-            raise ValueError(
-                f"component_type must match const 'MotorLabModel', got '{component_type}'"
-            )
+            raise ValueError(f"component_type must match const 'MotorLabModel', got '{component_type}'")
 
         def _parse_lab_data(data: object) -> MotorLabData | None | Unset:
             if data is None:
@@ -187,7 +185,7 @@ class MotorLabOutput:
         else:
             state = MotorState.from_dict(_state)
 
-        def _parse_thermal_model(data: object) -> None | ThermalModel | Unset:
+        def _parse_thermal_model(data: object) -> None | ThermalModelSolver | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -195,12 +193,12 @@ class MotorLabOutput:
             try:
                 if not isinstance(data, dict):
                     raise TypeError()
-                thermal_model_type_0 = ThermalModel.from_dict(data)
+                thermal_model_type_0 = ThermalModelSolver.from_dict(data)
 
                 return thermal_model_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
-            return cast(None | ThermalModel | Unset, data)
+            return cast(None | ThermalModelSolver | Unset, data)
 
         thermal_model = _parse_thermal_model(d.pop("thermal_model", UNSET))
 

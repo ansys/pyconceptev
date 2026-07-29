@@ -20,21 +20,23 @@ T = TypeVar("T", bound="BatteryLookupTableInput")
 class BatteryLookupTableInput:
     """Battery Lookup Table Input."""
 
-    lookup_table: BatteryLookupTableData
-    """ Data for a lookup table battery. """
+    lookup_table_data_id: str
     item_type: Literal["component"] | Unset = "component"
     name: str | Unset = "Lookup Table Battery"
     mass: float | Unset = 0.0
     moment_of_inertia: float | Unset = 0.0
     cost: float | Unset = 0.0
     component_type: Literal["BatteryLookupData"] | Unset = "BatteryLookupData"
+    lookup_table: BatteryLookupTableData | None | Unset = UNSET
     state: BatteryState | Unset = UNSET
     """ Variables that define state of a battery. """
     part_type: Literal["component"] | Unset = "component"
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        lookup_table = self.lookup_table.to_dict()
+        from ..models.battery_lookup_table_data import BatteryLookupTableData
+
+        lookup_table_data_id = self.lookup_table_data_id
 
         item_type = self.item_type
 
@@ -48,6 +50,14 @@ class BatteryLookupTableInput:
 
         component_type = self.component_type
 
+        lookup_table: dict[str, Any] | None | Unset
+        if isinstance(self.lookup_table, Unset):
+            lookup_table = UNSET
+        elif isinstance(self.lookup_table, BatteryLookupTableData):
+            lookup_table = self.lookup_table.to_dict()
+        else:
+            lookup_table = self.lookup_table
+
         state: dict[str, Any] | Unset = UNSET
         if not isinstance(self.state, Unset):
             state = self.state.to_dict()
@@ -58,7 +68,7 @@ class BatteryLookupTableInput:
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "lookup_table": lookup_table,
+                "lookup_table_data_id": lookup_table_data_id,
             }
         )
         if item_type is not UNSET:
@@ -73,6 +83,8 @@ class BatteryLookupTableInput:
             field_dict["cost"] = cost
         if component_type is not UNSET:
             field_dict["component_type"] = component_type
+        if lookup_table is not UNSET:
+            field_dict["lookup_table"] = lookup_table
         if state is not UNSET:
             field_dict["state"] = state
         if part_type is not UNSET:
@@ -86,7 +98,7 @@ class BatteryLookupTableInput:
         from ..models.battery_state import BatteryState
 
         d = dict(src_dict)
-        lookup_table = BatteryLookupTableData.from_dict(d.pop("lookup_table"))
+        lookup_table_data_id = d.pop("lookup_table_data_id")
 
         item_type = cast(Literal["component"] | Unset, d.pop("item_type", UNSET))
         if item_type != "component" and not isinstance(item_type, Unset):
@@ -106,6 +118,23 @@ class BatteryLookupTableInput:
                 f"component_type must match const 'BatteryLookupData', got '{component_type}'"
             )
 
+        def _parse_lookup_table(data: object) -> BatteryLookupTableData | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                lookup_table_type_0 = BatteryLookupTableData.from_dict(data)
+
+                return lookup_table_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(BatteryLookupTableData | None | Unset, data)
+
+        lookup_table = _parse_lookup_table(d.pop("lookup_table", UNSET))
+
         _state = d.pop("state", UNSET)
         state: BatteryState | Unset
         if isinstance(_state, Unset):
@@ -118,13 +147,14 @@ class BatteryLookupTableInput:
             raise ValueError(f"part_type must match const 'component', got '{part_type}'")
 
         battery_lookup_table_input = cls(
-            lookup_table=lookup_table,
+            lookup_table_data_id=lookup_table_data_id,
             item_type=item_type,
             name=name,
             mass=mass,
             moment_of_inertia=moment_of_inertia,
             cost=cost,
             component_type=component_type,
+            lookup_table=lookup_table,
             state=state,
             part_type=part_type,
         )

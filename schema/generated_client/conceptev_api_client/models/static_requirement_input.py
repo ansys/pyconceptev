@@ -43,6 +43,7 @@ class StaticRequirementInput:
     gradient: float | Unset = 0.0
     front_axle_split: float | None | Unset = UNSET
     steady_state: bool | Unset = False
+    steady_state_capability_curve: bool | Unset = False
     requirement_input_type: Literal["static"] | Unset = "static"
     acceleration: float | Unset = 1.0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -108,6 +109,8 @@ class StaticRequirementInput:
 
         steady_state = self.steady_state
 
+        steady_state_capability_curve = self.steady_state_capability_curve
+
         requirement_input_type = self.requirement_input_type
 
         acceleration = self.acceleration
@@ -161,6 +164,8 @@ class StaticRequirementInput:
             field_dict["front_axle_split"] = front_axle_split
         if steady_state is not UNSET:
             field_dict["steady_state"] = steady_state
+        if steady_state_capability_curve is not UNSET:
+            field_dict["steady_state_capability_curve"] = steady_state_capability_curve
         if requirement_input_type is not UNSET:
             field_dict["requirement_input_type"] = requirement_input_type
         if acceleration is not UNSET:
@@ -224,9 +229,7 @@ class StaticRequirementInput:
         if isinstance(_component_configurations, Unset):
             component_configurations = UNSET
         else:
-            component_configurations = ComponentConfigurationSet.from_dict(
-                _component_configurations
-            )
+            component_configurations = ComponentConfigurationSet.from_dict(_component_configurations)
 
         ambient_temperature = d.pop("ambient_temperature", UNSET)
 
@@ -251,13 +254,11 @@ class StaticRequirementInput:
 
         steady_state = d.pop("steady_state", UNSET)
 
-        requirement_input_type = cast(
-            Literal["static"] | Unset, d.pop("requirement_input_type", UNSET)
-        )
+        steady_state_capability_curve = d.pop("steady_state_capability_curve", UNSET)
+
+        requirement_input_type = cast(Literal["static"] | Unset, d.pop("requirement_input_type", UNSET))
         if requirement_input_type != "static" and not isinstance(requirement_input_type, Unset):
-            raise ValueError(
-                f"requirement_input_type must match const 'static', got '{requirement_input_type}'"
-            )
+            raise ValueError(f"requirement_input_type must match const 'static', got '{requirement_input_type}'")
 
         acceleration = d.pop("acceleration", UNSET)
 
@@ -285,6 +286,7 @@ class StaticRequirementInput:
             gradient=gradient,
             front_axle_split=front_axle_split,
             steady_state=steady_state,
+            steady_state_capability_curve=steady_state_capability_curve,
             requirement_input_type=requirement_input_type,
             acceleration=acceleration,
         )

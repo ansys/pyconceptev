@@ -52,6 +52,7 @@ class DynamicRequirementInput:
     gradient: float | Unset = 0.0
     max_capability: bool | Unset = False
     front_axle_split: float | None | Unset = UNSET
+    steady_state_capability_curve: bool | Unset = False
     requirement_input_type: Literal["dynamic"] | Unset = "dynamic"
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -134,6 +135,8 @@ class DynamicRequirementInput:
         else:
             front_axle_split = self.front_axle_split
 
+        steady_state_capability_curve = self.steady_state_capability_curve
+
         requirement_input_type = self.requirement_input_type
 
         field_dict: dict[str, Any] = {}
@@ -203,6 +206,8 @@ class DynamicRequirementInput:
             field_dict["max_capability"] = max_capability
         if front_axle_split is not UNSET:
             field_dict["front_axle_split"] = front_axle_split
+        if steady_state_capability_curve is not UNSET:
+            field_dict["steady_state_capability_curve"] = steady_state_capability_curve
         if requirement_input_type is not UNSET:
             field_dict["requirement_input_type"] = requirement_input_type
 
@@ -264,9 +269,7 @@ class DynamicRequirementInput:
         if isinstance(_component_configurations, Unset):
             component_configurations = UNSET
         else:
-            component_configurations = ComponentConfigurationSet.from_dict(
-                _component_configurations
-            )
+            component_configurations = ComponentConfigurationSet.from_dict(_component_configurations)
 
         ambient_temperature = d.pop("ambient_temperature", UNSET)
 
@@ -309,13 +312,11 @@ class DynamicRequirementInput:
 
         front_axle_split = _parse_front_axle_split(d.pop("front_axle_split", UNSET))
 
-        requirement_input_type = cast(
-            Literal["dynamic"] | Unset, d.pop("requirement_input_type", UNSET)
-        )
+        steady_state_capability_curve = d.pop("steady_state_capability_curve", UNSET)
+
+        requirement_input_type = cast(Literal["dynamic"] | Unset, d.pop("requirement_input_type", UNSET))
         if requirement_input_type != "dynamic" and not isinstance(requirement_input_type, Unset):
-            raise ValueError(
-                f"requirement_input_type must match const 'dynamic', got '{requirement_input_type}'"
-            )
+            raise ValueError(f"requirement_input_type must match const 'dynamic', got '{requirement_input_type}'")
 
         dynamic_requirement_input = cls(
             aero_id=aero_id,
@@ -350,6 +351,7 @@ class DynamicRequirementInput:
             gradient=gradient,
             max_capability=max_capability,
             front_axle_split=front_axle_split,
+            steady_state_capability_curve=steady_state_capability_curve,
             requirement_input_type=requirement_input_type,
         )
 

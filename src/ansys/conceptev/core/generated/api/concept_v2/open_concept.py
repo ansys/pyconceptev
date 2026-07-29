@@ -38,10 +38,6 @@ def _parse_response(
 
         return response_200
 
-    if response.status_code == 400:
-        response_400 = cast(Any, None)
-        return response_400
-
     if response.status_code == 404:
         response_404 = cast(Any, None)
         return response_404
@@ -50,6 +46,10 @@ def _parse_response(
         response_422 = HTTPValidationError.from_dict(response.json())
 
         return response_422
+
+    if response.status_code == 501:
+        response_501 = cast(Any, None)
+        return response_501
 
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
@@ -82,11 +82,6 @@ def sync_detailed(
     subsequent operations resolve the correct location without requiring
     another open call.  Multiple files in different directories can be
     registered independently.
-
-    Note: This endpoint is only meaningful when the file-system backend is
-    active.  It is registered unconditionally so the route exists regardless
-    of which backend was configured at import time (important for tests that
-    swap configs via fixtures).
 
     Args:
         path_to_file (str):
@@ -125,11 +120,6 @@ def sync(
     another open call.  Multiple files in different directories can be
     registered independently.
 
-    Note: This endpoint is only meaningful when the file-system backend is
-    active.  It is registered unconditionally so the route exists regardless
-    of which backend was configured at import time (important for tests that
-    swap configs via fixtures).
-
     Args:
         path_to_file (str):
 
@@ -161,11 +151,6 @@ async def asyncio_detailed(
     subsequent operations resolve the correct location without requiring
     another open call.  Multiple files in different directories can be
     registered independently.
-
-    Note: This endpoint is only meaningful when the file-system backend is
-    active.  It is registered unconditionally so the route exists regardless
-    of which backend was configured at import time (important for tests that
-    swap configs via fixtures).
 
     Args:
         path_to_file (str):
@@ -201,11 +186,6 @@ async def asyncio(
     subsequent operations resolve the correct location without requiring
     another open call.  Multiple files in different directories can be
     registered independently.
-
-    Note: This endpoint is only meaningful when the file-system backend is
-    active.  It is registered unconditionally so the route exists regardless
-    of which backend was configured at import time (important for tests that
-    swap configs via fixtures).
 
     Args:
         path_to_file (str):

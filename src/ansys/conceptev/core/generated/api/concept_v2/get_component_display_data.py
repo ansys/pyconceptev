@@ -7,6 +7,7 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.component_loss_map_args import ComponentLossMapArgs
+from ...models.loss_curve import LossCurve
 from ...models.loss_map_grid_lab import LossMapGridLab
 from ...models.loss_map_grid_power import LossMapGridPower
 from ...types import UNSET, Response, Unset
@@ -41,10 +42,12 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | Any | LossMapGridLab | LossMapGridPower | None:
+) -> Any | Any | LossCurve | LossMapGridLab | LossMapGridPower | None:
     if response.status_code == 200:
 
-        def _parse_response_200(data: object) -> Any | LossMapGridLab | LossMapGridPower:
+        def _parse_response_200(
+            data: object,
+        ) -> Any | LossCurve | LossMapGridLab | LossMapGridPower:
             try:
                 if not isinstance(data, dict):
                     raise TypeError()
@@ -61,7 +64,15 @@ def _parse_response(
                 return response_200_type_1
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
-            return cast(Any | LossMapGridLab | LossMapGridPower, data)
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_2 = LossCurve.from_dict(data)
+
+                return response_200_type_2
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(Any | LossCurve | LossMapGridLab | LossMapGridPower, data)
 
         response_200 = _parse_response_200(response.json())
 
@@ -83,7 +94,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | Any | LossMapGridLab | LossMapGridPower]:
+) -> Response[Any | Any | LossCurve | LossMapGridLab | LossMapGridPower]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -98,7 +109,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient | Client,
     body: ComponentLossMapArgs | None | Unset = UNSET,
-) -> Response[Any | Any | LossMapGridLab | LossMapGridPower]:
+) -> Response[Any | Any | LossCurve | LossMapGridLab | LossMapGridPower]:
     """Get Display Data
 
      Get graph data for a component.
@@ -108,6 +119,7 @@ def sync_detailed(
     - **MotorLab** — returns ``LossMapGridLab`` or ``LossMapGridPower``
     - **BatteryLookupTable** — returns ``BatteryLookupTableData``
     - **TransmissionLossCoefficients** — returns ``LossMapGridTorque``
+    - **InverterAnalytical** (IGBT / MOSFET) — returns ``LossCurve``
 
     Args:
         id: The concept ID.
@@ -133,7 +145,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Any | LossMapGridLab | LossMapGridPower]
+        Response[Any | Any | LossCurve | LossMapGridLab | LossMapGridPower]
     """
 
     kwargs = _get_kwargs(
@@ -155,7 +167,7 @@ def sync(
     *,
     client: AuthenticatedClient | Client,
     body: ComponentLossMapArgs | None | Unset = UNSET,
-) -> Any | Any | LossMapGridLab | LossMapGridPower | None:
+) -> Any | Any | LossCurve | LossMapGridLab | LossMapGridPower | None:
     """Get Display Data
 
      Get graph data for a component.
@@ -165,6 +177,7 @@ def sync(
     - **MotorLab** — returns ``LossMapGridLab`` or ``LossMapGridPower``
     - **BatteryLookupTable** — returns ``BatteryLookupTableData``
     - **TransmissionLossCoefficients** — returns ``LossMapGridTorque``
+    - **InverterAnalytical** (IGBT / MOSFET) — returns ``LossCurve``
 
     Args:
         id: The concept ID.
@@ -190,7 +203,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Any | LossMapGridLab | LossMapGridPower
+        Any | Any | LossCurve | LossMapGridLab | LossMapGridPower
     """
 
     return sync_detailed(
@@ -207,7 +220,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient | Client,
     body: ComponentLossMapArgs | None | Unset = UNSET,
-) -> Response[Any | Any | LossMapGridLab | LossMapGridPower]:
+) -> Response[Any | Any | LossCurve | LossMapGridLab | LossMapGridPower]:
     """Get Display Data
 
      Get graph data for a component.
@@ -217,6 +230,7 @@ async def asyncio_detailed(
     - **MotorLab** — returns ``LossMapGridLab`` or ``LossMapGridPower``
     - **BatteryLookupTable** — returns ``BatteryLookupTableData``
     - **TransmissionLossCoefficients** — returns ``LossMapGridTorque``
+    - **InverterAnalytical** (IGBT / MOSFET) — returns ``LossCurve``
 
     Args:
         id: The concept ID.
@@ -242,7 +256,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Any | LossMapGridLab | LossMapGridPower]
+        Response[Any | Any | LossCurve | LossMapGridLab | LossMapGridPower]
     """
 
     kwargs = _get_kwargs(
@@ -262,7 +276,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient | Client,
     body: ComponentLossMapArgs | None | Unset = UNSET,
-) -> Any | Any | LossMapGridLab | LossMapGridPower | None:
+) -> Any | Any | LossCurve | LossMapGridLab | LossMapGridPower | None:
     """Get Display Data
 
      Get graph data for a component.
@@ -272,6 +286,7 @@ async def asyncio(
     - **MotorLab** — returns ``LossMapGridLab`` or ``LossMapGridPower``
     - **BatteryLookupTable** — returns ``BatteryLookupTableData``
     - **TransmissionLossCoefficients** — returns ``LossMapGridTorque``
+    - **InverterAnalytical** (IGBT / MOSFET) — returns ``LossCurve``
 
     Args:
         id: The concept ID.
@@ -297,7 +312,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Any | LossMapGridLab | LossMapGridPower
+        Any | Any | LossCurve | LossMapGridLab | LossMapGridPower
     """
 
     return (

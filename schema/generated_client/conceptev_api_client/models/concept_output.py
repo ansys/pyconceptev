@@ -11,18 +11,26 @@ from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.aero_output import AeroOutput
+    from ..models.ancillary_load_output import AncillaryLoadOutput
     from ..models.architecture_output import ArchitectureOutput
     from ..models.battery_fixed_voltages_output import BatteryFixedVoltagesOutput
     from ..models.battery_lookup_table_output import BatteryLookupTableOutput
     from ..models.concept_job_record import ConceptJobRecord
+    from ..models.deceleration_limit_output import DecelerationLimitOutput
+    from ..models.disconnect_clutch_output import DisconnectClutchOutput
     from ..models.drive_cycle_output import DriveCycleOutput
     from ..models.drive_cycle_requirement_output import DriveCycleRequirementOutput
     from ..models.dynamic_requirement_output import DynamicRequirementOutput
     from ..models.file_item_output import FileItemOutput
+    from ..models.inverter_analytical_output import InverterAnalyticalOutput
+    from ..models.inverter_loss_map_output import InverterLossMapOutput
     from ..models.mass_output import MassOutput
     from ..models.motor_lab_output import MotorLabOutput
+    from ..models.motor_loss_map_output import MotorLossMapOutput
+    from ..models.motor_torque_curves_output import MotorTorqueCurvesOutput
     from ..models.static_requirement_output import StaticRequirementOutput
     from ..models.transmission_loss_coefficients_output import TransmissionLossCoefficientsOutput
+    from ..models.transmission_loss_map_output import TransmissionLossMapOutput
     from ..models.wheel_output import WheelOutput
 
 
@@ -54,17 +62,22 @@ class ConceptOutput:
         list[
             BatteryFixedVoltagesOutput
             | BatteryLookupTableOutput
+            | DisconnectClutchOutput
+            | InverterAnalyticalOutput
+            | InverterLossMapOutput
             | MotorLabOutput
+            | MotorLossMapOutput
+            | MotorTorqueCurvesOutput
             | TransmissionLossCoefficientsOutput
+            | TransmissionLossMapOutput
         ]
         | Unset
     ) = UNSET
-    configurations: list[AeroOutput | MassOutput | WheelOutput] | Unset = UNSET
-    architectures: list[ArchitectureOutput] | Unset = UNSET
-    requirements: (
-        list[DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput]
-        | Unset
+    configurations: (
+        list[AeroOutput | AncillaryLoadOutput | DecelerationLimitOutput | MassOutput | WheelOutput] | Unset
     ) = UNSET
+    architectures: list[ArchitectureOutput] | Unset = UNSET
+    requirements: list[DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput] | Unset = UNSET
     drive_cycles: list[DriveCycleOutput] | Unset = UNSET
     jobs: list[ConceptJobRecord] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -73,10 +86,18 @@ class ConceptOutput:
         from ..models.aero_output import AeroOutput
         from ..models.battery_fixed_voltages_output import BatteryFixedVoltagesOutput
         from ..models.battery_lookup_table_output import BatteryLookupTableOutput
+        from ..models.deceleration_limit_output import DecelerationLimitOutput
         from ..models.drive_cycle_requirement_output import DriveCycleRequirementOutput
         from ..models.dynamic_requirement_output import DynamicRequirementOutput
+        from ..models.inverter_analytical_output import InverterAnalyticalOutput
+        from ..models.inverter_loss_map_output import InverterLossMapOutput
         from ..models.mass_output import MassOutput
         from ..models.motor_lab_output import MotorLabOutput
+        from ..models.motor_loss_map_output import MotorLossMapOutput
+        from ..models.motor_torque_curves_output import MotorTorqueCurvesOutput
+        from ..models.transmission_loss_coefficients_output import TransmissionLossCoefficientsOutput
+        from ..models.transmission_loss_map_output import TransmissionLossMapOutput
+        from ..models.wheel_output import WheelOutput
 
         id = self.id
 
@@ -124,9 +145,21 @@ class ConceptOutput:
                 components_item: dict[str, Any]
                 if isinstance(components_item_data, MotorLabOutput):
                     components_item = components_item_data.to_dict()
+                elif isinstance(components_item_data, MotorLossMapOutput):
+                    components_item = components_item_data.to_dict()
+                elif isinstance(components_item_data, MotorTorqueCurvesOutput):
+                    components_item = components_item_data.to_dict()
                 elif isinstance(components_item_data, BatteryFixedVoltagesOutput):
                     components_item = components_item_data.to_dict()
                 elif isinstance(components_item_data, BatteryLookupTableOutput):
+                    components_item = components_item_data.to_dict()
+                elif isinstance(components_item_data, TransmissionLossCoefficientsOutput):
+                    components_item = components_item_data.to_dict()
+                elif isinstance(components_item_data, TransmissionLossMapOutput):
+                    components_item = components_item_data.to_dict()
+                elif isinstance(components_item_data, InverterAnalyticalOutput):
+                    components_item = components_item_data.to_dict()
+                elif isinstance(components_item_data, InverterLossMapOutput):
                     components_item = components_item_data.to_dict()
                 else:
                     components_item = components_item_data.to_dict()
@@ -141,6 +174,10 @@ class ConceptOutput:
                 if isinstance(configurations_item_data, AeroOutput):
                     configurations_item = configurations_item_data.to_dict()
                 elif isinstance(configurations_item_data, MassOutput):
+                    configurations_item = configurations_item_data.to_dict()
+                elif isinstance(configurations_item_data, WheelOutput):
+                    configurations_item = configurations_item_data.to_dict()
+                elif isinstance(configurations_item_data, DecelerationLimitOutput):
                     configurations_item = configurations_item_data.to_dict()
                 else:
                     configurations_item = configurations_item_data.to_dict()
@@ -221,20 +258,26 @@ class ConceptOutput:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.aero_output import AeroOutput
+        from ..models.ancillary_load_output import AncillaryLoadOutput
         from ..models.architecture_output import ArchitectureOutput
         from ..models.battery_fixed_voltages_output import BatteryFixedVoltagesOutput
         from ..models.battery_lookup_table_output import BatteryLookupTableOutput
         from ..models.concept_job_record import ConceptJobRecord
+        from ..models.deceleration_limit_output import DecelerationLimitOutput
+        from ..models.disconnect_clutch_output import DisconnectClutchOutput
         from ..models.drive_cycle_output import DriveCycleOutput
         from ..models.drive_cycle_requirement_output import DriveCycleRequirementOutput
         from ..models.dynamic_requirement_output import DynamicRequirementOutput
         from ..models.file_item_output import FileItemOutput
+        from ..models.inverter_analytical_output import InverterAnalyticalOutput
+        from ..models.inverter_loss_map_output import InverterLossMapOutput
         from ..models.mass_output import MassOutput
         from ..models.motor_lab_output import MotorLabOutput
+        from ..models.motor_loss_map_output import MotorLossMapOutput
+        from ..models.motor_torque_curves_output import MotorTorqueCurvesOutput
         from ..models.static_requirement_output import StaticRequirementOutput
-        from ..models.transmission_loss_coefficients_output import (
-            TransmissionLossCoefficientsOutput,
-        )
+        from ..models.transmission_loss_coefficients_output import TransmissionLossCoefficientsOutput
+        from ..models.transmission_loss_map_output import TransmissionLossMapOutput
         from ..models.wheel_output import WheelOutput
 
         d = dict(src_dict)
@@ -299,8 +342,14 @@ class ConceptOutput:
             list[
                 BatteryFixedVoltagesOutput
                 | BatteryLookupTableOutput
+                | DisconnectClutchOutput
+                | InverterAnalyticalOutput
+                | InverterLossMapOutput
                 | MotorLabOutput
+                | MotorLossMapOutput
+                | MotorTorqueCurvesOutput
                 | TransmissionLossCoefficientsOutput
+                | TransmissionLossMapOutput
             ]
             | Unset
         ) = UNSET
@@ -313,8 +362,14 @@ class ConceptOutput:
                 ) -> (
                     BatteryFixedVoltagesOutput
                     | BatteryLookupTableOutput
+                    | DisconnectClutchOutput
+                    | InverterAnalyticalOutput
+                    | InverterLossMapOutput
                     | MotorLabOutput
+                    | MotorLossMapOutput
+                    | MotorTorqueCurvesOutput
                     | TransmissionLossCoefficientsOutput
+                    | TransmissionLossMapOutput
                 ):
                     try:
                         if not isinstance(data, dict):
@@ -327,7 +382,7 @@ class ConceptOutput:
                     try:
                         if not isinstance(data, dict):
                             raise TypeError()
-                        components_item_type_1 = BatteryFixedVoltagesOutput.from_dict(data)
+                        components_item_type_1 = MotorLossMapOutput.from_dict(data)
 
                         return components_item_type_1
                     except (TypeError, ValueError, AttributeError, KeyError):
@@ -335,30 +390,80 @@ class ConceptOutput:
                     try:
                         if not isinstance(data, dict):
                             raise TypeError()
-                        components_item_type_2 = BatteryLookupTableOutput.from_dict(data)
+                        components_item_type_2 = MotorTorqueCurvesOutput.from_dict(data)
 
                         return components_item_type_2
                     except (TypeError, ValueError, AttributeError, KeyError):
                         pass
+                    try:
+                        if not isinstance(data, dict):
+                            raise TypeError()
+                        components_item_type_3 = BatteryFixedVoltagesOutput.from_dict(data)
+
+                        return components_item_type_3
+                    except (TypeError, ValueError, AttributeError, KeyError):
+                        pass
+                    try:
+                        if not isinstance(data, dict):
+                            raise TypeError()
+                        components_item_type_4 = BatteryLookupTableOutput.from_dict(data)
+
+                        return components_item_type_4
+                    except (TypeError, ValueError, AttributeError, KeyError):
+                        pass
+                    try:
+                        if not isinstance(data, dict):
+                            raise TypeError()
+                        components_item_type_5 = TransmissionLossCoefficientsOutput.from_dict(data)
+
+                        return components_item_type_5
+                    except (TypeError, ValueError, AttributeError, KeyError):
+                        pass
+                    try:
+                        if not isinstance(data, dict):
+                            raise TypeError()
+                        components_item_type_6 = TransmissionLossMapOutput.from_dict(data)
+
+                        return components_item_type_6
+                    except (TypeError, ValueError, AttributeError, KeyError):
+                        pass
+                    try:
+                        if not isinstance(data, dict):
+                            raise TypeError()
+                        components_item_type_7 = InverterAnalyticalOutput.from_dict(data)
+
+                        return components_item_type_7
+                    except (TypeError, ValueError, AttributeError, KeyError):
+                        pass
+                    try:
+                        if not isinstance(data, dict):
+                            raise TypeError()
+                        components_item_type_8 = InverterLossMapOutput.from_dict(data)
+
+                        return components_item_type_8
+                    except (TypeError, ValueError, AttributeError, KeyError):
+                        pass
                     if not isinstance(data, dict):
                         raise TypeError()
-                    components_item_type_3 = TransmissionLossCoefficientsOutput.from_dict(data)
+                    components_item_type_9 = DisconnectClutchOutput.from_dict(data)
 
-                    return components_item_type_3
+                    return components_item_type_9
 
                 components_item = _parse_components_item(components_item_data)
 
                 components.append(components_item)
 
         _configurations = d.pop("configurations", UNSET)
-        configurations: list[AeroOutput | MassOutput | WheelOutput] | Unset = UNSET
+        configurations: (
+            list[AeroOutput | AncillaryLoadOutput | DecelerationLimitOutput | MassOutput | WheelOutput] | Unset
+        ) = UNSET
         if _configurations is not UNSET:
             configurations = []
             for configurations_item_data in _configurations:
 
                 def _parse_configurations_item(
                     data: object,
-                ) -> AeroOutput | MassOutput | WheelOutput:
+                ) -> AeroOutput | AncillaryLoadOutput | DecelerationLimitOutput | MassOutput | WheelOutput:
                     try:
                         if not isinstance(data, dict):
                             raise TypeError()
@@ -375,11 +480,27 @@ class ConceptOutput:
                         return configurations_item_type_1
                     except (TypeError, ValueError, AttributeError, KeyError):
                         pass
+                    try:
+                        if not isinstance(data, dict):
+                            raise TypeError()
+                        configurations_item_type_2 = WheelOutput.from_dict(data)
+
+                        return configurations_item_type_2
+                    except (TypeError, ValueError, AttributeError, KeyError):
+                        pass
+                    try:
+                        if not isinstance(data, dict):
+                            raise TypeError()
+                        configurations_item_type_3 = DecelerationLimitOutput.from_dict(data)
+
+                        return configurations_item_type_3
+                    except (TypeError, ValueError, AttributeError, KeyError):
+                        pass
                     if not isinstance(data, dict):
                         raise TypeError()
-                    configurations_item_type_2 = WheelOutput.from_dict(data)
+                    configurations_item_type_4 = AncillaryLoadOutput.from_dict(data)
 
-                    return configurations_item_type_2
+                    return configurations_item_type_4
 
                 configurations_item = _parse_configurations_item(configurations_item_data)
 
@@ -395,19 +516,16 @@ class ConceptOutput:
                 architectures.append(architectures_item)
 
         _requirements = d.pop("requirements", UNSET)
-        requirements: (
-            list[DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput]
-            | Unset
-        ) = UNSET
+        requirements: list[DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput] | Unset = (
+            UNSET
+        )
         if _requirements is not UNSET:
             requirements = []
             for requirements_item_data in _requirements:
 
                 def _parse_requirements_item(
                     data: object,
-                ) -> (
-                    DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput
-                ):
+                ) -> DriveCycleRequirementOutput | DynamicRequirementOutput | StaticRequirementOutput:
                     try:
                         if not isinstance(data, dict):
                             raise TypeError()

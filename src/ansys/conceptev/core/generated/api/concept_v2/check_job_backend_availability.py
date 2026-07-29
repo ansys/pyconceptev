@@ -77,7 +77,7 @@ def _build_response(
 def sync_detailed(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[
     Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError
 ]:
@@ -110,7 +110,7 @@ def sync_detailed(
 def sync(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> (
     Any
     | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability
@@ -141,7 +141,7 @@ def sync(
 async def asyncio_detailed(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[
     Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError
 ]:
@@ -172,7 +172,7 @@ async def asyncio_detailed(
 async def asyncio(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> (
     Any
     | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability

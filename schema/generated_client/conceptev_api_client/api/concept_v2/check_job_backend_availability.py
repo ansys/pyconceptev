@@ -29,16 +29,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> (
-    Any
-    | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability
-    | HTTPValidationError
-    | None
-):
+) -> Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError | None:
     if response.status_code == 200:
-        response_200 = CheckJobBackendAvailabilityResponseCheckJobBackendAvailability.from_dict(
-            response.json()
-        )
+        response_200 = CheckJobBackendAvailabilityResponseCheckJobBackendAvailability.from_dict(response.json())
 
         return response_200
 
@@ -63,9 +56,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[
-    Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError
-]:
+) -> Response[Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -77,10 +68,8 @@ def _build_response(
 def sync_detailed(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
-) -> Response[
-    Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError
-]:
+    client: AuthenticatedClient,
+) -> Response[Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError]:
     """Check Job Backend Availability
 
      Check if job backend is available.
@@ -110,13 +99,8 @@ def sync_detailed(
 def sync(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
-) -> (
-    Any
-    | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability
-    | HTTPValidationError
-    | None
-):
+    client: AuthenticatedClient,
+) -> Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError | None:
     """Check Job Backend Availability
 
      Check if job backend is available.
@@ -141,10 +125,8 @@ def sync(
 async def asyncio_detailed(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
-) -> Response[
-    Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError
-]:
+    client: AuthenticatedClient,
+) -> Response[Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError]:
     """Check Job Backend Availability
 
      Check if job backend is available.
@@ -172,13 +154,8 @@ async def asyncio_detailed(
 async def asyncio(
     concept_id: str,
     *,
-    client: AuthenticatedClient | Client,
-) -> (
-    Any
-    | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability
-    | HTTPValidationError
-    | None
-):
+    client: AuthenticatedClient,
+) -> Any | CheckJobBackendAvailabilityResponseCheckJobBackendAvailability | HTTPValidationError | None:
     """Check Job Backend Availability
 
      Check if job backend is available.

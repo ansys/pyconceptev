@@ -21,6 +21,13 @@ class DriveCycleOutput:
     is excluded from the concept record so that large point arrays do not bloat
     the concept JSON.
 
+    ``number_of_points``, ``total_time``, and ``total_distance`` are stored
+    fields populated at part creation/update time (via ``part_get_additional_data``)
+    so that callers can read them without fetching the full points file.
+    The :class:`_DriveCycleSummaryMixin` ensures these stored field values are
+    returned correctly despite the same-named ``@property`` methods on the parent
+    :class:`~conceptev_solver.drive_cycle.DriveCycle`.
+
     """
 
     id: str
@@ -29,6 +36,9 @@ class DriveCycleOutput:
     name: str | Unset = ""
     points: list[Any] | Unset = UNSET
     part_type: Literal["drive_cycle"] | Unset = "drive_cycle"
+    number_of_points: int | Unset = 0
+    total_time: float | Unset = 0.0
+    total_distance: float | Unset = 0.0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -46,6 +56,12 @@ class DriveCycleOutput:
 
         part_type = self.part_type
 
+        number_of_points = self.number_of_points
+
+        total_time = self.total_time
+
+        total_distance = self.total_distance
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -62,6 +78,12 @@ class DriveCycleOutput:
             field_dict["points"] = points
         if part_type is not UNSET:
             field_dict["part_type"] = part_type
+        if number_of_points is not UNSET:
+            field_dict["number_of_points"] = number_of_points
+        if total_time is not UNSET:
+            field_dict["total_time"] = total_time
+        if total_distance is not UNSET:
+            field_dict["total_distance"] = total_distance
 
         return field_dict
 
@@ -84,6 +106,12 @@ class DriveCycleOutput:
         if part_type != "drive_cycle" and not isinstance(part_type, Unset):
             raise ValueError(f"part_type must match const 'drive_cycle', got '{part_type}'")
 
+        number_of_points = d.pop("number_of_points", UNSET)
+
+        total_time = d.pop("total_time", UNSET)
+
+        total_distance = d.pop("total_distance", UNSET)
+
         drive_cycle_output = cls(
             id=id,
             drive_cycle_data_id=drive_cycle_data_id,
@@ -91,6 +119,9 @@ class DriveCycleOutput:
             name=name,
             points=points,
             part_type=part_type,
+            number_of_points=number_of_points,
+            total_time=total_time,
+            total_distance=total_distance,
         )
 
         drive_cycle_output.additional_properties = d
