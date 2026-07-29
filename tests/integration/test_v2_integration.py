@@ -35,6 +35,7 @@ Fixtures are session-scoped so that the concept and job are created once and
 shared across all tests in this module, keeping test run time short.
 """
 
+import os
 from pathlib import Path
 import time
 
@@ -72,7 +73,7 @@ from ansys.conceptev.core.progress import (
 )
 
 DATA_DIR = Path(__file__).parent
-
+IS_CI = os.getenv("CI") == "true"
 TERMINAL_STATES = {"COMPLETED", "FAILED", "ERROR", "FINISHED"}
 JOB_POLL_INTERVAL = 10  # seconds
 JOB_TIMEOUT = 900  # seconds
@@ -83,7 +84,13 @@ JOB_TIMEOUT = 900  # seconds
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture(params=["local", "dev"], scope="session")
+@pytest.fixture(
+    params=[
+        pytest.param("local", marks=pytest.mark.skipif(IS_CI, reason="No local server in CI")),
+        pytest.param("dev", marks=pytest.mark.skipif(IS_CI, reason="Not working yet")),
+    ],
+    scope="session",
+)
 def client(request, session_token):
     """Return a ConceptEV client for the dev environment with strict error handling."""
     if request.param == "local":
