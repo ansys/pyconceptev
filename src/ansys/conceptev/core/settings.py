@@ -34,12 +34,18 @@ from pydantic import AfterValidator, EmailStr, HttpUrl, WebsocketUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 RESOURCE_DIRECTORY = Path(__file__).parents[0].joinpath("resources")
-
+RELEASE = "v271"
 SECRETS_DIR = RESOURCE_DIRECTORY
-
+APP_DATA_PATH = (
+    Path(os.path.expandvars("%APPDATA%"))
+    if os.platform == "win32"
+    else Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share/"))
+)
+DEFAULT_CONFIG_PATH = (
+    APP_DATA_PATH / "Ansys" / f"{RELEASE}" / "ConceptEV" / "connection_config.json"
+)
 HttpUrlString = Annotated[HttpUrl, AfterValidator(str)]
 WebSocketUrlString = Annotated[WebsocketUrl, AfterValidator(str)]
-RELEASE = "v271"
 
 
 class Settings(BaseSettings):
@@ -56,13 +62,7 @@ class Settings(BaseSettings):
     conceptev_username: EmailStr | None = None  # Only works in testing environment
     conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None
-    local_config_path: Path | None = (
-        Path(os.environ.get("APPDATA"))
-        / "Ansys"
-        / f"{RELEASE}"
-        / "ConceptEV"
-        / "connection_config.json"
-    )
+    local_config_path: Path | None = DEFAULT_CONFIG_PATH
     model_config = SettingsConfigDict(
         env_file=[
             os.environ.get("PYCONCEPTEV_SETTINGS", RESOURCE_DIRECTORY / "config.toml"),
