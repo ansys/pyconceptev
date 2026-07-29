@@ -23,6 +23,7 @@
 """Settings specification and reading."""
 import os
 from pathlib import Path
+import sys
 from typing import Annotated
 
 try:
@@ -38,7 +39,7 @@ RELEASE = "v271"
 SECRETS_DIR = RESOURCE_DIRECTORY
 APP_DATA_PATH = (
     Path(os.path.expandvars("%APPDATA%"))
-    if os.platform == "win32"
+    if sys.platform == "win32"
     else Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share/"))
 )
 DEFAULT_CONFIG_PATH = (
