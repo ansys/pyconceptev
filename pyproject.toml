@@ -97,6 +97,7 @@ matplotlib = "^3.10.8"
 fonttools = ">=4.62.0"
 pandas = {extras = ["excel"], version = "^2.2.3"}
 pyzmq = ">=26.3.0"
+openapi-python-client = {python = ">=3.11,<4.0"}
 
 [tool.poetry.group.tests] # Optional testing dependencies
 optional = true
@@ -116,7 +117,6 @@ optional = true
 [tool.poetry.group.build.dependencies]
 build = "^1.0.3"
 twine = ">=5,<7"
-openapi-python-client = {python = ">=3.11,<4.0"}
 
 [tool.poetry.group.linux-encryption]
 optional = true
