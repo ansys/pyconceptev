@@ -116,7 +116,7 @@ optional = true
 
 [tool.poetry.group.build.dependencies]
 build = "^1.0.3"
-twine = ">=5,<7"
+twine = ">=5,<8"
 
 [tool.poetry.group.linux-encryption]
 optional = true
