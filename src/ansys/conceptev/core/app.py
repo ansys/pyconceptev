@@ -23,6 +23,7 @@
 """Simple API client for the Ansys ConceptEV service."""
 import datetime
 import json
+import logging
 from pathlib import Path
 import subprocess
 import time
@@ -60,6 +61,8 @@ from ansys.conceptev.core.settings import settings
 
 if TYPE_CHECKING:
     import ansys.conceptev.core.generated as generated_client
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "get_or_create_project",
@@ -185,17 +188,19 @@ def get_local_client() -> "generated_client.Client":
             f"Local ConceptEV config file not found at {config_path}. "
             f"Check ConceptEV is running locally or add custom config file"
         )
-    with open(config_path, "r") as f:
-        local_config = json.load(f)
-    base_url = f"http://localhost:{local_config['port']}/api"
-    headers = {}
-    if local_config.get("api_key"):
-        headers = {"X-API-Key": local_config["api_key"]}
-    client = _OpcClient(base_url=base_url, headers=headers)
-    health_url = f"{base_url}/health"
+
+    def get_connection_details() -> tuple[str, dict[str, str]]:
+        with open(config_path, "r") as f:
+            local_config = json.load(f)
+        headers = {"X-API-Key": local_config["api_key"]} if local_config.get("api_key") else {}
+        return f"http://localhost:{local_config['port']}/api", headers
+
+    base_url, headers = get_connection_details()
+    started_process = None
     try:
-        response = client.get_httpx_client().get(health_url, timeout=1)
+        response = httpx.get(f"{base_url}/health", headers=headers, timeout=1)
         response.raise_for_status()
+        logger.info("Using existing local ConceptEV server at %s", base_url)
     except (httpx.HTTPError, OSError):
         server_path = (
             settings.local_server_headless_path
@@ -205,22 +210,37 @@ def get_local_client() -> "generated_client.Client":
         executable = Path(server_path) / "ConceptEV.exe"
         if not executable.exists():
             raise FileNotFoundError(f"ConceptEV executable not found at {executable}")
-        subprocess.Popen([str(executable)], cwd=server_path)
+        logger.info("Starting local ConceptEV server from %s", executable)
+        started_process = subprocess.Popen([str(executable)], cwd=server_path)
 
         deadline = time.monotonic() + settings.local_server_timeout
         while time.monotonic() < deadline:
             try:
-                response = client.get_httpx_client().get(health_url, timeout=1)
+                base_url, headers = get_connection_details()
+                response = httpx.get(f"{base_url}/health", headers=headers, timeout=1)
                 response.raise_for_status()
+                logger.info("Local ConceptEV server is ready at %s", base_url)
                 break
             except (httpx.HTTPError, OSError):
                 sleep(0.5)
         else:
+            logger.info("Stopping local ConceptEV server after startup timeout")
+            started_process.terminate()
             raise TimeoutError(
                 f"ConceptEV server did not become ready within "
                 f"{settings.local_server_timeout} seconds"
             )
-    return client
+
+    class LocalClient(_OpcClient):
+        def __exit__(self, *args):
+            try:
+                super().__exit__(*args)
+            finally:
+                if started_process is not None:
+                    logger.info("Stopping local ConceptEV server started by this client")
+                    started_process.terminate()
+
+    return LocalClient(base_url=base_url, headers=headers)
 
 
 def get_conceptev_client(

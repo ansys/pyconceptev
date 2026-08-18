@@ -29,14 +29,11 @@ results for a list of concept IDs and export them to Excel.
 
 The concept IDs are provided in ``resources/design_instance_ids.csv``.
 
-The example uses the ``conceptev_testing@ansys.com`` service account against
-the dev ConceptEV environment.  An ``examples/config.toml`` is provided with
-all required settings.  Before running, supply the account password via the
-``CONCEPTEV_PASSWORD`` environment variable (or a file named
-``conceptev_password`` in the working directory).
+The example connects to a local ConceptEV server, starting it automatically
+when needed.
 
 .. note::
-    Set ``get_results_off_server = True`` to fetch live results from the dev
+    Set ``get_results_off_server = True`` to fetch live results from the local
     server and save them to ``project_results.json``.  Set it to ``False`` on
     subsequent runs to iterate quickly on the Excel output without hitting the
     server again.
@@ -50,13 +47,19 @@ all required settings.  Before running, supply the account password via the
 # ------------------------
 
 import json
+from pathlib import Path
 import time
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ansys.conceptev.core.app import get_conceptev_client
-from ansys.conceptev.core.generated.api.concept_v2 import get_concept, get_job, list_jobs
+from ansys.conceptev.core.app import get_local_client
+from ansys.conceptev.core.generated.api.concept_v2 import (
+    get_concept,
+    get_job,
+    get_job_file,
+    list_jobs,
+)
 
 # %%
 # Inputs
@@ -73,7 +76,7 @@ output_filename = "results.xlsx"  # Output filename for results.
 
 def wait_for_job(client, concept_id: str, job_id: str, poll_interval: int = 5) -> object:
     """Poll the job endpoint until it reaches a terminal state and return the record."""
-    terminal_states = {"COMPLETED", "FAILED", "ERROR"}
+    terminal_states = {"COMPLETED", "FINISHED", "FAILED", "ERROR"}
     while True:
         job = get_job.sync(
             concept_id=concept_id,
@@ -97,11 +100,13 @@ def get_results_for_concept(client, concept_id: str) -> dict:
     job = wait_for_job(client, concept_id, jobs[0].id)
 
     results = None
-    if job.status == "COMPLETED" and job.files:
-        import httpx as _httpx  # noqa: PLC0415
-
-        results_url = job.files[0].path
-        results = _httpx.get(results_url).json()
+    if job.status in {"COMPLETED", "FINISHED"} and job.files:
+        results = get_job_file.sync(
+            concept_id=concept_id,
+            job_id=job.id,
+            file_id=job.files[0].id,
+            client=client,
+        )
 
     return {
         "concept_id": concept_id,
@@ -116,12 +121,14 @@ def get_results_for_concept(client, concept_id: str) -> dict:
 # ------------------------------------
 
 concept_ids_df = pd.read_csv(
-    "resources/design_instance_ids.csv", header=None, names=["design_instance_id"]
+    Path(__file__).parent / "resources" / "design_instance_ids.csv",
+    header=None,
+    names=["design_instance_id"],
 )
 concept_ids = concept_ids_df["design_instance_id"].tolist()
 
 if get_results_off_server:
-    with get_conceptev_client() as client:
+    with get_local_client() as client:
         all_results = [get_results_for_concept(client, cid) for cid in concept_ids]
 
     with open("project_results.json", "w") as f:

@@ -24,18 +24,12 @@
 Bulk Job Submit (v2 API)
 ========================
 
-Example script to bulk-submit jobs to the ConceptEV v2 API on the dev environment.
+Example script to bulk-submit jobs to a local ConceptEV v2 API.
 
 This example reads a list of component combinations from a CSV file and, for
 each combination, creates a new concept on the server, assembles it with the
 chosen components, and submits a job.  The resulting concept IDs and job IDs
 are written to an Excel file for later result retrieval.
-
-The example uses the ``conceptev_testing@ansys.com`` service account against
-the dev ConceptEV environment.  An ``examples/config.toml`` is provided with
-all required settings.  Before running, supply the account password via the
-``CONCEPTEV_PASSWORD`` environment variable (or a file named
-``conceptev_password`` in the working directory).
 
 The combinations CSV must contain a column per component role matching the
 ``component_order`` dictionary below, with component names as values.
@@ -49,11 +43,11 @@ components will be referenced when building each variant.
 # ------------------------
 
 import datetime
+from pathlib import Path
 
 import pandas as pd
 
-from ansys.conceptev.core import app
-from ansys.conceptev.core.app import get_conceptev_client
+from ansys.conceptev.core.app import get_local_client
 from ansys.conceptev.core.generated.api.concept_v2 import (
     create_concept,
     create_concept_part,
@@ -71,7 +65,7 @@ from ansys.conceptev.core.generated.models.job_request import JobRequest
 # ``base_concept_id`` must be the ID of an existing concept on the dev server
 # whose components are referenced in the combinations file.
 
-filename = "resources/combinations.csv"  # See example file for format.
+filename = Path(__file__).parent / "resources" / "combinations.csv"  # See example file for format.
 base_concept_id = "2465235f-ad2e-4923 - 9125-e2e69ccf5816"  # Existing concept on the dev server.
 component_order = {
     "front_transmission_id": "Front Transmission",
@@ -80,17 +74,6 @@ component_order = {
     "rear_motor_id": "Rear Motor",
     "battery_id": "Battery",
 }
-
-# %%
-# Obtain account ID
-# -----------------
-# The account ID is required when submitting jobs to the v2 API.
-
-with app.get_http_client() as http_client:
-    token = app.get_token(http_client)
-    account_id = app.get_account_id(token)
-    print(f"Using account ID: {account_id}")
-
 
 # %%
 # Helper: build a component name → ID map from a concept
@@ -118,7 +101,7 @@ assert (
     required_columns <= file_columns
 ), f"Missing columns in combinations file: {required_columns - file_columns}"
 
-with get_conceptev_client() as client:
+with get_local_client() as client:
     base_concept = get_concept.sync(id=base_concept_id, client=client)
     base_component_map = get_component_id_map(base_concept)
 
@@ -188,7 +171,6 @@ with get_conceptev_client() as client:
                 client=client,
                 body=JobRequest(
                     name=f"bulk_job: {title}",
-                    account_id=account_id,
                     requirement_ids=requirement_ids,
                     architecture_id=created_arch.id,
                 ),
@@ -223,7 +205,7 @@ print(f"Saved {len(created_designs)} designs to created_designs.xlsx")
 #    This permanently removes all concepts created above from the dev server.
 #    Comment out this section if you want to keep them.
 
-with get_conceptev_client() as client:
+with get_local_client() as client:
     for design in created_designs:
         delete_concept.sync(id=design["Concept ID"], client=client)
         print(f"Deleted concept {design['Concept ID']}")

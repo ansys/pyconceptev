@@ -25,13 +25,7 @@ Simple workflow (v2 API)
 ========================
 
 This example shows how to use PyConceptEV to perform basic operations using
-the v2 generated API client against the ConceptEV dev environment.
-
-The example uses the ``conceptev_testing@ansys.com`` service account.  An
-``examples/config.toml`` is provided with all required dev-environment
-settings.  Before running, supply the account password via the
-``CONCEPTEV_PASSWORD`` environment variable (or a file named
-``conceptev_password`` in the working directory).
+the v2 generated API client against a local ConceptEV server.
 
 - Required imports
 - Authenticate against the dev ConceptEV service
@@ -49,8 +43,7 @@ import time
 
 import matplotlib.pyplot as plt
 
-from ansys.conceptev.core import app
-from ansys.conceptev.core.app import get_conceptev_client
+from ansys.conceptev.core.app import get_local_client
 from ansys.conceptev.core.generated.api.concept_v2 import (
     create_concept,
     create_concept_part,
@@ -59,6 +52,7 @@ from ansys.conceptev.core.generated.api.concept_v2 import (
     delete_concept,
     get_component_display_data,
     get_job,
+    get_job_file,
 )
 from ansys.conceptev.core.generated.models import (
     AeroInput,
@@ -66,40 +60,29 @@ from ansys.conceptev.core.generated.models import (
     BatteryFixedVoltagesInput,
     BodyCreateFileItem,
     ConceptInput,
-    DynamicRequirementInput,
     MassInput,
     MotorLabInput,
+    StaticRequirementInput,
     TransmissionLossCoefficientsInput,
     WheelInput,
 )
 from ansys.conceptev.core.generated.models.job_request import JobRequest
+from ansys.conceptev.core.generated.types import File
 
 # %%
 # Define example data
 # ---------------------
 # You can obtain example data from the schema sections of the API documentation.
 
-MOTOR_LAB_FILE = Path("resources") / "e9.lab"
+MOTOR_LAB_FILE = Path(__file__).parent / "resources" / "e9.lab"
 
 # %%
-# Obtain account ID
-# -----------------
-# The account ID is required when submitting jobs to the v2 API.
-# It is retrieved from the token issued by the OCM authentication service.
+# Connect to the local ConceptEV service and create a concept
+# ------------------------------------------------------------
+# ``get_local_client`` starts ConceptEV when needed and reads its connection
+# details from the local ConceptEV configuration file.
 
-with app.get_http_client() as http_client:
-    token = app.get_token(http_client)
-    account_id = app.get_account_id(token)
-    print(f"Using account ID: {account_id}")
-
-# %%
-# Connect to the ConceptEV dev service and create a concept
-# ---------------------------------------------------------
-# ``get_conceptev_client`` returns a generated v2 API client whose underlying
-# HTTP session is pre-configured with AnsysID authentication and retry logic.
-# The target URL is read from ``settings.conceptev_url`` (set via config.toml).
-
-with get_conceptev_client() as client:
+with get_local_client() as client:
 
     # Create a new concept (study) on the server.
     concept = create_concept.sync(
@@ -184,7 +167,13 @@ with get_conceptev_client() as client:
         file_response = create_file_item.sync(
             id=concept_id,
             client=client,
-            body=BodyCreateFileItem(file=f.read().decode("latin-1")),
+            body=BodyCreateFileItem(
+                file=File(
+                    payload=f,
+                    file_name=MOTOR_LAB_FILE.name,
+                    mime_type="application/octet-stream",
+                )
+            ),
             name=MOTOR_LAB_FILE.name,
             component_file_type="motor_lab_file",
         )
@@ -273,14 +262,14 @@ with get_conceptev_client() as client:
     # %%
     # Create a requirement
     # --------------------
-    # Add a dynamic (acceleration) requirement referencing the configurations above.
+    # Static requirements are supported by the local solver.
 
     created_requirement = create_concept_part.sync(
         id=concept_id,
         part_type="requirement",
         client=client,
-        body=DynamicRequirementInput(
-            name="Dynamic Requirement 1",
+        body=StaticRequirementInput(
+            name="Static Requirement 1",
             aero_id=created_aero.id,
             mass_id=created_mass.id,
             wheel_id=created_wheel.id,
@@ -293,14 +282,13 @@ with get_conceptev_client() as client:
     # Submit a job and poll until complete
     # -------------------------------------
     # Create a job that runs the requirement against the architecture.
-    # The account_id obtained earlier must be included in the job request body.
+    # Local jobs do not require an account ID.
 
     job_record = create_job.sync(
         concept_id=concept_id,
         client=client,
         body=JobRequest(
             name="Simple Workflow Job",
-            account_id=account_id,
             requirement_ids=[created_requirement.id],
             architecture_id=created_arch.id,
         ),
@@ -308,7 +296,7 @@ with get_conceptev_client() as client:
     print(f"Submitted job with ID: {job_record.id}, status: {job_record.status}\n")
 
     # Poll until the job reaches a terminal state.
-    terminal_states = {"COMPLETED", "FAILED", "ERROR"}
+    terminal_states = {"COMPLETED", "FINISHED", "FAILED", "ERROR"}
     while job_record.status not in terminal_states:
         time.sleep(5)
         job_record = get_job.sync(
@@ -325,11 +313,13 @@ with get_conceptev_client() as client:
     # -----------------------------------
     # Read the results from the completed job and display a capability curve.
 
-    if job_record.status == "COMPLETED" and job_record.files:
-        import httpx as _httpx  # noqa: PLC0415
-
-        results_url = job_record.files[0].path
-        results = _httpx.get(results_url).json()
+    if job_record.status in {"COMPLETED", "FINISHED"} and job_record.files:
+        results = get_job_file.sync(
+            concept_id=concept_id,
+            job_id=job_record.id,
+            file_id=job_record.files[0].id,
+            client=client,
+        )
         x = results[0]["capability_curve"]["speeds"]
         y = results[0]["capability_curve"]["torques"]
 
