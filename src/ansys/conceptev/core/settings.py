@@ -24,7 +24,7 @@
 import os
 from pathlib import Path
 import sys
-from typing import Annotated
+from typing import Annotated, Literal
 
 try:
     import tomllib
@@ -45,6 +45,9 @@ APP_DATA_PATH = (
 DEFAULT_CONFIG_PATH = (
     APP_DATA_PATH / "Ansys" / f"{RELEASE}" / "ConceptEV" / "connection_config.json"
 )
+PROGRAM_FILES = Path(os.environ.get("ProgramFiles", "C:/Program Files"))
+DEFAULT_CONCEPTEV_PATH = PROGRAM_FILES / "ANSYS Inc" / RELEASE / "motorcad"
+DEFAULT_HEADLESS_CONCEPTEV_PATH = DEFAULT_CONCEPTEV_PATH / "resources" / "desktop-api"
 HttpUrlString = Annotated[HttpUrl, AfterValidator(str)]
 WebSocketUrlString = Annotated[WebsocketUrl, AfterValidator(str)]
 
@@ -64,6 +67,10 @@ class Settings(BaseSettings):
     conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None
     local_config_path: Path | None = DEFAULT_CONFIG_PATH
+    local_server_mode: Literal["gui", "headless"] = "gui"
+    local_server_path: Path | None = DEFAULT_CONCEPTEV_PATH
+    local_server_headless_path: Path | None = DEFAULT_HEADLESS_CONCEPTEV_PATH
+    local_server_timeout: float = 60.0
     model_config = SettingsConfigDict(
         env_file=[
             os.environ.get("PYCONCEPTEV_SETTINGS", RESOURCE_DIRECTORY / "config.toml"),

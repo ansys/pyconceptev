@@ -8,9 +8,19 @@ This section explains how to use PyConceptEV.
 Create a client (local server, v2 API)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use ``get_local_client`` to connect to a locally running ConceptEV service at
-``http://127.0.0.1:8080/api``.  No authentication is required.  The returned
-client is a typed generated client that works directly with the v2 API modules.
+Use ``get_local_client`` to connect to the local ConceptEV service.  If the
+service is unavailable, ``ConceptEV.exe`` is started automatically and the
+client waits for its health endpoint.  No authentication is required.  The
+returned client is a typed generated client that works directly with the v2
+API modules.
+
+The ``LOCAL_SERVER_MODE`` setting selects ``gui`` (the default) or ``headless``.
+By default, the executable is searched for in
+``%ProgramFiles%/ANSYS Inc/{RELEASE}/motorcad`` for GUI mode and
+``%ProgramFiles%/ANSYS Inc/{RELEASE}/motorcad/resources/desktop-api`` for
+headless mode.  Override ``local_server_path``,
+``local_server_headless_path``, or ``local_server_timeout`` in the settings for
+custom installations.
 
 .. code-block:: python
 

@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import json
 import re
 
 import httpx
@@ -346,6 +347,71 @@ def test_read_file(mocker):
     mocker.patch("builtins.open", mocked_file_data)
     results = app.read_file("filename")
     assert results == file_data
+
+
+def test_get_local_client_does_not_launch_when_server_is_healthy(mocker, tmp_path):
+    config_path = tmp_path / "connection_config.json"
+    config_path.write_text(json.dumps({"port": 8080}))
+    http_client = mocker.Mock()
+    healthy_response = mocker.Mock()
+    healthy_response.raise_for_status.return_value = None
+    http_client.get.return_value = healthy_response
+    generated_client = mocker.Mock()
+    generated_client.get_httpx_client.return_value = http_client
+
+    mocker.patch("ansys.conceptev.core.generated.client.Client", return_value=generated_client)
+    mocker.patch.object(app, "LOCAL_CONFIG_PATH", config_path)
+    launch = mocker.patch("ansys.conceptev.core.app.subprocess.Popen")
+
+    assert app.get_local_client() is generated_client
+    launch.assert_not_called()
+
+
+def test_get_local_client_launches_server_when_unavailable(mocker, tmp_path):
+    config_path = tmp_path / "connection_config.json"
+    config_path.write_text(json.dumps({"port": 8080, "api_key": "key"}))
+    executable = tmp_path / "ConceptEV.exe"
+    executable.touch()
+    http_client = mocker.Mock()
+    healthy_response = mocker.Mock()
+    healthy_response.raise_for_status.return_value = None
+    http_client.get.side_effect = [httpx.ConnectError("offline"), healthy_response]
+    generated_client = mocker.Mock()
+    generated_client.get_httpx_client.return_value = http_client
+
+    mocker.patch("ansys.conceptev.core.generated.client.Client", return_value=generated_client)
+    mocker.patch.object(app, "LOCAL_CONFIG_PATH", config_path)
+    mocker.patch.object(app.settings, "local_server_path", tmp_path)
+    mocker.patch.object(app.settings, "local_server_timeout", 1)
+    launch = mocker.patch("ansys.conceptev.core.app.subprocess.Popen")
+
+    assert app.get_local_client() is generated_client
+    launch.assert_called_once_with([str(executable)], cwd=tmp_path)
+
+
+def test_get_local_client_uses_headless_server_path(mocker, tmp_path):
+    config_path = tmp_path / "connection_config.json"
+    config_path.write_text(json.dumps({"port": 8080}))
+    headless_path = tmp_path / "desktop-api"
+    headless_path.mkdir()
+    executable = headless_path / "ConceptEV.exe"
+    executable.touch()
+    http_client = mocker.Mock()
+    healthy_response = mocker.Mock()
+    healthy_response.raise_for_status.return_value = None
+    http_client.get.side_effect = [httpx.ConnectError("offline"), healthy_response]
+    generated_client = mocker.Mock()
+    generated_client.get_httpx_client.return_value = http_client
+
+    mocker.patch("ansys.conceptev.core.generated.client.Client", return_value=generated_client)
+    mocker.patch.object(app, "LOCAL_CONFIG_PATH", config_path)
+    mocker.patch.object(app.settings, "local_server_mode", "headless")
+    mocker.patch.object(app.settings, "local_server_headless_path", headless_path)
+    mocker.patch.object(app.settings, "local_server_timeout", 1)
+    launch = mocker.patch("ansys.conceptev.core.app.subprocess.Popen")
+
+    app.get_local_client()
+    launch.assert_called_once_with([str(executable)], cwd=headless_path)
 
 
 @pytest.fixture
