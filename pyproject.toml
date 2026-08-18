@@ -71,6 +71,7 @@ pywin32 = {version = ">=310", markers = "sys_platform == 'win32' and platform_py
 watchfiles = ">=1.0.5"
 python-calamine = ">=0.4.0"
 rpds-py = ">=0.24.0"
+openapi-python-client = {python = ">=3.11,<4.0"}
 
 # Optional documentation dependencies
 [tool.poetry.group.doc]

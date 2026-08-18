@@ -23,7 +23,8 @@
 """Settings specification and reading."""
 import os
 from pathlib import Path
-from typing import Annotated
+import sys
+from typing import Annotated, Literal
 
 try:
     import tomllib
@@ -34,9 +35,19 @@ from pydantic import AfterValidator, EmailStr, HttpUrl, WebsocketUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 RESOURCE_DIRECTORY = Path(__file__).parents[0].joinpath("resources")
-
+RELEASE = "v271"
 SECRETS_DIR = RESOURCE_DIRECTORY
-
+APP_DATA_PATH = (
+    Path(os.path.expandvars("%APPDATA%"))
+    if sys.platform == "win32"
+    else Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share/"))
+)
+DEFAULT_CONFIG_PATH = (
+    APP_DATA_PATH / "Ansys" / f"{RELEASE}" / "ConceptEV" / "connection_config.json"
+)
+PROGRAM_FILES = Path(os.environ.get("ProgramFiles", "C:/Program Files"))
+DEFAULT_CONCEPTEV_PATH = PROGRAM_FILES / "ANSYS Inc" / RELEASE / "motorcad"
+DEFAULT_HEADLESS_CONCEPTEV_PATH = DEFAULT_CONCEPTEV_PATH / "resources" / "desktop-api"
 HttpUrlString = Annotated[HttpUrl, AfterValidator(str)]
 WebSocketUrlString = Annotated[WebsocketUrl, AfterValidator(str)]
 
@@ -55,6 +66,11 @@ class Settings(BaseSettings):
     conceptev_username: EmailStr | None = None  # Only works in testing environment
     conceptev_password: str | None = None  # Only works in testing environment
     account_name: str | None
+    local_config_path: Path | None = DEFAULT_CONFIG_PATH
+    local_server_mode: Literal["gui", "headless"] = "gui"
+    local_server_path: Path | None = DEFAULT_CONCEPTEV_PATH
+    local_server_headless_path: Path | None = DEFAULT_HEADLESS_CONCEPTEV_PATH
+    local_server_timeout: float = 60.0
     model_config = SettingsConfigDict(
         env_file=[
             os.environ.get("PYCONCEPTEV_SETTINGS", RESOURCE_DIRECTORY / "config.toml"),

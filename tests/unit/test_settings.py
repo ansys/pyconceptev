@@ -36,3 +36,14 @@ def test_settings(monkeypatch):
     assert settings.job_timeout == 3600  # from config.toml
     assert settings.ocm_url == "https://dev.portal.onscale.com/api"  # from ./config.toml
     assert settings.account_name == "borked"  # from environment variable
+    assert settings.local_server_mode == "gui"
+    assert settings.local_server_path.name == "motorcad"
+    assert settings.local_server_headless_path.name == "desktop-api"
+
+
+def test_local_server_settings_can_be_overridden(monkeypatch):
+    monkeypatch.setenv("LOCAL_SERVER_MODE", "headless")
+    monkeypatch.setenv("LOCAL_SERVER_TIMEOUT", "10")
+    settings = Settings()
+    assert settings.local_server_mode == "headless"
+    assert settings.local_server_timeout == 10
