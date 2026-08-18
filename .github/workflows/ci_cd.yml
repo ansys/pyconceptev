@@ -234,4 +234,6 @@ jobs:
       - name: Release to GitHub
         uses: ansys/actions/release-github@a5b0351dc277d68c2dc1beca2d2674c7dfa4fc55 # v10.3.3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           library-name: ${{ env.PACKAGE_NAME }}
+          changelog-release-notes: true
