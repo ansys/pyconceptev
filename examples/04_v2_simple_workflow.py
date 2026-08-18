@@ -28,7 +28,7 @@ This example shows how to use PyConceptEV to perform basic operations using
 the v2 generated API client against a local ConceptEV server.
 
 - Required imports
-- Authenticate against the dev ConceptEV service
+- Connect to the local ConceptEV service
 - Create a concept
 - Add configurations, components, architecture, and requirements
 - Submit a job and plot the results

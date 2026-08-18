@@ -25,48 +25,32 @@ Get Results workflow (v2 API)
 ==============================
 
 This example shows how to use the v2 PyConceptEV generated client to collect
-results for a list of concept IDs and export them to Excel.
-
-The concept IDs are provided in ``resources/design_instance_ids.csv``.
+results for a local study it creates itself and export them to Excel.
 
 The example connects to a local ConceptEV server, starting it automatically
 when needed.
 
-.. note::
-    Set ``get_results_off_server = True`` to fetch live results from the local
-    server and save them to ``project_results.json``.  Set it to ``False`` on
-    subsequent runs to iterate quickly on the Excel output without hitting the
-    server again.
-
-.. warning::
-    Assumes the first completed job in each concept is the result we want.
+The study and job are deleted after their results are retrieved.
 """
 
 # %%
 # Perform required imports
 # ------------------------
 
-import json
-from pathlib import Path
 import time
 
+from local_v2_study import create_local_study, submit_local_job
 import matplotlib.pyplot as plt
 import pandas as pd
 
 from ansys.conceptev.core.app import get_local_client
-from ansys.conceptev.core.generated.api.concept_v2 import (
-    get_concept,
-    get_job,
-    get_job_file,
-    list_jobs,
-)
+from ansys.conceptev.core.generated.api.concept_v2 import delete_concept, get_job, get_job_file
 
 # %%
 # Inputs
 # ------
 # Change the following variables to match your data.
 
-get_results_off_server = True  # Set False to skip server fetch and read from project_results.json.
 output_filename = "results.xlsx"  # Output filename for results.
 
 # %%
@@ -89,15 +73,9 @@ def wait_for_job(client, concept_id: str, job_id: str, poll_interval: int = 5) -
         time.sleep(poll_interval)
 
 
-def get_results_for_concept(client, concept_id: str) -> dict:
-    """Return results for the first completed job of a concept."""
-    concept = get_concept.sync(id=concept_id, client=client)
-
-    jobs = list_jobs.sync(concept_id=concept_id, client=client)
-    if not jobs:
-        raise RuntimeError(f"No jobs found for concept {concept_id}")
-
-    job = wait_for_job(client, concept_id, jobs[0].id)
+def get_results_for_job(client, concept_id: str, job_id: str) -> dict:
+    """Wait for a local job and return its results."""
+    job = wait_for_job(client, concept_id, job_id)
 
     results = None
     if job.status in {"COMPLETED", "FINISHED"} and job.files:
@@ -110,32 +88,33 @@ def get_results_for_concept(client, concept_id: str) -> dict:
 
     return {
         "concept_id": concept_id,
-        "concept_name": concept.name,
+        "concept_name": "Local Results Study",
         "job_id": job.id,
         "results": results,
     }
 
 
 # %%
-# Load concept IDs and collect results
-# ------------------------------------
+# Create a local study and collect results
+# -----------------------------------------
 
-concept_ids_df = pd.read_csv(
-    Path(__file__).parent / "resources" / "design_instance_ids.csv",
-    header=None,
-    names=["design_instance_id"],
-)
-concept_ids = concept_ids_df["design_instance_id"].tolist()
-
-if get_results_off_server:
-    with get_local_client() as client:
-        all_results = [get_results_for_concept(client, cid) for cid in concept_ids]
-
-    with open("project_results.json", "w") as f:
-        json.dump(all_results, f)
-else:
-    with open("project_results.json") as f:
-        all_results = json.load(f)
+with get_local_client() as client:
+    concept_id = None
+    try:
+        concept_id, requirement_id, architecture_id = create_local_study(
+            client, "Local Results Study"
+        )
+        job = submit_local_job(
+            client,
+            concept_id,
+            requirement_id,
+            architecture_id,
+            "Local Results Job",
+        )
+        all_results = [get_results_for_job(client, concept_id, job.id)]
+    finally:
+        if concept_id is not None:
+            delete_concept.sync(id=concept_id, client=client)
 
 # %%
 # Build output DataFrame and export to Excel
