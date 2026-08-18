@@ -138,6 +138,7 @@ sphinx_gallery_conf = {
     # Modules for which function level galleries are created.  In
     "doc_module": "ansys-conceptev-core",
     "image_scrapers": ("matplotlib"),
+    "plot_gallery": False,
     # Exclude flycheck temp files and v2 examples (require dev credentials not
     # available during the production doc build).
     "ignore_pattern": r"flycheck|0[456]_v2_",

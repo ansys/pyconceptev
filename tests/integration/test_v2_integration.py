@@ -77,6 +77,7 @@ IS_CI = os.getenv("CI") == "true"
 TERMINAL_STATES = {"COMPLETED", "FAILED", "ERROR", "FINISHED"}
 JOB_POLL_INTERVAL = 10  # seconds
 JOB_TIMEOUT = 900  # seconds
+pytestmark = pytest.mark.skipif(IS_CI, reason="v2 integration tests require a local or dev server")
 
 
 # ---------------------------------------------------------------------------

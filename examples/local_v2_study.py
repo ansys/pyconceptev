@@ -20,7 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Helpers for self-contained local ConceptEV v2 examples."""
+"""
+Local ConceptEV v2 study
+========================
+
+Helpers for self-contained local ConceptEV v2 examples.
+"""
 
 from pathlib import Path
 
