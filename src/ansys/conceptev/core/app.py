@@ -25,7 +25,7 @@ import datetime
 import json
 import logging
 from pathlib import Path
-import subprocess
+import subprocess  # nosec B404
 import time
 from time import sleep
 from typing import TYPE_CHECKING, Literal
@@ -211,7 +211,7 @@ def get_local_client() -> "generated_client.Client":
         if not executable.exists():
             raise FileNotFoundError(f"ConceptEV executable not found at {executable}")
         logger.info("Starting local ConceptEV server from %s", executable)
-        started_process = subprocess.Popen([str(executable)], cwd=server_path)
+        started_process = subprocess.Popen([str(executable)], cwd=server_path)  # nosec B603
 
         deadline = time.monotonic() + settings.local_server_timeout
         while time.monotonic() < deadline:
