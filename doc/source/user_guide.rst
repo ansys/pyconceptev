@@ -8,9 +8,9 @@ This section explains how to use PyConceptEV.
 Create a client (local server, v2 API)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use ``get_local_client`` to connect to the local ConceptEV service.  If the
+Use ``get_local_client`` to connect to the local ConceptEV service. If the
 service is unavailable, ``ConceptEV.exe`` is started automatically and the
-client waits for its health endpoint.  No authentication is required.  The
+client waits for its health endpoint. No authentication is required. The
 returned client is a typed generated client that works directly with the v2
 API modules.
 
@@ -194,7 +194,7 @@ Update the configuration of the client by using the ``config.toml``. The
 defaults are located in ``src/ansys/conceptev/core/resources/config.toml``.
 Create a new ``config.toml`` file in your working directory with the
 ``account_name`` set or create an environment variable called ``ACCOUNT_NAME``
-and the settings management will find it.
+and the settings management uses it.
 Most things can be left as default but the ``account_name`` should be changed
 to match your company account name.
 
