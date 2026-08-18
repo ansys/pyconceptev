@@ -20,7 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
 import json
+from pathlib import Path
 import ssl
 import tempfile
 from unittest.mock import AsyncMock, patch
@@ -40,6 +42,8 @@ from ansys.conceptev.core.progress import (
     get_status,
     monitor_job_messages,
     monitor_job_progress,
+    monitor_job_progress_local,
+    monitor_job_progress_local_sync,
     ssl_context,
 )
 
@@ -191,3 +195,91 @@ async def test_token_refreshed_on_websocket_reconnect():
     assert connection_calls[1] == refreshed_token
     # get_ansyId_token was called once to refresh after the first WebSocket disconnected
     mock_refresh.assert_called_once_with(app)
+
+
+@pytest.mark.asyncio
+async def test_monitor_job_progress_local_file_not_found():
+    """Raises FileNotFoundError when local config file does not exist."""
+    with patch("ansys.conceptev.core.progress.settings") as mock_settings:
+        mock_settings.local_config_path = Path("/nonexistent/path/config.json")
+        mock_settings.job_timeout = 3600
+        with pytest.raises(FileNotFoundError, match="Local ConceptEV config file not found"):
+            await monitor_job_progress_local("job_id", "api_key")
+
+
+@pytest.mark.asyncio
+async def test_monitor_job_progress_local_returns_status_on_complete():
+    """Returns STATUS_COMPLETE when a completion message is received."""
+    import tempfile
+
+    from ansys.conceptev.core.progress import monitor_job_progress_local
+
+    job_id = "local_job"
+    api_key = "test_key"
+    complete_message = json.dumps(
+        {"jobId": job_id, "messagetype": "status", "status": STATUS_COMPLETE}
+    )
+
+    config = {"port": 8080}
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        json.dump(config, f)
+        config_path = Path(f.name)
+
+    with patch("ansys.conceptev.core.progress.settings") as mock_settings:
+        mock_settings.local_config_path = config_path
+        mock_settings.job_timeout = 3600
+        with patch("ansys.conceptev.core.progress.connect") as mock_connect:
+            mock_connect.return_value = AsyncContextManager([complete_message])
+            result = await monitor_job_progress_local(job_id, api_key)
+
+    assert result == STATUS_COMPLETE
+
+
+@pytest.mark.asyncio
+async def test_monitor_job_progress_local_timeout():
+    """Raises TimeoutError when job takes too long."""
+    import tempfile
+
+    from ansys.conceptev.core.progress import monitor_job_progress_local
+
+    job_id = "local_job"
+    api_key = "test_key"
+    config = {"port": 8080}
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        json.dump(config, f)
+        config_path = Path(f.name)
+
+    async def slow_iterator():
+        await asyncio.sleep(10)
+        yield json.dumps({"jobId": job_id, "messagetype": "status", "status": STATUS_COMPLETE})
+
+    class SlowAsyncContextManager:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            pass
+
+        def __aiter__(self):
+            return slow_iterator().__aiter__()
+
+    with patch("ansys.conceptev.core.progress.settings") as mock_settings:
+        mock_settings.local_config_path = config_path
+        mock_settings.job_timeout = 3600
+        with patch("ansys.conceptev.core.progress.connect") as mock_connect:
+            mock_connect.return_value = SlowAsyncContextManager()
+            with pytest.raises((TimeoutError, asyncio.TimeoutError)):
+                await monitor_job_progress_local(job_id, api_key, timeout=0.01)
+
+
+def test_monitor_job_progress_local_sync():
+    """monitor_job_progress_local_sync wraps the async function correctly."""
+
+    with patch(
+        "ansys.conceptev.core.progress.monitor_job_progress_local", new_callable=AsyncMock
+    ) as mock_local:
+        mock_local.return_value = STATUS_COMPLETE
+        result = monitor_job_progress_local_sync("job_id", "api_key")
+        mock_local.assert_called_once_with("job_id", "api_key", 3600)
+        assert result == STATUS_COMPLETE

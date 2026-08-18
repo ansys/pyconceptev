@@ -51,7 +51,7 @@ def build_persistence(location, fallback_to_plaintext=True):
     """Create Persistent Cache."""
     try:
         return build_encrypted_persistence(location)
-    except:
+    except Exception:
         if not fallback_to_plaintext:
             raise
         logger.exception("Encryption unavailable. Opting in to plain text.")

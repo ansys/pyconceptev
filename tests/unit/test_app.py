@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import json
 import re
 
 import httpx
@@ -348,6 +349,89 @@ def test_read_file(mocker):
     assert results == file_data
 
 
+def test_get_local_client_does_not_launch_when_server_is_healthy(mocker, tmp_path):
+    config_path = tmp_path / "connection_config.json"
+    config_path.write_text(json.dumps({"port": 8080}))
+    healthy_response = mocker.Mock()
+    healthy_response.raise_for_status.return_value = None
+
+    mocker.patch.object(app, "LOCAL_CONFIG_PATH", config_path)
+    mocker.patch("ansys.conceptev.core.app.httpx.get", return_value=healthy_response)
+    launch = mocker.patch("ansys.conceptev.core.app.subprocess.Popen")
+
+    assert app.get_local_client() is not None
+    launch.assert_not_called()
+
+
+def test_get_local_client_launches_server_when_unavailable(mocker, tmp_path):
+    config_path = tmp_path / "connection_config.json"
+    config_path.write_text(json.dumps({"port": 8080, "api_key": "key"}))
+    executable = tmp_path / "ConceptEV.exe"
+    executable.touch()
+    healthy_response = mocker.Mock()
+    healthy_response.raise_for_status.return_value = None
+
+    mocker.patch.object(app, "LOCAL_CONFIG_PATH", config_path)
+    mocker.patch.object(app.settings, "local_server_path", tmp_path)
+    mocker.patch.object(app.settings, "local_server_timeout", 1)
+    mocker.patch(
+        "ansys.conceptev.core.app.httpx.get",
+        side_effect=[httpx.ConnectError("offline"), healthy_response],
+    )
+    launch = mocker.patch("ansys.conceptev.core.app.subprocess.Popen")
+
+    assert app.get_local_client() is not None
+    launch.assert_called_once_with([str(executable)], cwd=tmp_path)
+
+
+def test_get_local_client_stops_only_the_server_it_started(mocker, tmp_path):
+    config_path = tmp_path / "connection_config.json"
+    config_path.write_text(json.dumps({"port": 8080}))
+    executable = tmp_path / "ConceptEV.exe"
+    executable.touch()
+    healthy_response = mocker.Mock()
+    healthy_response.raise_for_status.return_value = None
+    process = mocker.Mock()
+
+    mocker.patch.object(app, "LOCAL_CONFIG_PATH", config_path)
+    mocker.patch.object(app.settings, "local_server_path", tmp_path)
+    mocker.patch.object(app.settings, "local_server_timeout", 1)
+    mocker.patch(
+        "ansys.conceptev.core.app.httpx.get",
+        side_effect=[httpx.ConnectError("offline"), healthy_response],
+    )
+    mocker.patch("ansys.conceptev.core.app.subprocess.Popen", return_value=process)
+
+    with app.get_local_client():
+        pass
+
+    process.terminate.assert_called_once()
+
+
+def test_get_local_client_uses_headless_server_path(mocker, tmp_path):
+    config_path = tmp_path / "connection_config.json"
+    config_path.write_text(json.dumps({"port": 8080}))
+    headless_path = tmp_path / "desktop-api"
+    headless_path.mkdir()
+    executable = headless_path / "ConceptEV.exe"
+    executable.touch()
+    healthy_response = mocker.Mock()
+    healthy_response.raise_for_status.return_value = None
+
+    mocker.patch.object(app, "LOCAL_CONFIG_PATH", config_path)
+    mocker.patch.object(app.settings, "local_server_mode", "headless")
+    mocker.patch.object(app.settings, "local_server_headless_path", headless_path)
+    mocker.patch.object(app.settings, "local_server_timeout", 1)
+    mocker.patch(
+        "ansys.conceptev.core.app.httpx.get",
+        side_effect=[httpx.ConnectError("offline"), healthy_response],
+    )
+    launch = mocker.patch("ansys.conceptev.core.app.subprocess.Popen")
+
+    app.get_local_client()
+    launch.assert_called_once_with([str(executable)], cwd=headless_path)
+
+
 @pytest.fixture
 def mock_job_results(mocker):
     mocker.patch("ansys.conceptev.core.app.job_status")
@@ -577,7 +661,7 @@ def test_returns_final_status_when_present(httpx_mock, final_status, last_status
     )
 
     if final_status is None and last_status is None:
-        with pytest.raises(ResponseError) as exc:
+        with pytest.raises(ResponseError):
             result = app.get_status(job_info, token)
         return True
     else:

@@ -1,0 +1,20 @@
+# openapi-python-client configuration
+# https://github.com/openapi-generators/openapi-python-client#configuration
+
+# Override the generated project/package name instead of deriving it from the
+# spec title ("ConceptEV-API" → "concept-ev-api-client" by default).
+project_name_override: conceptev-api-client
+package_name_override: conceptev_api_client
+
+# Put attribute descriptions in per-attribute docstrings rather than bundling
+# them all in the class-level docstring — cleaner for IDE tooling.
+docstrings_on_attributes: true
+
+# Use Literal values instead of Enum subclasses. Required because the spec has
+# duplicate case-folded enum keys (e.g. "MJ" / "mJ" in EnergyUnit).
+literal_enums: true
+
+# Post-generation hooks — default ruff lint + format passes.
+post_hooks:
+  - "ruff check . --fix-only"
+  - "ruff format ."

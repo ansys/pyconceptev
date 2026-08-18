@@ -1,0 +1,6468 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ConceptEV-API",
+    "summary": "API Endpoint documentation for ConceptEV",
+    "version": "0.2.158"
+  },
+  "paths": {
+    "/v2/concept/{concept_id}/job/availability": {
+      "get": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Check Job Backend Availability",
+        "description": "Check if job backend is available.",
+        "operationId": "check_job_backend_availability_v2_concept__concept_id__job_availability_get",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Check Job Backend Availability V2 Concept  Concept Id  Job Availability Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{concept_id}/job": {
+      "get": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Get Jobs List",
+        "description": "Retrieve list of jobs.",
+        "operationId": "get_jobs_list_v2_concept__concept_id__job_get",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobOutput"
+                  },
+                  "title": "Response Get Jobs List V2 Concept  Concept Id  Job Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Create Job",
+        "description": "Create a new requirement job.\n\nStores an initial RUNNING ConceptJobRecord in the concept immediately\n(as a PartType.JOB part), then updates it with the output URL once the\nsolver finishes. Returns the stored record so the caller has the part id.",
+        "operationId": "create_job_v2_concept__concept_id__job_post",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptJobRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{concept_id}/job/{job_id}": {
+      "get": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Get Job",
+        "description": "Retrieve job status.",
+        "operationId": "get_job_v2_concept__concept_id__job__job_id__get",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOutput"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Delete Job",
+        "description": "Delete a job from the backend.",
+        "operationId": "delete_job_v2_concept__concept_id__job__job_id__delete",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{concept_id}/job/{job_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Get Job File",
+        "description": "Retrieve a job output file.\n\nFor local backends the file bytes are streamed directly.  For remote\nbackends (e.g. HPS/S3) a 307 redirect to a presigned download URL is\nreturned instead.",
+        "operationId": "get_job_file_v2_concept__concept_id__job__job_id__files__file_id__get",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{id}": {
+      "get": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Get Concept",
+        "description": "Get a concept by ID from the database.",
+        "operationId": "get_concept_v2_concept__id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Update Concept",
+        "description": "Update an existing concept in the database.",
+        "operationId": "update_concept_v2_concept__id__put",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConceptInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Delete Concept",
+        "description": "Delete a concept from the database.",
+        "operationId": "delete_concept_v2_concept__id__delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept": {
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Create Concept",
+        "description": "Create a new concept in the database.",
+        "operationId": "create_concept_v2_concept_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConceptInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{id}/save": {
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Save Concept",
+        "description": "Save a concept to a specified file path (filesystem backend only).\n\nCopies the ``.cev`` archive to the given path, re-registers the concept\nat that location, and sets ``save_state`` to ``SaveState.SAVED``.",
+        "operationId": "save_concept_v2_concept__id__save_post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConceptSaveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Get File",
+        "description": "Get file metadata for a concept.",
+        "operationId": "get_file_v2_concept__id__files__file_id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileItemOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Update File",
+        "description": "Update an existing file for a concept.",
+        "operationId": "update_file_v2_concept__id__files__file_id__put",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileItemInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileItemOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Delete File",
+        "description": "Delete a file from a concept.",
+        "operationId": "delete_file_v2_concept__id__files__file_id__delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{id}/files": {
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Create File",
+        "description": "Upload a new file for a concept.",
+        "operationId": "create_file_v2_concept__id__files_post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          },
+          {
+            "name": "component_file_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ComponentFileType"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_create_file_v2_concept__id__files_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileItemCreateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{id}/{part_type}/{part_id}": {
+      "get": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Get Concept Part",
+        "description": "Get a specific part from a concept.",
+        "operationId": "get_concept_part_v2_concept__id___part_type___part_id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "part_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PartType"
+            }
+          },
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Part Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/MotorLabOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BatteryFixedVoltagesOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BatteryLookupTableOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/TransmissionLossCoefficientsOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "component_type",
+                        "mapping": {
+                          "MotorLabModel": "#/components/schemas/MotorLabOutput",
+                          "BatteryFixedVoltages": "#/components/schemas/BatteryFixedVoltagesOutput",
+                          "BatteryLookupData": "#/components/schemas/BatteryLookupTableOutput",
+                          "TransmissionLossCoefficients": "#/components/schemas/TransmissionLossCoefficientsOutput"
+                        }
+                      }
+                    },
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/AeroOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MassOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/WheelOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "config_type",
+                        "mapping": {
+                          "aero": "#/components/schemas/AeroOutput",
+                          "mass": "#/components/schemas/MassOutput",
+                          "wheel": "#/components/schemas/WheelOutput"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/ArchitectureOutput"
+                    },
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/DriveCycleRequirementOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DynamicRequirementOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/StaticRequirementOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "requirement_input_type",
+                        "mapping": {
+                          "drive_cycle": "#/components/schemas/DriveCycleRequirementOutput",
+                          "dynamic": "#/components/schemas/DynamicRequirementOutput",
+                          "static": "#/components/schemas/StaticRequirementOutput"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/DriveCycleOutput"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ConceptJobRecord"
+                    }
+                  ],
+                  "title": "Response Get Concept Part V2 Concept  Id   Part Type   Part Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Update Concept Part",
+        "description": "Update an existing part within a concept.",
+        "operationId": "update_concept_part_v2_concept__id___part_type___part_id__put",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "part_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PartType"
+            }
+          },
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Part Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MotorLabInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BatteryFixedVoltagesInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BatteryLookupTableInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/TransmissionLossCoefficientsInput"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "component_type",
+                      "mapping": {
+                        "MotorLabModel": "#/components/schemas/MotorLabInput",
+                        "BatteryFixedVoltages": "#/components/schemas/BatteryFixedVoltagesInput",
+                        "BatteryLookupData": "#/components/schemas/BatteryLookupTableInput",
+                        "TransmissionLossCoefficients": "#/components/schemas/TransmissionLossCoefficientsInput"
+                      }
+                    }
+                  },
+                  {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/AeroInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/MassInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/WheelInput"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "config_type",
+                      "mapping": {
+                        "aero": "#/components/schemas/AeroInput",
+                        "mass": "#/components/schemas/MassInput",
+                        "wheel": "#/components/schemas/WheelInput"
+                      }
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/ArchitectureInput"
+                  },
+                  {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DriveCycleRequirementInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DynamicRequirementInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/StaticRequirementInput"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "requirement_input_type",
+                      "mapping": {
+                        "drive_cycle": "#/components/schemas/DriveCycleRequirementInput",
+                        "dynamic": "#/components/schemas/DynamicRequirementInput",
+                        "static": "#/components/schemas/StaticRequirementInput"
+                      }
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/DriveCycleInput"
+                  }
+                ],
+                "title": "Part"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/MotorLabOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BatteryFixedVoltagesOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BatteryLookupTableOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/TransmissionLossCoefficientsOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "component_type",
+                        "mapping": {
+                          "MotorLabModel": "#/components/schemas/MotorLabOutput",
+                          "BatteryFixedVoltages": "#/components/schemas/BatteryFixedVoltagesOutput",
+                          "BatteryLookupData": "#/components/schemas/BatteryLookupTableOutput",
+                          "TransmissionLossCoefficients": "#/components/schemas/TransmissionLossCoefficientsOutput"
+                        }
+                      }
+                    },
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/AeroOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MassOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/WheelOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "config_type",
+                        "mapping": {
+                          "aero": "#/components/schemas/AeroOutput",
+                          "mass": "#/components/schemas/MassOutput",
+                          "wheel": "#/components/schemas/WheelOutput"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/ArchitectureOutput"
+                    },
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/DriveCycleRequirementOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DynamicRequirementOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/StaticRequirementOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "requirement_input_type",
+                        "mapping": {
+                          "drive_cycle": "#/components/schemas/DriveCycleRequirementOutput",
+                          "dynamic": "#/components/schemas/DynamicRequirementOutput",
+                          "static": "#/components/schemas/StaticRequirementOutput"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/DriveCycleOutput"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ConceptJobRecord"
+                    }
+                  ],
+                  "title": "Response Update Concept Part V2 Concept  Id   Part Type   Part Id  Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Delete Concept Part",
+        "description": "Delete a part from a concept.",
+        "operationId": "delete_concept_part_v2_concept__id___part_type___part_id__delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "part_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PartType"
+            }
+          },
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Part Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{id}/{part_type}": {
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Create Concept Part",
+        "description": "Create a new part within a concept.",
+        "operationId": "create_concept_part_v2_concept__id___part_type__post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "part_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PartType"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MotorLabInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BatteryFixedVoltagesInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BatteryLookupTableInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/TransmissionLossCoefficientsInput"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "component_type",
+                      "mapping": {
+                        "MotorLabModel": "#/components/schemas/MotorLabInput",
+                        "BatteryFixedVoltages": "#/components/schemas/BatteryFixedVoltagesInput",
+                        "BatteryLookupData": "#/components/schemas/BatteryLookupTableInput",
+                        "TransmissionLossCoefficients": "#/components/schemas/TransmissionLossCoefficientsInput"
+                      }
+                    }
+                  },
+                  {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/AeroInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/MassInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/WheelInput"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "config_type",
+                      "mapping": {
+                        "aero": "#/components/schemas/AeroInput",
+                        "mass": "#/components/schemas/MassInput",
+                        "wheel": "#/components/schemas/WheelInput"
+                      }
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/ArchitectureInput"
+                  },
+                  {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DriveCycleRequirementInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DynamicRequirementInput"
+                      },
+                      {
+                        "$ref": "#/components/schemas/StaticRequirementInput"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "requirement_input_type",
+                      "mapping": {
+                        "drive_cycle": "#/components/schemas/DriveCycleRequirementInput",
+                        "dynamic": "#/components/schemas/DynamicRequirementInput",
+                        "static": "#/components/schemas/StaticRequirementInput"
+                      }
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/DriveCycleInput"
+                  }
+                ],
+                "title": "Part"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/MotorLabOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BatteryFixedVoltagesOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BatteryLookupTableOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/TransmissionLossCoefficientsOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "component_type",
+                        "mapping": {
+                          "MotorLabModel": "#/components/schemas/MotorLabOutput",
+                          "BatteryFixedVoltages": "#/components/schemas/BatteryFixedVoltagesOutput",
+                          "BatteryLookupData": "#/components/schemas/BatteryLookupTableOutput",
+                          "TransmissionLossCoefficients": "#/components/schemas/TransmissionLossCoefficientsOutput"
+                        }
+                      }
+                    },
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/AeroOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MassOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/WheelOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "config_type",
+                        "mapping": {
+                          "aero": "#/components/schemas/AeroOutput",
+                          "mass": "#/components/schemas/MassOutput",
+                          "wheel": "#/components/schemas/WheelOutput"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/ArchitectureOutput"
+                    },
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/DriveCycleRequirementOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DynamicRequirementOutput"
+                        },
+                        {
+                          "$ref": "#/components/schemas/StaticRequirementOutput"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "requirement_input_type",
+                        "mapping": {
+                          "drive_cycle": "#/components/schemas/DriveCycleRequirementOutput",
+                          "dynamic": "#/components/schemas/DynamicRequirementOutput",
+                          "static": "#/components/schemas/StaticRequirementOutput"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/DriveCycleOutput"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ConceptJobRecord"
+                    }
+                  ],
+                  "title": "Response Create Concept Part V2 Concept  Id   Part Type  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept:open": {
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Open Concept",
+        "description": "Open a .cev concept file and load it into the file-system database.\n\nReads the concept ID from inside the file so the filename can be any\nhuman-readable name rather than the UUID.  Registers the path so all\nsubsequent operations resolve the correct location without requiring\nanother open call.  Multiple files in different directories can be\nregistered independently.\n\nNote: This endpoint is only meaningful when the file-system backend is\nactive.  It is registered unconditionally so the route exists regardless\nof which backend was configured at import time (important for tests that\nswap configs via fixtures).",
+        "operationId": "open_concept_v2_concept_open_post",
+        "parameters": [
+          {
+            "name": "path_to_file",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "path",
+              "title": "Path To File"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{id}/component/{part_id}:get_display_data": {
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Get Display Data",
+        "description": "Get graph data for a component.\n\nSupported component types:\n\n- **MotorLab** \u2014 returns ``LossMapGridLab`` or ``LossMapGridPower``\n- **BatteryLookupTable** \u2014 returns ``BatteryLookupTableData``\n- **TransmissionLossCoefficients** \u2014 returns ``LossMapGridTorque``\n\nArgs:\n    id: The concept ID.\n    part_id: The component part ID.\n    database: Injected database dependency.\n    unit_choices: Injected unit-choice dependency.\n    extra_args: Optional loss-map calculation arguments (speed, voltage\u2026).\n\nReturns:\n    A display-data object in user units.\n\nRaises:\n    HTTPException 404: If the component or its associated file is not found.\n    HTTPException 422: If the component type does not support display data.",
+        "operationId": "get_display_data_v2_concept__id__component__part_id__get_display_data_post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Part Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ComponentLossMapArgs"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Extra Args"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/LossMapGridLab"
+                    },
+                    {
+                      "$ref": "#/components/schemas/LossMapGridPower"
+                    },
+                    {}
+                  ],
+                  "title": "Response Get Display Data V2 Concept  Id  Component  Part Id  Get Display Data Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{id}:calculate_forces": {
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Calculate Total Forces",
+        "description": "Calculate the total tractive torque.",
+        "operationId": "calculate_total_forces_v2_concept__id__calculate_forces_post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TotalTractiveTorqueGraphInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotalTractiveTorqueGraphOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/unit_choices": {
+      "get": {
+        "tags": [
+          "Unit Choices"
+        ],
+        "summary": "Read",
+        "description": "Get from ID.",
+        "operationId": "read_unit_choices_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitChoices"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Unit Choices"
+        ],
+        "summary": "Update",
+        "description": "Update with new parameters.",
+        "operationId": "update_unit_choices_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnitChoices"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitChoices"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Unit Choices"
+        ],
+        "summary": "Create Unit Choices",
+        "description": "Create.",
+        "operationId": "create_unit_choices_unit_choices_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnitChoices"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitChoices"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Unit Choices"
+        ],
+        "summary": "Delete",
+        "description": "Delete by ID.",
+        "operationId": "delete_unit_choices_delete",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/unit_choices/info": {
+      "get": {
+        "tags": [
+          "Unit Choices"
+        ],
+        "summary": "Get Info",
+        "description": "Get table of units for frontend generation.",
+        "operationId": "get_info_unit_choices_info_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Info Unit Choices Info Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccelerationUnit": {
+        "type": "string",
+        "enum": [
+          "m/s\u00b2",
+          "km/hr/s",
+          "mph/s"
+        ],
+        "title": "AccelerationUnit",
+        "description": "Acceleration Unit."
+      },
+      "Aero": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "config",
+            "title": "Item Type",
+            "default": "config"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Aero Config"
+          },
+          "drag_coefficient": {
+            "type": "number",
+            "title": "Drag Coefficient",
+            "default": 0.4
+          },
+          "drag_coefficient_rear": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drag Coefficient Rear"
+          },
+          "cross_sectional_area": {
+            "type": "number",
+            "title": "Cross Sectional Area",
+            "default": 2
+          },
+          "config_type": {
+            "type": "string",
+            "const": "aero",
+            "title": "Config Type",
+            "default": "aero"
+          }
+        },
+        "type": "object",
+        "title": "Aero",
+        "description": "Aero Configuration."
+      },
+      "AeroInput": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "config",
+            "title": "Item Type",
+            "default": "config"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Aero Config"
+          },
+          "drag_coefficient": {
+            "type": "number",
+            "title": "Drag Coefficient",
+            "default": 0.4
+          },
+          "drag_coefficient_rear": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drag Coefficient Rear"
+          },
+          "cross_sectional_area": {
+            "type": "number",
+            "title": "Cross Sectional Area",
+            "default": 2
+          },
+          "config_type": {
+            "type": "string",
+            "const": "aero",
+            "title": "Config Type",
+            "default": "aero"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "configuration",
+            "title": "Part Type",
+            "default": "configuration"
+          }
+        },
+        "type": "object",
+        "title": "AeroInput",
+        "description": "Aero Input."
+      },
+      "AeroOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "config",
+            "title": "Item Type",
+            "default": "config"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Aero Config"
+          },
+          "drag_coefficient": {
+            "type": "number",
+            "title": "Drag Coefficient",
+            "default": 0.4
+          },
+          "drag_coefficient_rear": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drag Coefficient Rear"
+          },
+          "cross_sectional_area": {
+            "type": "number",
+            "title": "Cross Sectional Area",
+            "default": 2
+          },
+          "config_type": {
+            "type": "string",
+            "const": "aero",
+            "title": "Config Type",
+            "default": "aero"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "configuration",
+            "title": "Part Type",
+            "default": "configuration"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "AeroOutput",
+        "description": "Aero Output."
+      },
+      "AngleUnit": {
+        "type": "string",
+        "enum": [
+          "rad",
+          "deg",
+          "%"
+        ],
+        "title": "AngleUnit",
+        "description": "Unit of Angle."
+      },
+      "AngularAccelerationUnit": {
+        "type": "string",
+        "enum": [
+          "rad/s\u00b2",
+          "rpm/s",
+          "rps/s",
+          "deg/s\u00b2"
+        ],
+        "title": "AngularAccelerationUnit",
+        "description": "Angular Acceleration Unit."
+      },
+      "AngularSpeedUnit": {
+        "type": "string",
+        "enum": [
+          "rad/s",
+          "rpm",
+          "rps",
+          "deg/s"
+        ],
+        "title": "AngularSpeedUnit",
+        "description": "Angular Speed Unit."
+      },
+      "ArchitectureInput": {
+        "properties": {
+          "wheelbase": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wheelbase"
+          },
+          "number_of_front_motors": {
+            "type": "integer",
+            "title": "Number Of Front Motors",
+            "default": 0
+          },
+          "number_of_front_wheels": {
+            "type": "integer",
+            "title": "Number Of Front Wheels",
+            "default": 2
+          },
+          "number_of_rear_motors": {
+            "type": "integer",
+            "title": "Number Of Rear Motors",
+            "default": 0
+          },
+          "number_of_rear_wheels": {
+            "type": "integer",
+            "title": "Number Of Rear Wheels",
+            "default": 2
+          },
+          "battery": {
+            "type": "null",
+            "title": "Battery"
+          },
+          "front_transmission": {
+            "type": "null",
+            "title": "Front Transmission"
+          },
+          "front_motor": {
+            "type": "null",
+            "title": "Front Motor"
+          },
+          "front_inverter": {
+            "type": "null",
+            "title": "Front Inverter"
+          },
+          "front_clutch": {
+            "type": "null",
+            "title": "Front Clutch"
+          },
+          "rear_transmission": {
+            "type": "null",
+            "title": "Rear Transmission"
+          },
+          "rear_motor": {
+            "type": "null",
+            "title": "Rear Motor"
+          },
+          "rear_inverter": {
+            "type": "null",
+            "title": "Rear Inverter"
+          },
+          "rear_clutch": {
+            "type": "null",
+            "title": "Rear Clutch"
+          },
+          "battery_id": {
+            "type": "string",
+            "title": "Battery Id"
+          },
+          "front_transmission_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Transmission Id"
+          },
+          "front_motor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Motor Id"
+          },
+          "front_inverter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Inverter Id"
+          },
+          "front_clutch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Clutch Id"
+          },
+          "rear_transmission_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rear Transmission Id"
+          },
+          "rear_motor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rear Motor Id"
+          },
+          "rear_inverter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rear Inverter Id"
+          },
+          "rear_clutch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rear Clutch Id"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "architecture",
+            "title": "Part Type",
+            "default": "architecture"
+          }
+        },
+        "type": "object",
+        "required": [
+          "battery_id"
+        ],
+        "title": "ArchitectureInput",
+        "description": "Architecture Input."
+      },
+      "ArchitectureOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "wheelbase": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wheelbase"
+          },
+          "number_of_front_motors": {
+            "type": "integer",
+            "title": "Number Of Front Motors",
+            "default": 0
+          },
+          "number_of_front_wheels": {
+            "type": "integer",
+            "title": "Number Of Front Wheels",
+            "default": 2
+          },
+          "number_of_rear_motors": {
+            "type": "integer",
+            "title": "Number Of Rear Motors",
+            "default": 0
+          },
+          "number_of_rear_wheels": {
+            "type": "integer",
+            "title": "Number Of Rear Wheels",
+            "default": 2
+          },
+          "battery": {
+            "type": "null",
+            "title": "Battery"
+          },
+          "front_transmission": {
+            "type": "null",
+            "title": "Front Transmission"
+          },
+          "front_motor": {
+            "type": "null",
+            "title": "Front Motor"
+          },
+          "front_inverter": {
+            "type": "null",
+            "title": "Front Inverter"
+          },
+          "front_clutch": {
+            "type": "null",
+            "title": "Front Clutch"
+          },
+          "rear_transmission": {
+            "type": "null",
+            "title": "Rear Transmission"
+          },
+          "rear_motor": {
+            "type": "null",
+            "title": "Rear Motor"
+          },
+          "rear_inverter": {
+            "type": "null",
+            "title": "Rear Inverter"
+          },
+          "rear_clutch": {
+            "type": "null",
+            "title": "Rear Clutch"
+          },
+          "battery_id": {
+            "type": "string",
+            "title": "Battery Id"
+          },
+          "front_transmission_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Transmission Id"
+          },
+          "front_motor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Motor Id"
+          },
+          "front_inverter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Inverter Id"
+          },
+          "front_clutch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Clutch Id"
+          },
+          "rear_transmission_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rear Transmission Id"
+          },
+          "rear_motor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rear Motor Id"
+          },
+          "rear_inverter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rear Inverter Id"
+          },
+          "rear_clutch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rear Clutch Id"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "architecture",
+            "title": "Part Type",
+            "default": "architecture"
+          },
+          "components_cost": {
+            "type": "number",
+            "title": "Components Cost",
+            "default": 0
+          },
+          "components_mass": {
+            "type": "number",
+            "title": "Components Mass",
+            "default": 0
+          },
+          "max_wheel_speed": {
+            "type": "number",
+            "title": "Max Wheel Speed",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "battery_id"
+        ],
+        "title": "ArchitectureOutput",
+        "description": "Architecture Output."
+      },
+      "AreaUnit": {
+        "type": "string",
+        "enum": [
+          "m\u00b2",
+          "mm\u00b2",
+          "cm\u00b2",
+          "in\u00b2",
+          "ft\u00b2",
+          "yd\u00b2"
+        ],
+        "title": "AreaUnit",
+        "description": "Area Unit."
+      },
+      "BatteryConfiguration": {
+        "properties": {
+          "component_config_type": {
+            "type": "string",
+            "const": "battery",
+            "title": "Component Config Type",
+            "default": "battery"
+          },
+          "state": {
+            "$ref": "#/components/schemas/BatteryState",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "title": "BatteryConfiguration",
+        "description": "Configuration that can change characteristics of the battery."
+      },
+      "BatteryFixedVoltagesInput": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Item Type",
+            "default": "component"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Fixed Voltages Battery"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "moment_of_inertia": {
+            "type": "number",
+            "title": "Moment Of Inertia",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "component_type": {
+            "type": "string",
+            "const": "BatteryFixedVoltages",
+            "title": "Component Type",
+            "default": "BatteryFixedVoltages"
+          },
+          "voltage_max": {
+            "type": "number",
+            "title": "Voltage Max",
+            "default": 400.0
+          },
+          "voltage_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voltage Min"
+          },
+          "charge_acceptance_limit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charge Acceptance Limit"
+          },
+          "charge_release_limit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charge Release Limit"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "internal_resistance_charge": {
+            "type": "number",
+            "title": "Internal Resistance Charge",
+            "default": 0.0
+          },
+          "internal_resistance_discharge": {
+            "type": "number",
+            "title": "Internal Resistance Discharge",
+            "default": 0.0
+          },
+          "state": {
+            "$ref": "#/components/schemas/BatteryState",
+            "default": {}
+          },
+          "part_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Part Type",
+            "default": "component"
+          }
+        },
+        "type": "object",
+        "title": "BatteryFixedVoltagesInput",
+        "description": "Battery Fixed Voltages Input."
+      },
+      "BatteryFixedVoltagesOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Item Type",
+            "default": "component"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Fixed Voltages Battery"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "moment_of_inertia": {
+            "type": "number",
+            "title": "Moment Of Inertia",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "component_type": {
+            "type": "string",
+            "const": "BatteryFixedVoltages",
+            "title": "Component Type",
+            "default": "BatteryFixedVoltages"
+          },
+          "voltage_max": {
+            "type": "number",
+            "title": "Voltage Max",
+            "default": 400.0
+          },
+          "voltage_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voltage Min"
+          },
+          "charge_acceptance_limit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charge Acceptance Limit"
+          },
+          "charge_release_limit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charge Release Limit"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "internal_resistance_charge": {
+            "type": "number",
+            "title": "Internal Resistance Charge",
+            "default": 0.0
+          },
+          "internal_resistance_discharge": {
+            "type": "number",
+            "title": "Internal Resistance Discharge",
+            "default": 0.0
+          },
+          "state": {
+            "$ref": "#/components/schemas/BatteryState",
+            "default": {}
+          },
+          "part_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Part Type",
+            "default": "component"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "BatteryFixedVoltagesOutput",
+        "description": "Battery Fixed Voltages Output."
+      },
+      "BatteryLookupTableData": {
+        "properties": {
+          "voltage": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Voltage"
+          },
+          "state_of_charge": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "State Of Charge"
+          },
+          "usable_charge": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Usable Charge"
+          },
+          "power_limit_charge": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Power Limit Charge"
+          },
+          "power_limit_discharge": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Power Limit Discharge"
+          },
+          "internal_resistance_charge": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Internal Resistance Charge"
+          },
+          "internal_resistance_discharge": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Internal Resistance Discharge"
+          },
+          "internal_resistance": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Internal Resistance",
+            "default": []
+          },
+          "component_file_type": {
+            "type": "string",
+            "const": "BatteryLookupTable",
+            "title": "Component File Type",
+            "default": "BatteryLookupTable"
+          }
+        },
+        "type": "object",
+        "required": [
+          "voltage",
+          "state_of_charge",
+          "usable_charge",
+          "power_limit_charge",
+          "power_limit_discharge",
+          "internal_resistance_charge",
+          "internal_resistance_discharge"
+        ],
+        "title": "BatteryLookupTableData",
+        "description": "Data for a lookup table battery."
+      },
+      "BatteryLookupTableInput": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Item Type",
+            "default": "component"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Lookup Table Battery"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "moment_of_inertia": {
+            "type": "number",
+            "title": "Moment Of Inertia",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "component_type": {
+            "type": "string",
+            "const": "BatteryLookupData",
+            "title": "Component Type",
+            "default": "BatteryLookupData"
+          },
+          "lookup_table": {
+            "$ref": "#/components/schemas/BatteryLookupTableData"
+          },
+          "state": {
+            "$ref": "#/components/schemas/BatteryState",
+            "default": {}
+          },
+          "part_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Part Type",
+            "default": "component"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lookup_table"
+        ],
+        "title": "BatteryLookupTableInput",
+        "description": "Battery Lookup Table Input."
+      },
+      "BatteryLookupTableOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Item Type",
+            "default": "component"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Lookup Table Battery"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "moment_of_inertia": {
+            "type": "number",
+            "title": "Moment Of Inertia",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "component_type": {
+            "type": "string",
+            "const": "BatteryLookupData",
+            "title": "Component Type",
+            "default": "BatteryLookupData"
+          },
+          "lookup_table": {
+            "$ref": "#/components/schemas/BatteryLookupTableData"
+          },
+          "state": {
+            "$ref": "#/components/schemas/BatteryState",
+            "default": {}
+          },
+          "part_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Part Type",
+            "default": "component"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "lookup_table"
+        ],
+        "title": "BatteryLookupTableOutput",
+        "description": "Battery Lookup Table Output."
+      },
+      "BatteryState": {
+        "properties": {
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          }
+        },
+        "type": "object",
+        "title": "BatteryState",
+        "description": "Variables that define state of a battery."
+      },
+      "Body_create_file_v2_concept__id__files_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_create_file_v2_concept__id__files_post"
+      },
+      "ComponentAxle": {
+        "type": "string",
+        "enum": [
+          "Front",
+          "Rear",
+          "None"
+        ],
+        "title": "ComponentAxle",
+        "description": "Component axle."
+      },
+      "ComponentConfigurationSet": {
+        "properties": {
+          "configurations": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MotorConfiguration"
+                },
+                {
+                  "$ref": "#/components/schemas/BatteryConfiguration"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "component_config_type",
+                "mapping": {
+                  "battery": "#/components/schemas/BatteryConfiguration",
+                  "motor": "#/components/schemas/MotorConfiguration"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Configurations"
+          }
+        },
+        "type": "object",
+        "title": "ComponentConfigurationSet",
+        "description": "Set of component configurations."
+      },
+      "ComponentFileType": {
+        "type": "string",
+        "enum": [
+          "motor_lab_file",
+          "motor_torque_grid_file",
+          "motor_torque_speed_file",
+          "transmission_torque_grid_file",
+          "battery_lookup_file",
+          "drive_cycle_file",
+          "inverter_loss_file",
+          "thermal_model_file"
+        ],
+        "title": "ComponentFileType",
+        "description": "Types of files."
+      },
+      "ComponentLossMapArgs": {
+        "properties": {
+          "voltage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voltage"
+          },
+          "gear_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gear Ratio"
+          },
+          "speed": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speed"
+          },
+          "dc_current": {
+            "type": "number",
+            "title": "Dc Current",
+            "default": 50
+          },
+          "power_factor": {
+            "type": "number",
+            "title": "Power Factor",
+            "default": 1
+          },
+          "phase_current_max": {
+            "type": "number",
+            "title": "Phase Current Max",
+            "default": 400
+          },
+          "frequency": {
+            "type": "number",
+            "title": "Frequency",
+            "default": 1000
+          }
+        },
+        "type": "object",
+        "title": "ComponentLossMapArgs",
+        "description": "Args for create component loss maps.\n\nAllows unit transforming."
+      },
+      "ConceptInput": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Study"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "design_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Design Id"
+          },
+          "design_instance_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Design Instance Id"
+          },
+          "file_items": {
+            "items": {
+              "$ref": "#/components/schemas/FileItemOutput"
+            },
+            "type": "array",
+            "title": "File Items",
+            "default": []
+          },
+          "components": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MotorLabInput"
+                },
+                {
+                  "$ref": "#/components/schemas/BatteryFixedVoltagesInput"
+                },
+                {
+                  "$ref": "#/components/schemas/BatteryLookupTableInput"
+                },
+                {
+                  "$ref": "#/components/schemas/TransmissionLossCoefficientsInput"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "component_type",
+                "mapping": {
+                  "BatteryFixedVoltages": "#/components/schemas/BatteryFixedVoltagesInput",
+                  "BatteryLookupData": "#/components/schemas/BatteryLookupTableInput",
+                  "MotorLabModel": "#/components/schemas/MotorLabInput",
+                  "TransmissionLossCoefficients": "#/components/schemas/TransmissionLossCoefficientsInput"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Components",
+            "default": []
+          },
+          "configurations": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AeroInput"
+                },
+                {
+                  "$ref": "#/components/schemas/MassInput"
+                },
+                {
+                  "$ref": "#/components/schemas/WheelInput"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "config_type",
+                "mapping": {
+                  "aero": "#/components/schemas/AeroInput",
+                  "mass": "#/components/schemas/MassInput",
+                  "wheel": "#/components/schemas/WheelInput"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Configurations",
+            "default": []
+          },
+          "architectures": {
+            "items": {
+              "$ref": "#/components/schemas/ArchitectureInput"
+            },
+            "type": "array",
+            "title": "Architectures",
+            "default": []
+          },
+          "requirements": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DriveCycleRequirementInput"
+                },
+                {
+                  "$ref": "#/components/schemas/DynamicRequirementInput"
+                },
+                {
+                  "$ref": "#/components/schemas/StaticRequirementInput"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "requirement_input_type",
+                "mapping": {
+                  "drive_cycle": "#/components/schemas/DriveCycleRequirementInput",
+                  "dynamic": "#/components/schemas/DynamicRequirementInput",
+                  "static": "#/components/schemas/StaticRequirementInput"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Requirements",
+            "default": []
+          },
+          "drive_cycles": {
+            "items": {
+              "$ref": "#/components/schemas/DriveCycleInput"
+            },
+            "type": "array",
+            "title": "Drive Cycles",
+            "default": []
+          }
+        },
+        "type": "object",
+        "title": "ConceptInput",
+        "description": "Concept input \u2014 uses input variants of each part group."
+      },
+      "ConceptJobRecord": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "job",
+            "title": "Part Type",
+            "default": "job"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "RUNNING"
+          },
+          "output_urls": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Output Urls",
+            "default": []
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ConceptJobRecord",
+        "description": "A job record stored as a part inside a concept.\n\nTracks backend job status and the output file URLs written by the solver.\nStored under PartType.JOB so it uses the same CRUD path as all other parts."
+      },
+      "ConceptOutput": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Study"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "design_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Design Id"
+          },
+          "design_instance_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Design Instance Id"
+          },
+          "file_items": {
+            "items": {
+              "$ref": "#/components/schemas/FileItemOutput"
+            },
+            "type": "array",
+            "title": "File Items",
+            "default": []
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "save_state": {
+            "$ref": "#/components/schemas/SaveState",
+            "default": "saved"
+          },
+          "components": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MotorLabOutput"
+                },
+                {
+                  "$ref": "#/components/schemas/BatteryFixedVoltagesOutput"
+                },
+                {
+                  "$ref": "#/components/schemas/BatteryLookupTableOutput"
+                },
+                {
+                  "$ref": "#/components/schemas/TransmissionLossCoefficientsOutput"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "component_type",
+                "mapping": {
+                  "BatteryFixedVoltages": "#/components/schemas/BatteryFixedVoltagesOutput",
+                  "BatteryLookupData": "#/components/schemas/BatteryLookupTableOutput",
+                  "MotorLabModel": "#/components/schemas/MotorLabOutput",
+                  "TransmissionLossCoefficients": "#/components/schemas/TransmissionLossCoefficientsOutput"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Components",
+            "default": []
+          },
+          "configurations": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AeroOutput"
+                },
+                {
+                  "$ref": "#/components/schemas/MassOutput"
+                },
+                {
+                  "$ref": "#/components/schemas/WheelOutput"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "config_type",
+                "mapping": {
+                  "aero": "#/components/schemas/AeroOutput",
+                  "mass": "#/components/schemas/MassOutput",
+                  "wheel": "#/components/schemas/WheelOutput"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Configurations",
+            "default": []
+          },
+          "architectures": {
+            "items": {
+              "$ref": "#/components/schemas/ArchitectureOutput"
+            },
+            "type": "array",
+            "title": "Architectures",
+            "default": []
+          },
+          "requirements": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DriveCycleRequirementOutput"
+                },
+                {
+                  "$ref": "#/components/schemas/DynamicRequirementOutput"
+                },
+                {
+                  "$ref": "#/components/schemas/StaticRequirementOutput"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "requirement_input_type",
+                "mapping": {
+                  "drive_cycle": "#/components/schemas/DriveCycleRequirementOutput",
+                  "dynamic": "#/components/schemas/DynamicRequirementOutput",
+                  "static": "#/components/schemas/StaticRequirementOutput"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Requirements",
+            "default": []
+          },
+          "drive_cycles": {
+            "items": {
+              "$ref": "#/components/schemas/DriveCycleOutput"
+            },
+            "type": "array",
+            "title": "Drive Cycles",
+            "default": []
+          },
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/ConceptJobRecord"
+            },
+            "type": "array",
+            "title": "Jobs",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "ConceptOutput",
+        "description": "Concept output with database ID \u2014 uses output variants of each part group."
+      },
+      "ConceptSaveRequest": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "title": "ConceptSaveRequest",
+        "description": "Request body for the save-concept endpoint."
+      },
+      "CurrentUnit": {
+        "type": "string",
+        "enum": [
+          "A",
+          "mA",
+          "kA"
+        ],
+        "title": "CurrentUnit",
+        "description": "Current Unit."
+      },
+      "DensityUnit": {
+        "type": "string",
+        "enum": [
+          "kg/m\u00b3",
+          "g/cm\u00b3"
+        ],
+        "title": "DensityUnit",
+        "description": "Density Unit."
+      },
+      "DriveCycleInput": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "drive_cycle",
+            "title": "Item Type",
+            "default": "drive_cycle"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": ""
+          },
+          "points": {
+            "items": {},
+            "type": "array",
+            "title": "Points"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "drive_cycle",
+            "title": "Part Type",
+            "default": "drive_cycle"
+          },
+          "drive_cycle_data_id": {
+            "type": "string",
+            "title": "Drive Cycle Data Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "drive_cycle_data_id"
+        ],
+        "title": "DriveCycleInput",
+        "description": "Drive Cycle Input.\n\nUpload the raw drive cycle data (CSV or JSON export from the solver) as a\nfile first, then create a ``DriveCycleInput`` referencing that file via\n``drive_cycle_data_id``.  The ``points`` field is excluded from storage."
+      },
+      "DriveCycleOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "drive_cycle",
+            "title": "Item Type",
+            "default": "drive_cycle"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": ""
+          },
+          "points": {
+            "items": {},
+            "type": "array",
+            "title": "Points"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "drive_cycle",
+            "title": "Part Type",
+            "default": "drive_cycle"
+          },
+          "drive_cycle_data_id": {
+            "type": "string",
+            "title": "Drive Cycle Data Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "drive_cycle_data_id"
+        ],
+        "title": "DriveCycleOutput",
+        "description": "Drive Cycle Output.\n\nThe raw time-series data (``points``) is stored in a separate file\nreferenced by ``drive_cycle_data_id``, mirroring the pattern used by\n:class:`~src.v2.models.components.MotorLabOutput`.  The ``points`` field\nis excluded from the concept record so that large point arrays do not bloat\nthe concept JSON."
+      },
+      "DriveCycleRequirementInput": {
+        "properties": {
+          "part_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Part Type",
+            "default": "requirement"
+          },
+          "aero_id": {
+            "type": "string",
+            "title": "Aero Id"
+          },
+          "mass_id": {
+            "type": "string",
+            "title": "Mass Id"
+          },
+          "wheel_id": {
+            "type": "string",
+            "title": "Wheel Id"
+          },
+          "deceleration_limit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deceleration Limit Id"
+          },
+          "ancillary_load_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ancillary Load Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Item Type",
+            "default": "requirement"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Requirement"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "mass": {
+            "type": "null",
+            "title": "Mass"
+          },
+          "aero": {
+            "type": "null",
+            "title": "Aero"
+          },
+          "wheel": {
+            "type": "null",
+            "title": "Wheel"
+          },
+          "deceleration_limit": {
+            "type": "null",
+            "title": "Deceleration Limit"
+          },
+          "state_of_charge": {
+            "type": "number",
+            "title": "State Of Charge",
+            "default": 1
+          },
+          "component_configurations": {
+            "$ref": "#/components/schemas/ComponentConfigurationSet",
+            "default": {
+              "configurations": []
+            }
+          },
+          "ambient_temperature": {
+            "type": "number",
+            "title": "Ambient Temperature",
+            "default": 293.15
+          },
+          "ancillary_load": {
+            "type": "null",
+            "title": "Ancillary Load"
+          },
+          "thermal_analysis": {
+            "type": "boolean",
+            "title": "Thermal Analysis",
+            "default": false
+          },
+          "shift_delta": {
+            "type": "number",
+            "title": "Shift Delta",
+            "default": 0
+          },
+          "stop_at_temperature_limit": {
+            "type": "boolean",
+            "title": "Stop At Temperature Limit",
+            "default": true
+          },
+          "requirement_input_type": {
+            "type": "string",
+            "const": "drive_cycle",
+            "title": "Requirement Input Type",
+            "default": "drive_cycle"
+          },
+          "requirement_type": {
+            "type": "string",
+            "const": "drive_cycle",
+            "title": "Requirement Type",
+            "default": "drive_cycle"
+          },
+          "solver_id": {
+            "type": "integer",
+            "title": "Solver Id",
+            "default": -1
+          },
+          "drive_cycle": {
+            "title": "Drive Cycle"
+          },
+          "range": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Range"
+          },
+          "full_range_calculation": {
+            "type": "boolean",
+            "title": "Full Range Calculation",
+            "default": false
+          },
+          "drive_cycle_id": {
+            "type": "string",
+            "title": "Drive Cycle Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "aero_id",
+          "mass_id",
+          "wheel_id",
+          "drive_cycle_id"
+        ],
+        "title": "DriveCycleRequirementInput",
+        "description": "Drive Cycle Requirement Input."
+      },
+      "DriveCycleRequirementOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Part Type",
+            "default": "requirement"
+          },
+          "aero_id": {
+            "type": "string",
+            "title": "Aero Id"
+          },
+          "mass_id": {
+            "type": "string",
+            "title": "Mass Id"
+          },
+          "wheel_id": {
+            "type": "string",
+            "title": "Wheel Id"
+          },
+          "deceleration_limit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deceleration Limit Id"
+          },
+          "ancillary_load_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ancillary Load Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Item Type",
+            "default": "requirement"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Requirement"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "mass": {
+            "type": "null",
+            "title": "Mass"
+          },
+          "aero": {
+            "type": "null",
+            "title": "Aero"
+          },
+          "wheel": {
+            "type": "null",
+            "title": "Wheel"
+          },
+          "deceleration_limit": {
+            "type": "null",
+            "title": "Deceleration Limit"
+          },
+          "state_of_charge": {
+            "type": "number",
+            "title": "State Of Charge",
+            "default": 1
+          },
+          "component_configurations": {
+            "$ref": "#/components/schemas/ComponentConfigurationSet",
+            "default": {
+              "configurations": []
+            }
+          },
+          "ambient_temperature": {
+            "type": "number",
+            "title": "Ambient Temperature",
+            "default": 293.15
+          },
+          "ancillary_load": {
+            "type": "null",
+            "title": "Ancillary Load"
+          },
+          "thermal_analysis": {
+            "type": "boolean",
+            "title": "Thermal Analysis",
+            "default": false
+          },
+          "shift_delta": {
+            "type": "number",
+            "title": "Shift Delta",
+            "default": 0
+          },
+          "stop_at_temperature_limit": {
+            "type": "boolean",
+            "title": "Stop At Temperature Limit",
+            "default": true
+          },
+          "requirement_input_type": {
+            "type": "string",
+            "const": "drive_cycle",
+            "title": "Requirement Input Type",
+            "default": "drive_cycle"
+          },
+          "requirement_type": {
+            "type": "string",
+            "const": "drive_cycle",
+            "title": "Requirement Type",
+            "default": "drive_cycle"
+          },
+          "solver_id": {
+            "type": "integer",
+            "title": "Solver Id",
+            "default": -1
+          },
+          "drive_cycle": {
+            "title": "Drive Cycle"
+          },
+          "range": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Range"
+          },
+          "full_range_calculation": {
+            "type": "boolean",
+            "title": "Full Range Calculation",
+            "default": false
+          },
+          "drive_cycle_id": {
+            "type": "string",
+            "title": "Drive Cycle Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "aero_id",
+          "mass_id",
+          "wheel_id",
+          "drive_cycle_id"
+        ],
+        "title": "DriveCycleRequirementOutput",
+        "description": "Drive Cycle Requirement Output."
+      },
+      "DynamicRequirementInput": {
+        "properties": {
+          "part_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Part Type",
+            "default": "requirement"
+          },
+          "aero_id": {
+            "type": "string",
+            "title": "Aero Id"
+          },
+          "mass_id": {
+            "type": "string",
+            "title": "Mass Id"
+          },
+          "wheel_id": {
+            "type": "string",
+            "title": "Wheel Id"
+          },
+          "deceleration_limit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deceleration Limit Id"
+          },
+          "ancillary_load_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ancillary Load Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Item Type",
+            "default": "requirement"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "D1"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "mass": {
+            "type": "null",
+            "title": "Mass"
+          },
+          "aero": {
+            "type": "null",
+            "title": "Aero"
+          },
+          "wheel": {
+            "type": "null",
+            "title": "Wheel"
+          },
+          "deceleration_limit": {
+            "type": "null",
+            "title": "Deceleration Limit"
+          },
+          "state_of_charge": {
+            "type": "number",
+            "title": "State Of Charge",
+            "default": 1
+          },
+          "component_configurations": {
+            "$ref": "#/components/schemas/ComponentConfigurationSet",
+            "default": {
+              "configurations": []
+            }
+          },
+          "ambient_temperature": {
+            "type": "number",
+            "title": "Ambient Temperature",
+            "default": 293.15
+          },
+          "ancillary_load": {
+            "type": "null",
+            "title": "Ancillary Load"
+          },
+          "thermal_analysis": {
+            "type": "boolean",
+            "title": "Thermal Analysis",
+            "default": false
+          },
+          "shift_delta": {
+            "type": "number",
+            "title": "Shift Delta",
+            "default": 0
+          },
+          "stop_at_temperature_limit": {
+            "type": "boolean",
+            "title": "Stop At Temperature Limit",
+            "default": true
+          },
+          "from_speed": {
+            "type": "number",
+            "title": "From Speed",
+            "default": 0
+          },
+          "to_speed": {
+            "type": "number",
+            "title": "To Speed",
+            "default": 1
+          },
+          "time_step": {
+            "type": "number",
+            "title": "Time Step",
+            "default": 0.1
+          },
+          "no_of_points": {
+            "type": "integer",
+            "title": "No Of Points",
+            "default": 6
+          },
+          "base_speed_ratio": {
+            "type": "number",
+            "title": "Base Speed Ratio",
+            "default": 0.5
+          },
+          "required_time": {
+            "type": "number",
+            "title": "Required Time",
+            "default": 10000000000.0
+          },
+          "required_distance": {
+            "type": "number",
+            "title": "Required Distance",
+            "default": 10000000000.0
+          },
+          "altitude": {
+            "type": "number",
+            "title": "Altitude",
+            "default": 0
+          },
+          "headwind": {
+            "type": "number",
+            "title": "Headwind",
+            "default": 0
+          },
+          "gradient": {
+            "type": "number",
+            "title": "Gradient",
+            "default": 0
+          },
+          "max_capability": {
+            "type": "boolean",
+            "title": "Max Capability",
+            "default": false
+          },
+          "front_axle_split": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Axle Split"
+          },
+          "requirement_input_type": {
+            "type": "string",
+            "const": "dynamic",
+            "title": "Requirement Input Type",
+            "default": "dynamic"
+          }
+        },
+        "type": "object",
+        "required": [
+          "aero_id",
+          "mass_id",
+          "wheel_id"
+        ],
+        "title": "DynamicRequirementInput",
+        "description": "Dynamic Requirement Input."
+      },
+      "DynamicRequirementOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Part Type",
+            "default": "requirement"
+          },
+          "aero_id": {
+            "type": "string",
+            "title": "Aero Id"
+          },
+          "mass_id": {
+            "type": "string",
+            "title": "Mass Id"
+          },
+          "wheel_id": {
+            "type": "string",
+            "title": "Wheel Id"
+          },
+          "deceleration_limit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deceleration Limit Id"
+          },
+          "ancillary_load_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ancillary Load Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Item Type",
+            "default": "requirement"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "D1"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "mass": {
+            "type": "null",
+            "title": "Mass"
+          },
+          "aero": {
+            "type": "null",
+            "title": "Aero"
+          },
+          "wheel": {
+            "type": "null",
+            "title": "Wheel"
+          },
+          "deceleration_limit": {
+            "type": "null",
+            "title": "Deceleration Limit"
+          },
+          "state_of_charge": {
+            "type": "number",
+            "title": "State Of Charge",
+            "default": 1
+          },
+          "component_configurations": {
+            "$ref": "#/components/schemas/ComponentConfigurationSet",
+            "default": {
+              "configurations": []
+            }
+          },
+          "ambient_temperature": {
+            "type": "number",
+            "title": "Ambient Temperature",
+            "default": 293.15
+          },
+          "ancillary_load": {
+            "type": "null",
+            "title": "Ancillary Load"
+          },
+          "thermal_analysis": {
+            "type": "boolean",
+            "title": "Thermal Analysis",
+            "default": false
+          },
+          "shift_delta": {
+            "type": "number",
+            "title": "Shift Delta",
+            "default": 0
+          },
+          "stop_at_temperature_limit": {
+            "type": "boolean",
+            "title": "Stop At Temperature Limit",
+            "default": true
+          },
+          "from_speed": {
+            "type": "number",
+            "title": "From Speed",
+            "default": 0
+          },
+          "to_speed": {
+            "type": "number",
+            "title": "To Speed",
+            "default": 1
+          },
+          "time_step": {
+            "type": "number",
+            "title": "Time Step",
+            "default": 0.1
+          },
+          "no_of_points": {
+            "type": "integer",
+            "title": "No Of Points",
+            "default": 6
+          },
+          "base_speed_ratio": {
+            "type": "number",
+            "title": "Base Speed Ratio",
+            "default": 0.5
+          },
+          "required_time": {
+            "type": "number",
+            "title": "Required Time",
+            "default": 10000000000.0
+          },
+          "required_distance": {
+            "type": "number",
+            "title": "Required Distance",
+            "default": 10000000000.0
+          },
+          "altitude": {
+            "type": "number",
+            "title": "Altitude",
+            "default": 0
+          },
+          "headwind": {
+            "type": "number",
+            "title": "Headwind",
+            "default": 0
+          },
+          "gradient": {
+            "type": "number",
+            "title": "Gradient",
+            "default": 0
+          },
+          "max_capability": {
+            "type": "boolean",
+            "title": "Max Capability",
+            "default": false
+          },
+          "front_axle_split": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Axle Split"
+          },
+          "requirement_input_type": {
+            "type": "string",
+            "const": "dynamic",
+            "title": "Requirement Input Type",
+            "default": "dynamic"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "aero_id",
+          "mass_id",
+          "wheel_id"
+        ],
+        "title": "DynamicRequirementOutput",
+        "description": "Dynamic Requirement Output."
+      },
+      "Edge": {
+        "properties": {
+          "resistance": {
+            "type": "number",
+            "title": "Resistance"
+          },
+          "connected_node_list": {
+            "items": {},
+            "type": "array",
+            "title": "Connected Node List"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resistance"
+        ],
+        "title": "Edge"
+      },
+      "ElectricChargeUnit": {
+        "type": "string",
+        "enum": [
+          "A\u00b7s"
+        ],
+        "title": "ElectricChargeUnit",
+        "description": "Unit of Electrical Charge."
+      },
+      "ElectricalEnergyUnit": {
+        "type": "string",
+        "enum": [
+          "J",
+          "kWh",
+          "VA\u00b7hr",
+          "Wh"
+        ],
+        "title": "ElectricalEnergyUnit",
+        "description": "Unit of Electrical Energy."
+      },
+      "ElectricalPowerUnit": {
+        "type": "string",
+        "enum": [
+          "W",
+          "kW",
+          "VA",
+          "kVA"
+        ],
+        "title": "ElectricalPowerUnit",
+        "description": "Unit of Electrical Power."
+      },
+      "EnergyUnit": {
+        "type": "string",
+        "enum": [
+          "J",
+          "kJ",
+          "MJ",
+          "mJ",
+          "Wh",
+          "kWh"
+        ],
+        "title": "EnergyUnit",
+        "description": "Energy Unit."
+      },
+      "FileInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "path"
+        ],
+        "title": "FileInfo",
+        "description": "File data model."
+      },
+      "FileItemCreateResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "calculated_values": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Calculated Values",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "FileItemCreateResponse",
+        "description": "Response from creating a file item.\n\nIncludes any calculated values extracted from the file."
+      },
+      "FileItemInput": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "FileItemInput",
+        "description": "File Item Input \u2014 metadata supplied when registering a stored file."
+      },
+      "FileItemOutput": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "FileItemOutput",
+        "description": "File Item."
+      },
+      "ForceUnit": {
+        "type": "string",
+        "enum": [
+          "N",
+          "lbf",
+          "dyn"
+        ],
+        "title": "ForceUnit",
+        "description": "Force Unit."
+      },
+      "FrequencyUnit": {
+        "type": "string",
+        "enum": [
+          "Hz"
+        ],
+        "title": "FrequencyUnit",
+        "description": "Unit of frequency."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "InertiaUnit": {
+        "type": "string",
+        "enum": [
+          "kg\u00b7m\u00b2",
+          "g\u00b7mm\u00b2"
+        ],
+        "title": "InertiaUnit",
+        "description": "Inertia Unit."
+      },
+      "JobOutput": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "files": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FileInfo"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Files"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "id",
+          "status"
+        ],
+        "title": "JobOutput",
+        "description": "Job result data model."
+      },
+      "JobRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "requirement_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requirement Ids"
+          },
+          "architecture_id": {
+            "type": "string",
+            "title": "Architecture Id"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "default": "latest"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "requirement_ids",
+          "architecture_id"
+        ],
+        "title": "JobRequest",
+        "description": "Request body for creating a job."
+      },
+      "LengthUnit": {
+        "type": "string",
+        "enum": [
+          "m",
+          "mm",
+          "cm",
+          "in",
+          "ft",
+          "yd",
+          "km",
+          "miles"
+        ],
+        "title": "LengthUnit",
+        "description": "Length Unit."
+      },
+      "LossMapGridLab": {
+        "properties": {
+          "currents": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Currents"
+          },
+          "phase_advances": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase Advances"
+          },
+          "slips": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slips"
+          },
+          "losses_total": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Losses Total"
+          },
+          "losses_iron": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Losses Iron"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currents",
+          "phase_advances",
+          "slips",
+          "losses_total",
+          "losses_iron"
+        ],
+        "title": "LossMapGridLab",
+        "description": "Used for Lab motors if no efficiency map included in the .lab file.\n\nLosses for plotted with current/phase advance or current/slip."
+      },
+      "LossMapGridPower": {
+        "properties": {
+          "speeds": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Speeds"
+          },
+          "torques": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Torques"
+          },
+          "losses": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Losses"
+          },
+          "efficiencies": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Efficiencies"
+          },
+          "powers": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Powers"
+          },
+          "meta_data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LossMapGridPowerMetaData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "speeds",
+          "torques",
+          "losses",
+          "efficiencies",
+          "powers"
+        ],
+        "title": "LossMapGridPower",
+        "description": "Power losses (e.g. motors)."
+      },
+      "LossMapGridPowerMetaData": {
+        "properties": {
+          "voltage": {
+            "type": "number",
+            "title": "Voltage"
+          },
+          "control_strategy_bpm": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Control Strategy Bpm"
+          },
+          "control_strategy_sync": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Control Strategy Sync"
+          },
+          "current_limit_line_peak": {
+            "type": "number",
+            "title": "Current Limit Line Peak"
+          },
+          "stator_temperature": {
+            "type": "number",
+            "title": "Stator Temperature"
+          },
+          "rotor_temperature": {
+            "type": "number",
+            "title": "Rotor Temperature"
+          }
+        },
+        "type": "object",
+        "required": [
+          "voltage",
+          "control_strategy_bpm",
+          "control_strategy_sync",
+          "current_limit_line_peak",
+          "stator_temperature",
+          "rotor_temperature"
+        ],
+        "title": "LossMapGridPowerMetaData",
+        "description": "Meta-data for efficiency maps that have been calculated in Lab."
+      },
+      "Mass": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "config",
+            "title": "Item Type",
+            "default": "config"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Mass Config"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 2000
+          },
+          "com_horizontal_offset": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Com Horizontal Offset"
+          },
+          "com_vertical_height": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Com Vertical Height"
+          },
+          "add_components_mass": {
+            "type": "boolean",
+            "title": "Add Components Mass",
+            "default": false
+          },
+          "config_type": {
+            "type": "string",
+            "const": "mass",
+            "title": "Config Type",
+            "default": "mass"
+          }
+        },
+        "type": "object",
+        "title": "Mass",
+        "description": "Mass Configuration."
+      },
+      "MassInput": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "config",
+            "title": "Item Type",
+            "default": "config"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Mass Config"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 2000
+          },
+          "com_horizontal_offset": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Com Horizontal Offset"
+          },
+          "com_vertical_height": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Com Vertical Height"
+          },
+          "add_components_mass": {
+            "type": "boolean",
+            "title": "Add Components Mass",
+            "default": false
+          },
+          "config_type": {
+            "type": "string",
+            "const": "mass",
+            "title": "Config Type",
+            "default": "mass"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "configuration",
+            "title": "Part Type",
+            "default": "configuration"
+          }
+        },
+        "type": "object",
+        "title": "MassInput",
+        "description": "Mass Input."
+      },
+      "MassOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "config",
+            "title": "Item Type",
+            "default": "config"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Mass Config"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 2000
+          },
+          "com_horizontal_offset": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Com Horizontal Offset"
+          },
+          "com_vertical_height": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Com Vertical Height"
+          },
+          "add_components_mass": {
+            "type": "boolean",
+            "title": "Add Components Mass",
+            "default": false
+          },
+          "config_type": {
+            "type": "string",
+            "const": "mass",
+            "title": "Config Type",
+            "default": "mass"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "configuration",
+            "title": "Part Type",
+            "default": "configuration"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "MassOutput",
+        "description": "Mass Output."
+      },
+      "MassUnit": {
+        "type": "string",
+        "enum": [
+          "kg",
+          "g",
+          "lb",
+          "oz",
+          "t",
+          "LT",
+          "tn"
+        ],
+        "title": "MassUnit",
+        "description": "Mass Unit."
+      },
+      "MotorConfiguration": {
+        "properties": {
+          "component_config_type": {
+            "type": "string",
+            "const": "motor",
+            "title": "Component Config Type",
+            "default": "motor"
+          },
+          "axle": {
+            "$ref": "#/components/schemas/ComponentAxle",
+            "default": "None"
+          },
+          "state": {
+            "$ref": "#/components/schemas/MotorState",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "title": "MotorConfiguration",
+        "description": "Configuration that can change characteristics of the motor."
+      },
+      "MotorLabData": {
+        "properties": {
+          "lab_file_dict": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Lab File Dict"
+          },
+          "component_file_type": {
+            "type": "string",
+            "const": "MotorLab",
+            "title": "Component File Type",
+            "default": "MotorLab"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lab_file_dict"
+        ],
+        "title": "MotorLabData",
+        "description": "Motor Lab Data.\n\nModel is held as a dict, exported from Lab."
+      },
+      "MotorLabInput": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Item Type",
+            "default": "component"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Component Input"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "moment_of_inertia": {
+            "type": "number",
+            "title": "Moment Of Inertia",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "component_type": {
+            "type": "string",
+            "const": "MotorLabModel",
+            "title": "Component Type",
+            "default": "MotorLabModel"
+          },
+          "lab_data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MotorLabData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "max_speed": {
+            "type": "number",
+            "title": "Max Speed"
+          },
+          "flow_rate": {
+            "type": "number",
+            "title": "Flow Rate",
+            "default": 0
+          },
+          "state": {
+            "$ref": "#/components/schemas/MotorState"
+          },
+          "thermal_model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ThermalModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "thermal_limits": {
+            "$ref": "#/components/schemas/MotorThermalLimits"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Part Type",
+            "default": "component"
+          },
+          "lab_data_id": {
+            "type": "string",
+            "title": "Lab Data Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "max_speed",
+          "lab_data_id"
+        ],
+        "title": "MotorLabInput",
+        "description": "Motor Lab Input."
+      },
+      "MotorLabOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Item Type",
+            "default": "component"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Component Input"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "moment_of_inertia": {
+            "type": "number",
+            "title": "Moment Of Inertia",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "component_type": {
+            "type": "string",
+            "const": "MotorLabModel",
+            "title": "Component Type",
+            "default": "MotorLabModel"
+          },
+          "lab_data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MotorLabData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "max_speed": {
+            "type": "number",
+            "title": "Max Speed"
+          },
+          "flow_rate": {
+            "type": "number",
+            "title": "Flow Rate",
+            "default": 0
+          },
+          "state": {
+            "$ref": "#/components/schemas/MotorState"
+          },
+          "thermal_model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ThermalModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "thermal_limits": {
+            "$ref": "#/components/schemas/MotorThermalLimits"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Part Type",
+            "default": "component"
+          },
+          "lab_data_id": {
+            "type": "string",
+            "title": "Lab Data Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "max_speed",
+          "lab_data_id"
+        ],
+        "title": "MotorLabOutput",
+        "description": "Motor Lab Output."
+      },
+      "MotorState": {
+        "properties": {
+          "stator_winding_temp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stator Winding Temp"
+          },
+          "stator_winding_temp_peak": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stator Winding Temp Peak"
+          },
+          "rotor_temp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rotor Temp"
+          },
+          "stator_current_limit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stator Current Limit"
+          },
+          "airgap_temp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Airgap Temp"
+          },
+          "bearing_temp_front": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bearing Temp Front"
+          },
+          "bearing_temp_rear": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bearing Temp Rear"
+          },
+          "control_strategy_bpm": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Control Strategy Bpm"
+          },
+          "control_strategy_sync": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Control Strategy Sync"
+          }
+        },
+        "type": "object",
+        "title": "MotorState",
+        "description": "Variables that define state of a motor.\n\nEssentially these are mostly all inputs to a Lab operating point calculation."
+      },
+      "MotorThermalLimits": {
+        "properties": {
+          "stator": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stator"
+          },
+          "rotor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rotor"
+          },
+          "stator_limit_type": {
+            "type": "string",
+            "title": "Stator Limit Type",
+            "default": "average"
+          }
+        },
+        "type": "object",
+        "title": "MotorThermalLimits",
+        "description": "Thermal limits for motor components."
+      },
+      "Node": {
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "title": "Uid"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "capacitance": {
+            "type": "number",
+            "title": "Capacitance",
+            "default": 0
+          },
+          "fixed_temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fixed Temperature"
+          }
+        },
+        "type": "object",
+        "required": [
+          "uid",
+          "name"
+        ],
+        "title": "Node"
+      },
+      "PartType": {
+        "type": "string",
+        "enum": [
+          "component",
+          "configuration",
+          "requirement",
+          "job",
+          "architecture",
+          "drive_cycle"
+        ],
+        "title": "PartType",
+        "description": "Part type enum."
+      },
+      "PowerUnit": {
+        "type": "string",
+        "enum": [
+          "W",
+          "kW",
+          "mW",
+          "MW",
+          "hp",
+          "hp"
+        ],
+        "title": "PowerUnit",
+        "description": "Power Unit."
+      },
+      "PressureUnit": {
+        "type": "string",
+        "enum": [
+          "Pa",
+          "kPa",
+          "MPa",
+          "psi"
+        ],
+        "title": "PressureUnit",
+        "description": "Pressure Unit."
+      },
+      "RatioUnit": {
+        "type": "string",
+        "enum": [
+          "",
+          "%"
+        ],
+        "title": "RatioUnit",
+        "description": "Ratio Unit."
+      },
+      "ResistanceUnit": {
+        "type": "string",
+        "enum": [
+          "ohm"
+        ],
+        "title": "ResistanceUnit",
+        "description": "Resistance Unit."
+      },
+      "RoadEfficiencyUnit": {
+        "type": "string",
+        "enum": [
+          "m/J",
+          "km/kWh",
+          "miles/kWh",
+          "MPGe"
+        ],
+        "title": "RoadEfficiencyUnit",
+        "description": "Unit of Road Efficiency."
+      },
+      "SaveState": {
+        "type": "string",
+        "enum": [
+          "unsaved",
+          "saved"
+        ],
+        "title": "SaveState",
+        "description": "Persistence state of a concept on the filesystem.\n\n``UNSAVED`` \u2014 concept was created in this session and has never been\nwritten to a user-chosen path (the default for new concepts).\n\n``SAVED`` \u2014 concept has been explicitly saved to a known path.\n\nExtending example: add ``MODIFIED`` here when tracking unsaved edits\nto an already-saved concept (\"dirty\" state)."
+      },
+      "SpeedUnit": {
+        "type": "string",
+        "enum": [
+          "m/s",
+          "km/hr",
+          "mph",
+          "ft/s"
+        ],
+        "title": "SpeedUnit",
+        "description": "Speed Unit."
+      },
+      "StaticRequirementInput": {
+        "properties": {
+          "part_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Part Type",
+            "default": "requirement"
+          },
+          "aero_id": {
+            "type": "string",
+            "title": "Aero Id"
+          },
+          "mass_id": {
+            "type": "string",
+            "title": "Mass Id"
+          },
+          "wheel_id": {
+            "type": "string",
+            "title": "Wheel Id"
+          },
+          "deceleration_limit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deceleration Limit Id"
+          },
+          "ancillary_load_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ancillary Load Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Item Type",
+            "default": "requirement"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "S1"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "mass": {
+            "type": "null",
+            "title": "Mass"
+          },
+          "aero": {
+            "type": "null",
+            "title": "Aero"
+          },
+          "wheel": {
+            "type": "null",
+            "title": "Wheel"
+          },
+          "deceleration_limit": {
+            "type": "null",
+            "title": "Deceleration Limit"
+          },
+          "state_of_charge": {
+            "type": "number",
+            "title": "State Of Charge",
+            "default": 1
+          },
+          "component_configurations": {
+            "$ref": "#/components/schemas/ComponentConfigurationSet",
+            "default": {
+              "configurations": []
+            }
+          },
+          "ambient_temperature": {
+            "type": "number",
+            "title": "Ambient Temperature",
+            "default": 293.15
+          },
+          "ancillary_load": {
+            "type": "null",
+            "title": "Ancillary Load"
+          },
+          "speed": {
+            "type": "number",
+            "title": "Speed",
+            "default": 10
+          },
+          "altitude": {
+            "type": "number",
+            "title": "Altitude",
+            "default": 0
+          },
+          "headwind": {
+            "type": "number",
+            "title": "Headwind",
+            "default": 0
+          },
+          "gradient": {
+            "type": "number",
+            "title": "Gradient",
+            "default": 0
+          },
+          "front_axle_split": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Axle Split"
+          },
+          "steady_state": {
+            "type": "boolean",
+            "title": "Steady State",
+            "default": false
+          },
+          "requirement_input_type": {
+            "type": "string",
+            "const": "static",
+            "title": "Requirement Input Type",
+            "default": "static"
+          },
+          "acceleration": {
+            "type": "number",
+            "title": "Acceleration",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "required": [
+          "aero_id",
+          "mass_id",
+          "wheel_id"
+        ],
+        "title": "StaticRequirementInput",
+        "description": "Static Requirement (Acceleration) Input."
+      },
+      "StaticRequirementOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Part Type",
+            "default": "requirement"
+          },
+          "aero_id": {
+            "type": "string",
+            "title": "Aero Id"
+          },
+          "mass_id": {
+            "type": "string",
+            "title": "Mass Id"
+          },
+          "wheel_id": {
+            "type": "string",
+            "title": "Wheel Id"
+          },
+          "deceleration_limit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deceleration Limit Id"
+          },
+          "ancillary_load_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ancillary Load Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "requirement",
+            "title": "Item Type",
+            "default": "requirement"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "S1"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "mass": {
+            "type": "null",
+            "title": "Mass"
+          },
+          "aero": {
+            "type": "null",
+            "title": "Aero"
+          },
+          "wheel": {
+            "type": "null",
+            "title": "Wheel"
+          },
+          "deceleration_limit": {
+            "type": "null",
+            "title": "Deceleration Limit"
+          },
+          "state_of_charge": {
+            "type": "number",
+            "title": "State Of Charge",
+            "default": 1
+          },
+          "component_configurations": {
+            "$ref": "#/components/schemas/ComponentConfigurationSet",
+            "default": {
+              "configurations": []
+            }
+          },
+          "ambient_temperature": {
+            "type": "number",
+            "title": "Ambient Temperature",
+            "default": 293.15
+          },
+          "ancillary_load": {
+            "type": "null",
+            "title": "Ancillary Load"
+          },
+          "speed": {
+            "type": "number",
+            "title": "Speed"
+          },
+          "altitude": {
+            "type": "number",
+            "title": "Altitude",
+            "default": 0
+          },
+          "headwind": {
+            "type": "number",
+            "title": "Headwind",
+            "default": 0
+          },
+          "gradient": {
+            "type": "number",
+            "title": "Gradient",
+            "default": 0
+          },
+          "front_axle_split": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Front Axle Split"
+          },
+          "steady_state": {
+            "type": "boolean",
+            "title": "Steady State",
+            "default": false
+          },
+          "requirement_input_type": {
+            "type": "string",
+            "const": "static",
+            "title": "Requirement Input Type",
+            "default": "static"
+          },
+          "acceleration": {
+            "type": "number",
+            "title": "Acceleration"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "aero_id",
+          "mass_id",
+          "wheel_id",
+          "speed",
+          "acceleration"
+        ],
+        "title": "StaticRequirementOutput",
+        "description": "Static Requirement (Acceleration) Output."
+      },
+      "SurfaceConditionTractionConfigs": {
+        "type": "string",
+        "enum": [
+          "Snow",
+          "Wet",
+          "Dry"
+        ],
+        "title": "SurfaceConditionTractionConfigs",
+        "description": "Surface conditions that affect the traction coefficient."
+      },
+      "TemperatureUnit": {
+        "type": "string",
+        "enum": [
+          "K",
+          "\u00b0C",
+          "\u00b0F"
+        ],
+        "title": "TemperatureUnit",
+        "description": "Temperature Unit."
+      },
+      "ThermalModel": {
+        "properties": {
+          "component_file_type": {
+            "type": "string",
+            "const": "ThermalModel",
+            "title": "Component File Type",
+            "default": "ThermalModel"
+          },
+          "network": {
+            "$ref": "#/components/schemas/ThermalNetwork"
+          },
+          "loss_map": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Loss Map"
+          },
+          "temperature_map": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Temperature Map"
+          }
+        },
+        "type": "object",
+        "required": [
+          "network",
+          "loss_map",
+          "temperature_map"
+        ],
+        "title": "ThermalModel",
+        "description": "Thermal model.\n\nContains the thermal network defined by nodes and edges, and mappings of which nodes\ncorrespond to which losses and temperatures."
+      },
+      "ThermalNetwork": {
+        "properties": {
+          "edges": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/Edge"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Edges"
+          },
+          "nodes": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/Node"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Nodes"
+          },
+          "speed_dict": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Speed Dict"
+          },
+          "flow_rate_dict": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Flow Rate Dict"
+          }
+        },
+        "type": "object",
+        "required": [
+          "edges",
+          "nodes",
+          "speed_dict",
+          "flow_rate_dict"
+        ],
+        "title": "ThermalNetwork",
+        "description": "Lumped parameter thermal network.\n\nIt is constructed from sets of nodes and edges (connections) at different speeds\nand flow rates.\n\nFields:\n    speed_dict (dict): Dictionary mapping indices to speed values.\n    flow_rate_dict (dict): Dictionary mapping indices to flow rate values.\n    edges (dict): Dictionary mapping indices to edge lists.\n    nodes (dict): Dictionary mapping indices to node lists."
+      },
+      "TimeUnit": {
+        "type": "string",
+        "enum": [
+          "s",
+          "ms",
+          "min",
+          "hr"
+        ],
+        "title": "TimeUnit",
+        "description": "Time Unit."
+      },
+      "TorqueUnit": {
+        "type": "string",
+        "enum": [
+          "N\u00b7m",
+          "ft\u00b7lbf",
+          "kN\u00b7m",
+          "MN\u00b7m",
+          "dyn\u00b7cm"
+        ],
+        "title": "TorqueUnit",
+        "description": "Torque Unit."
+      },
+      "TotalTractiveTorqueGraphInput": {
+        "properties": {
+          "max_speed": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Speed"
+          },
+          "step_size_speed": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Step Size Speed"
+          },
+          "acceleration": {
+            "type": "number",
+            "title": "Acceleration"
+          },
+          "mass": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Mass"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "aero": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Aero"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "wheel": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WheelInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "altitude": {
+            "type": "number",
+            "title": "Altitude"
+          },
+          "headwind": {
+            "type": "number",
+            "title": "Headwind"
+          },
+          "gradient": {
+            "type": "number",
+            "title": "Gradient"
+          },
+          "aero_id": {
+            "type": "string",
+            "title": "Aero Id"
+          },
+          "mass_id": {
+            "type": "string",
+            "title": "Mass Id"
+          },
+          "wheel_id": {
+            "type": "string",
+            "title": "Wheel Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "max_speed",
+          "step_size_speed",
+          "acceleration",
+          "altitude",
+          "headwind",
+          "gradient",
+          "aero_id",
+          "mass_id",
+          "wheel_id"
+        ],
+        "title": "TotalTractiveTorqueGraphInput",
+        "description": "Total Tractive Torque Graph Input."
+      },
+      "TotalTractiveTorqueGraphOutput": {
+        "properties": {
+          "speeds": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Speeds"
+          },
+          "acceleration": {
+            "type": "number",
+            "title": "Acceleration"
+          },
+          "total_tractive_torques": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Total Tractive Torques"
+          },
+          "aero_forces": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Aero Forces"
+          },
+          "mass_forces": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Mass Forces"
+          },
+          "total_forces": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Total Forces"
+          },
+          "total_tractive_powers": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Total Tractive Powers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "speeds",
+          "acceleration",
+          "total_tractive_torques",
+          "aero_forces",
+          "mass_forces",
+          "total_forces",
+          "total_tractive_powers"
+        ],
+        "title": "TotalTractiveTorqueGraphOutput",
+        "description": "Total Tractive Torque Graph Output."
+      },
+      "TransmissionLossCoefficientsInput": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Item Type",
+            "default": "component"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Loss Coefficients Transmission"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "moment_of_inertia": {
+            "type": "number",
+            "title": "Moment Of Inertia",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "component_type": {
+            "type": "string",
+            "const": "TransmissionLossCoefficients",
+            "title": "Component Type",
+            "default": "TransmissionLossCoefficients"
+          },
+          "gear_ratios": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Gear Ratios",
+            "default": [
+              1
+            ]
+          },
+          "headline_efficiencies": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Headline Efficiencies",
+            "default": [
+              1
+            ]
+          },
+          "max_torque": {
+            "type": "number",
+            "title": "Max Torque",
+            "default": 200
+          },
+          "max_speed": {
+            "type": "number",
+            "title": "Max Speed",
+            "default": 1047.1975499999983
+          },
+          "static_drags": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Static Drags",
+            "default": [
+              0
+            ]
+          },
+          "friction_ratios": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Friction Ratios",
+            "default": [
+              0.5
+            ]
+          },
+          "shift_time": {
+            "type": "number",
+            "title": "Shift Time",
+            "default": 0
+          },
+          "moment_of_inertia_wheel_side": {
+            "type": "number",
+            "title": "Moment Of Inertia Wheel Side",
+            "default": 0
+          },
+          "part_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Part Type",
+            "default": "component"
+          }
+        },
+        "type": "object",
+        "title": "TransmissionLossCoefficientsInput",
+        "description": "Transmission Loss Coefficients Input."
+      },
+      "TransmissionLossCoefficientsOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Item Type",
+            "default": "component"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Default Loss Coefficients Transmission"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "moment_of_inertia": {
+            "type": "number",
+            "title": "Moment Of Inertia",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "component_type": {
+            "type": "string",
+            "const": "TransmissionLossCoefficients",
+            "title": "Component Type",
+            "default": "TransmissionLossCoefficients"
+          },
+          "gear_ratios": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Gear Ratios",
+            "default": [
+              1
+            ]
+          },
+          "headline_efficiencies": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Headline Efficiencies",
+            "default": [
+              1
+            ]
+          },
+          "max_torque": {
+            "type": "number",
+            "title": "Max Torque",
+            "default": 200
+          },
+          "max_speed": {
+            "type": "number",
+            "title": "Max Speed",
+            "default": 1047.1975499999983
+          },
+          "static_drags": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Static Drags",
+            "default": [
+              0
+            ]
+          },
+          "friction_ratios": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Friction Ratios",
+            "default": [
+              0.5
+            ]
+          },
+          "shift_time": {
+            "type": "number",
+            "title": "Shift Time",
+            "default": 0
+          },
+          "moment_of_inertia_wheel_side": {
+            "type": "number",
+            "title": "Moment Of Inertia Wheel Side",
+            "default": 0
+          },
+          "part_type": {
+            "type": "string",
+            "const": "component",
+            "title": "Part Type",
+            "default": "component"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "TransmissionLossCoefficientsOutput",
+        "description": "Transmission Loss Coefficients Output."
+      },
+      "UnitChoices": {
+        "properties": {
+          "unit_type_to_unit_map": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/MassUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/TimeUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/ForceUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/TorqueUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/TemperatureUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/LengthUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/AreaUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/VolumeUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/SpeedUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/AccelerationUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/AngularSpeedUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/AngularAccelerationUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/EnergyUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/PowerUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/DensityUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/InertiaUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/PressureUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/RatioUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/VoltageUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/CurrentUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/ResistanceUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/ElectricChargeUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/ElectricalEnergyUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/ElectricalPowerUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/AngleUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/RoadEfficiencyUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/FrequencyUnit"
+                },
+                {
+                  "$ref": "#/components/schemas/VolumetricFlowRateUnit"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Unit Type To Unit Map",
+            "default": {
+              "mass": "kg",
+              "time": "s",
+              "force": "N",
+              "torque": "N\u00b7m",
+              "temperature": "\u00b0C",
+              "length": "m",
+              "distance": "km",
+              "area": "m\u00b2",
+              "volume": "m\u00b3",
+              "speed": "km/hr",
+              "acceleration": "m/s\u00b2",
+              "angular_speed": "rpm",
+              "angular_acceleration": "rps/s",
+              "energy": "J",
+              "power": "kW",
+              "density": "kg/m\u00b3",
+              "inertia": "kg\u00b7m\u00b2",
+              "pressure": "Pa",
+              "ratio": "%",
+              "voltage": "V",
+              "current": "A",
+              "resistance": "ohm",
+              "electric_charge": "A\u00b7s",
+              "electrical_energy": "kWh",
+              "electrical_power": "kW",
+              "gradient": "deg",
+              "road_efficiency": "km/kWh",
+              "frequency": "Hz",
+              "volumetric_flow_rate": "l/min"
+            }
+          }
+        },
+        "type": "object",
+        "title": "UnitChoices",
+        "description": "Unit Choice for the analysis.\n\nWe might not need all of these.\nWe might want to create preset groups of these (eg. MKS, Imperial etc)"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VoltageUnit": {
+        "type": "string",
+        "enum": [
+          "V",
+          "mV",
+          "kV"
+        ],
+        "title": "VoltageUnit",
+        "description": "Voltage Unit."
+      },
+      "VolumeUnit": {
+        "type": "string",
+        "enum": [
+          "m\u00b3",
+          "mm\u00b3",
+          "cm\u00b3",
+          "in\u00b3",
+          "ft\u00b3",
+          "yd\u00b3",
+          "l",
+          "ml",
+          "cc"
+        ],
+        "title": "VolumeUnit",
+        "description": "Volume Unit."
+      },
+      "VolumetricFlowRateUnit": {
+        "type": "string",
+        "enum": [
+          "m\u00b3/s",
+          "m\u00b3/min",
+          "l/s",
+          "l/min"
+        ],
+        "title": "VolumetricFlowRateUnit",
+        "description": "Unit of volumetric flow rate."
+      },
+      "WheelInput": {
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "const": "config",
+            "title": "Item Type",
+            "default": "config"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Wheel"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "rolling_radius": {
+            "type": "number",
+            "title": "Rolling Radius",
+            "default": 0.3
+          },
+          "rolling_resistance_coefficient": {
+            "type": "number",
+            "title": "Rolling Resistance Coefficient",
+            "default": 0.02
+          },
+          "rolling_resistance_key": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WheelRollingResistanceConfigs"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "traction_coefficient": {
+            "type": "number",
+            "title": "Traction Coefficient",
+            "default": 0.9
+          },
+          "traction_coefficient_key": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SurfaceConditionTractionConfigs"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "config_type": {
+            "type": "string",
+            "const": "wheel",
+            "title": "Config Type",
+            "default": "wheel"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "configuration",
+            "title": "Part Type",
+            "default": "configuration"
+          }
+        },
+        "type": "object",
+        "title": "WheelInput",
+        "description": "Wheel Input."
+      },
+      "WheelOutput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_type": {
+            "type": "string",
+            "const": "config",
+            "title": "Item Type",
+            "default": "config"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Wheel"
+          },
+          "mass": {
+            "type": "number",
+            "title": "Mass",
+            "default": 0
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost",
+            "default": 0
+          },
+          "rolling_radius": {
+            "type": "number",
+            "title": "Rolling Radius",
+            "default": 0.3
+          },
+          "rolling_resistance_coefficient": {
+            "type": "number",
+            "title": "Rolling Resistance Coefficient",
+            "default": 0.02
+          },
+          "rolling_resistance_key": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WheelRollingResistanceConfigs"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "traction_coefficient": {
+            "type": "number",
+            "title": "Traction Coefficient",
+            "default": 0.9
+          },
+          "traction_coefficient_key": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SurfaceConditionTractionConfigs"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "config_type": {
+            "type": "string",
+            "const": "wheel",
+            "title": "Config Type",
+            "default": "wheel"
+          },
+          "part_type": {
+            "type": "string",
+            "const": "configuration",
+            "title": "Part Type",
+            "default": "configuration"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "WheelOutput",
+        "description": "Wheel Output."
+      },
+      "WheelRollingResistanceConfigs": {
+        "type": "string",
+        "enum": [
+          "Car on asphalt",
+          "Car on concrete",
+          "Car on gravel"
+        ],
+        "title": "WheelRollingResistanceConfigs",
+        "description": "Condition on wheels which affect the rolling resistance coefficient."
+      }
+    },
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/api"
+    }
+  ]
+}

@@ -49,7 +49,7 @@ STATUS_FINISHED = "FINISHED"
 STATUS_ERROR = "FAILED"
 OCM_SOCKET_URL = settings.ocm_socket_url
 JOB_TIMEOUT = settings.job_timeout
-
+CONCEPTEV_URL = settings.conceptev_url
 logger = logging.getLogger(__name__)
 # Optional file path for capturing progress messages from subprocesses where
 # stdout is suppressed (e.g. optiSLang integration plugin).  Set the
@@ -206,6 +206,36 @@ def monitor_job_progress(
 ):
     """Monitor job progress and return the status when complete."""
     result = asyncio.run(monitor_job_messages(job_id, user_id, token, app, timeout))
+    return result
+
+
+async def monitor_job_progress_local(job_id: str, api_key: str, timeout=JOB_TIMEOUT):
+    """Monitor job progress and return the status when complete."""
+    config_path = settings.local_config_path
+    if config_path.exists():
+        with open(config_path, "r") as f:
+            local_config = json.load(f)
+        print(local_config)
+    else:
+        raise FileNotFoundError(
+            f"Local ConceptEV config file not found at {config_path}. "
+            f"Check ConceptEV is running locally or add custom config file"
+        )
+    base_url = f"localhost:{local_config['port']}/api"
+    local_websocket_client = connect(f"ws://{base_url}/v2/job/progress?api_key={api_key}")
+    async with async_timeout.timeout(timeout):
+        async with local_websocket_client as websocket:
+            _log("Connected to local Websockets.")
+            async for message in websocket:
+                print(f"Received message: {message}")
+                status = json.loads(message).get("status", None)
+                if check_status(status):
+                    return status
+
+
+def monitor_job_progress_local_sync(job_id: str, api_key: str, timeout=JOB_TIMEOUT):
+    """Monitor job progress and return the status when complete."""
+    result = asyncio.run(monitor_job_progress_local(job_id, api_key, timeout))
     return result
 
 
