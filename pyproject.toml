@@ -46,7 +46,7 @@ tenacity = ">=8.2.3,<10.0.0"
 truststore = {version = "^0.10.4", python = ">=3.10,<4.0"}
 pydantic = ">=2.11"
 [tool.poetry.group.dev.dependencies] # Common packages for test and examples
-plotly = ">=5.18,<7.0"
+plotly = ">=5.18,<8.0"
 tox = "^4.15.1"
 pytest-cov = ">=5,<8"
 pre-commit = ">=3.7.1,<5.0.0"
@@ -116,7 +116,7 @@ optional = true
 
 [tool.poetry.group.build.dependencies]
 build = "^1.0.3"
-twine = ">=5,<7"
+twine = ">=5,<8"
 
 [tool.poetry.group.linux-encryption]
 optional = true
