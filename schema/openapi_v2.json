@@ -3,7 +3,7 @@
   "info": {
     "title": "ConceptEV-API",
     "summary": "API Endpoint documentation for ConceptEV",
-    "version": "0.2.185"
+    "version": "0.2.204"
   },
   "paths": {
     "/v2/concept/{concept_id}/job/availability": {
@@ -321,6 +321,83 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/concept/{concept_id}/job/{job_id}/files/{file_id}:converted": {
+      "get": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Get Job File Converted",
+        "description": "Retrieve a job output file with values converted to the caller's units.\n\nReads the raw (SI-unit) solver output and converts every solved\nrequirement to the caller's preferred display units server-side, so\nclients don't need their own copy of the unit-conversion logic.",
+        "operationId": "get_job_file_converted",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response Get Job File Converted"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Job output file is not yet available"
           },
           "422": {
             "description": "Validation Error",
@@ -1733,6 +1810,9 @@
           "404": {
             "description": "Concept or part not found"
           },
+          "409": {
+            "description": "Part is in use and cannot be deleted"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -2026,7 +2106,7 @@
           "concept-v2"
         ],
         "summary": "Open Concept",
-        "description": "Open a .cev concept file and load it into the file-system database.\n\nReads the concept ID from inside the file so the filename can be any\nhuman-readable name rather than the UUID.  Registers the path so all\nsubsequent operations resolve the correct location without requiring\nanother open call.  Multiple files in different directories can be\nregistered independently.",
+        "description": "Open a .cev concept file and load it into the file-system database.\n\nThe returned ``id`` is a handle minted by the server and keyed on the\nfile location, not something read out of the archive.  Opening the same\npath again during one server run returns the same handle, while a copy\nof the file at another path gets its own -- so duplicating a ``.cev`` in\nthe file explorer yields two independent concepts rather than two\nreferences to one.  Handles do not survive a server restart.",
         "operationId": "open_concept",
         "parameters": [
           {
@@ -2066,6 +2146,62 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v2/concept:import": {
+      "post": {
+        "tags": [
+          "concept-v2"
+        ],
+        "summary": "Import Concept",
+        "description": "Import a legacy v1 ExchangeFile JSON export into a v2 .cev concept.\n\nConverts the v1 schema to v2, extracts all embedded blobs into file items,\nstrips cloud-specific fields (user_id, project_id, design_id, etc.),\nand writes the result as a new unsaved .cev archive.\n\nThe imported concept will have ``save_state=UNSAVED`` \u2014 use the\n`/v2/concept/{id}/save` endpoint to persist it to a user-specified path.\n\nArgs:\n    file: The uploaded ExchangeFile JSON export from a v1 concept.\n    name: Optional override for the concept name.\n    database: Filesystem database (this endpoint is filesystem-backend only).\n\nReturns:\n    ConceptOutput with save_state=UNSAVED, ready for saving or modification.",
+        "operationId": "import_concept",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Name"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_import_concept"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptOutput"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not available for non-filesystem backends"
+          },
+          "422": {
+            "description": "Invalid ExchangeFile format"
           }
         }
       }
@@ -3822,6 +3958,20 @@
           "file"
         ],
         "title": "Body_create_file_item"
+      },
+      "Body_import_concept": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "title": "File",
+            "format": "binary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_import_concept"
       },
       "Body_update_file_item": {
         "properties": {
@@ -6403,6 +6553,11 @@
             "type": "string",
             "title": "Docker Tag",
             "default": "latest"
+          },
+          "debug_force_failure": {
+            "type": "boolean",
+            "title": "Debug Force Failure",
+            "default": false
           }
         },
         "type": "object",
@@ -7089,6 +7244,9 @@
           "lab_data_id": {
             "type": "string",
             "title": "Lab Data Id"
+          },
+          "thermal_model_details": {
+            "$ref": "#/components/schemas/ThermalModelDetails"
           }
         },
         "type": "object",
@@ -8120,6 +8278,45 @@
         "title": "TemperatureUnit",
         "description": "Temperature Unit."
       },
+      "ThermalModelDetails": {
+        "properties": {
+          "model_type": {
+            "$ref": "#/components/schemas/ThermalModelType",
+            "default": "None"
+          },
+          "speeds": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speeds"
+          },
+          "flow_rates": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flow Rates"
+          }
+        },
+        "type": "object",
+        "title": "ThermalModelDetails",
+        "description": "Thermal Model Details."
+      },
       "ThermalModelSolver": {
         "properties": {
           "component_file_type": {
@@ -8160,6 +8357,16 @@
         ],
         "title": "ThermalModelSolver",
         "description": "Thermal model.\n\nContains the thermal network defined by nodes and edges, and mappings of which nodes\ncorrespond to which losses and temperatures."
+      },
+      "ThermalModelType": {
+        "type": "string",
+        "enum": [
+          "None",
+          "OneDimension",
+          "TwoDimension"
+        ],
+        "title": "ThermalModelType",
+        "description": "Types of thermal model."
       },
       "ThermalNetwork": {
         "properties": {

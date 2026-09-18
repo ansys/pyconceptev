@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from ..models.motor_lab_data import MotorLabData
     from ..models.motor_state import MotorState
     from ..models.motor_thermal_limits import MotorThermalLimits
+    from ..models.thermal_model_details import ThermalModelDetails
     from ..models.thermal_model_solver import ThermalModelSolver
 
 
@@ -41,6 +42,8 @@ class MotorLabOutput:
     thermal_limits: MotorThermalLimits | Unset = UNSET
     """ Thermal limits for motor components. """
     part_type: Literal["component"] | Unset = "component"
+    thermal_model_details: ThermalModelDetails | Unset = UNSET
+    """ Thermal Model Details. """
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -93,6 +96,10 @@ class MotorLabOutput:
 
         part_type = self.part_type
 
+        thermal_model_details: dict[str, Any] | Unset = UNSET
+        if not isinstance(self.thermal_model_details, Unset):
+            thermal_model_details = self.thermal_model_details.to_dict()
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -126,6 +133,8 @@ class MotorLabOutput:
             field_dict["thermal_limits"] = thermal_limits
         if part_type is not UNSET:
             field_dict["part_type"] = part_type
+        if thermal_model_details is not UNSET:
+            field_dict["thermal_model_details"] = thermal_model_details
 
         return field_dict
 
@@ -134,6 +143,7 @@ class MotorLabOutput:
         from ..models.motor_lab_data import MotorLabData
         from ..models.motor_state import MotorState
         from ..models.motor_thermal_limits import MotorThermalLimits
+        from ..models.thermal_model_details import ThermalModelDetails
         from ..models.thermal_model_solver import ThermalModelSolver
 
         d = dict(src_dict)
@@ -213,6 +223,13 @@ class MotorLabOutput:
         if part_type != "component" and not isinstance(part_type, Unset):
             raise ValueError(f"part_type must match const 'component', got '{part_type}'")
 
+        _thermal_model_details = d.pop("thermal_model_details", UNSET)
+        thermal_model_details: ThermalModelDetails | Unset
+        if isinstance(_thermal_model_details, Unset):
+            thermal_model_details = UNSET
+        else:
+            thermal_model_details = ThermalModelDetails.from_dict(_thermal_model_details)
+
         motor_lab_output = cls(
             id=id,
             max_speed=max_speed,
@@ -229,6 +246,7 @@ class MotorLabOutput:
             thermal_model=thermal_model,
             thermal_limits=thermal_limits,
             part_type=part_type,
+            thermal_model_details=thermal_model_details,
         )
 
         motor_lab_output.additional_properties = d

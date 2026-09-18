@@ -1,13 +1,13 @@
 from typing import Literal
 
-EnergyUnit = Literal["J", "kJ", "kWh", "mJ", "MJ", "Wh"]
+EnergyUnit = Literal["J", "kJ", "kWh", "MJ", "mJ", "Wh"]
 
 ENERGY_UNIT_VALUES: set[EnergyUnit] = {
     "J",
     "kJ",
     "kWh",
-    "mJ",
     "MJ",
+    "mJ",
     "Wh",
 }
 

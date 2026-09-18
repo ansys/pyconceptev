@@ -20,6 +20,7 @@ from .battery_lookup_table_input import BatteryLookupTableInput
 from .battery_lookup_table_output import BatteryLookupTableOutput
 from .battery_state import BatteryState
 from .body_create_file_item import BodyCreateFileItem
+from .body_import_concept import BodyImportConcept
 from .body_update_file_item import BodyUpdateFileItem
 from .check_job_backend_availability_response_check_job_backend_availability import (
     CheckJobBackendAvailabilityResponseCheckJobBackendAvailability,
@@ -59,6 +60,7 @@ from .frequency_unit import FrequencyUnit
 from .get_info_v2_unit_choices_info_get_response_get_info_v2_unit_choices_info_get import (
     GetInfoV2UnitChoicesInfoGetResponseGetInfoV2UnitChoicesInfoGet,
 )
+from .get_job_file_converted_response_200_item import GetJobFileConvertedResponse200Item
 from .health_check_health_get_response_health_check_health_get import HealthCheckHealthGetResponseHealthCheckHealthGet
 from .http_validation_error import HTTPValidationError
 from .inertia_unit import InertiaUnit
@@ -108,11 +110,13 @@ from .static_requirement_input import StaticRequirementInput
 from .static_requirement_output import StaticRequirementOutput
 from .surface_condition_traction_configs import SurfaceConditionTractionConfigs
 from .temperature_unit import TemperatureUnit
+from .thermal_model_details import ThermalModelDetails
 from .thermal_model_solver import ThermalModelSolver
 from .thermal_model_solver_loss_map import ThermalModelSolverLossMap
 from .thermal_model_solver_loss_map_additional_property import ThermalModelSolverLossMapAdditionalProperty
 from .thermal_model_solver_temperature_map import ThermalModelSolverTemperatureMap
 from .thermal_model_solver_temperature_map_additional_property import ThermalModelSolverTemperatureMapAdditionalProperty
+from .thermal_model_type import ThermalModelType
 from .thermal_network import ThermalNetwork
 from .thermal_network_flow_rate_dict import ThermalNetworkFlowRateDict
 from .thermal_network_network_dict import ThermalNetworkNetworkDict
@@ -161,6 +165,7 @@ __all__ = (
     "BatteryLookupTableOutput",
     "BatteryState",
     "BodyCreateFileItem",
+    "BodyImportConcept",
     "BodyUpdateFileItem",
     "CheckJobBackendAvailabilityResponseCheckJobBackendAvailability",
     "ComponentAxle",
@@ -196,6 +201,7 @@ __all__ = (
     "ForceUnit",
     "FrequencyUnit",
     "GetInfoV2UnitChoicesInfoGetResponseGetInfoV2UnitChoicesInfoGet",
+    "GetJobFileConvertedResponse200Item",
     "HealthCheckHealthGetResponseHealthCheckHealthGet",
     "HTTPValidationError",
     "InertiaUnit",
@@ -245,11 +251,13 @@ __all__ = (
     "StaticRequirementOutput",
     "SurfaceConditionTractionConfigs",
     "TemperatureUnit",
+    "ThermalModelDetails",
     "ThermalModelSolver",
     "ThermalModelSolverLossMap",
     "ThermalModelSolverLossMapAdditionalProperty",
     "ThermalModelSolverTemperatureMap",
     "ThermalModelSolverTemperatureMapAdditionalProperty",
+    "ThermalModelType",
     "ThermalNetwork",
     "ThermalNetworkFlowRateDict",
     "ThermalNetworkNetworkDict",

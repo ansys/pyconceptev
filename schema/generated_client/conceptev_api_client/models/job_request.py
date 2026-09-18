@@ -23,6 +23,7 @@ class JobRequest:
     design_instance_id: None | str | Unset = UNSET
     design_id: None | str | Unset = UNSET
     docker_tag: str | Unset = "latest"
+    debug_force_failure: bool | Unset = False
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -54,6 +55,8 @@ class JobRequest:
 
         docker_tag = self.docker_tag
 
+        debug_force_failure = self.debug_force_failure
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -73,6 +76,8 @@ class JobRequest:
             field_dict["design_id"] = design_id
         if docker_tag is not UNSET:
             field_dict["docker_tag"] = docker_tag
+        if debug_force_failure is not UNSET:
+            field_dict["debug_force_failure"] = debug_force_failure
 
         return field_dict
 
@@ -116,6 +121,8 @@ class JobRequest:
 
         docker_tag = d.pop("docker_tag", UNSET)
 
+        debug_force_failure = d.pop("debug_force_failure", UNSET)
+
         job_request = cls(
             name=name,
             requirement_ids=requirement_ids,
@@ -125,6 +132,7 @@ class JobRequest:
             design_instance_id=design_instance_id,
             design_id=design_id,
             docker_tag=docker_tag,
+            debug_force_failure=debug_force_failure,
         )
 
         job_request.additional_properties = d
