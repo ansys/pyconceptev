@@ -45,8 +45,9 @@ APP_DATA_PATH = (
 DEFAULT_CONFIG_PATH = (
     APP_DATA_PATH / "Ansys" / f"{RELEASE}" / "ConceptEV" / "connection_config.json"
 )
-PROGRAM_FILES = Path(os.environ.get("ProgramFiles", "C:/Program Files"))
-DEFAULT_CONCEPTEV_PATH = PROGRAM_FILES / "ANSYS Inc" / RELEASE / "motorcad"
+AWP_ROOT_ENV = "AWP_ROOT" + RELEASE.strip("v")
+AWP_ROOT = Path(os.environ.get(AWP_ROOT_ENV, "C:/Program Files/ANSYS Inc"))
+DEFAULT_CONCEPTEV_PATH = AWP_ROOT / "motorcad"
 DEFAULT_HEADLESS_CONCEPTEV_PATH = DEFAULT_CONCEPTEV_PATH / "resources" / "desktop-api"
 HttpUrlString = Annotated[HttpUrl, AfterValidator(str)]
 WebSocketUrlString = Annotated[WebsocketUrl, AfterValidator(str)]
