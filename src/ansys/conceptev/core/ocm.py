@@ -366,8 +366,15 @@ def get_project_id(name: str, account_id: str, token: str) -> str:
     return projects[name][0]
 
 
-def delete_project(project_id, token):
-    """Delete a project."""
+def delete_project(project_id, token, recursive=True):
+    """Delete a project.
+
+    Args:
+        project_id: The project ID to delete.
+        token: Authentication token.
+        recursive: If True, recursively delete the project and its children.
+                  Defaults to True to avoid failures when projects have child items.
+    """
     ocm_delete_init = create_ocm_client(token).request(
         method="DELETE",
         url="/project/delete/init",
@@ -378,7 +385,7 @@ def delete_project(project_id, token):
     ocm_delete = create_ocm_client(token).request(
         method="DELETE",
         url="/project/delete/execute",
-        json={"projectId": project_id, "hash": ocm_delete_init["hash"]},
+        json={"projectId": project_id, "hash": ocm_delete_init["hash"], "recursive": recursive},
         timeout=20,
     )
     ocm_delete = process_response(ocm_delete)
