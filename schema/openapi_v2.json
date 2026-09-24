@@ -3,7 +3,7 @@
   "info": {
     "title": "ConceptEV-API",
     "summary": "API Endpoint documentation for ConceptEV",
-    "version": "0.2.204"
+    "version": "0.2.207"
   },
   "paths": {
     "/v2/concept/{concept_id}/job/availability": {
@@ -4372,37 +4372,24 @@
             "title": "Backend Job Id"
           },
           "progress": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Progress"
+            "type": "number",
+            "title": "Progress",
+            "default": 0.0
           },
           "min_time_left": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Min Time Left"
+            "type": "number",
+            "title": "Min Time Left",
+            "default": 0.0
           },
           "max_time_left": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Max Time Left"
+            "type": "number",
+            "title": "Max Time Left",
+            "default": 0.0
+          },
+          "time_taken": {
+            "type": "number",
+            "title": "Time Taken",
+            "default": 0.0
           }
         },
         "type": "object",
@@ -6553,11 +6540,6 @@
             "type": "string",
             "title": "Docker Tag",
             "default": "latest"
-          },
-          "debug_force_failure": {
-            "type": "boolean",
-            "title": "Debug Force Failure",
-            "default": false
           }
         },
         "type": "object",

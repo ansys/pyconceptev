@@ -1,12 +1,12 @@
 from typing import Literal
 
-PowerUnit = Literal["hp", "kW", "mW", "MW", "W"]
+PowerUnit = Literal["hp", "kW", "MW", "mW", "W"]
 
 POWER_UNIT_VALUES: set[PowerUnit] = {
     "hp",
     "kW",
-    "mW",
     "MW",
+    "mW",
     "W",
 }
 
