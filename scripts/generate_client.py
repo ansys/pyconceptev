@@ -102,6 +102,14 @@ def copy_to_src(generated_output: Path, dest: Path, spec: Path) -> None:
     )
 
 
+def cleanup_temp_output(output_dir: Path) -> None:
+    """Remove the temporary generated_client directory after copying to src."""
+    if output_dir.exists():
+        print(f"==> Cleaning up temporary output at {output_dir}...")
+        shutil.rmtree(output_dir)
+        print("==> Done!")
+
+
 def main() -> None:
     """Parse args and run the generation pipeline."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -152,6 +160,7 @@ def main() -> None:
 
     if not args.no_copy:
         copy_to_src(output_path, SRC_DEST, spec_path)
+        cleanup_temp_output(output_path)
 
 
 if __name__ == "__main__":
