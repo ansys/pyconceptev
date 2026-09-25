@@ -3,5 +3,5 @@
 Regenerate with: python scripts/generate_client.py
 """
 
-SPEC_VERSION = "0.2.185"
-GENERATED_AT = "2026-07-29T13:57:21+00:00"
+SPEC_VERSION = "0.2.207"
+GENERATED_AT = "2026-09-24T10:06:55+00:00"

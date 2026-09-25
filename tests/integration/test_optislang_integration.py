@@ -142,7 +142,13 @@ def project_name():
 def created_project(client, account_id, hpc_id, token, project_name):
     created_project = app.create_new_project(client, account_id, hpc_id, f"{project_name}")
     yield created_project
-    app.delete_project(created_project["projectId"], token)
+
+    # Clean up: try to delete the project, but don't fail the test if cleanup fails
+    try:
+        app.delete_project(created_project["projectId"], token)
+    except Exception:
+        # Silently ignore cleanup failures to avoid breaking test teardown
+        pass
 
 
 @pytest.fixture

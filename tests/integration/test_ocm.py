@@ -95,7 +95,13 @@ def temp_project(token, account_id, hpc_id):
     project_name = f"OCM test project {datetime.now()}"
     project = ocm.create_new_project(client, account_id, hpc_id, project_name)
     yield project
-    ocm.delete_project(project["projectId"], token)
+
+    # Clean up: try to delete the project, but don't fail the test if cleanup fails
+    try:
+        ocm.delete_project(project["projectId"], token)
+    except Exception:
+        # Silently ignore cleanup failures to avoid breaking test teardown
+        pass
 
 
 def test_get_default_hpc(token, account_id):
