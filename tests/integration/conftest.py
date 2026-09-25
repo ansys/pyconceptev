@@ -106,7 +106,10 @@ def _creation_concept(session_token, session_account_id, session_hpc_id):
             title="Component creation test concept",
         )
     yield concept
-    app.delete_project(project["projectId"], session_token)
+    try:
+        app.delete_project(project["projectId"], session_token)
+    except Exception as e:
+        print(f"Warning: failed to clean up project {project['projectId']}: {e}")
 
 
 @pytest.fixture(scope="session")
@@ -203,7 +206,10 @@ def populated_concept(session_token, session_account_id, session_hpc_id):
 
     yield concept_data, design_instance_id, session_token
 
-    app.delete_project(project["projectId"], session_token)
+    try:
+        app.delete_project(project["projectId"], session_token)
+    except Exception as e:
+        print(f"Warning: failed to clean up project {project['projectId']}: {e}")
 
 
 @pytest.fixture(scope="session")
