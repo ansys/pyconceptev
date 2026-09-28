@@ -226,9 +226,11 @@ jobs:
           repository-url: "https://upload.pypi.org/legacy/"
           print-hash: true
           packages-dir: ${{ env.PACKAGE_NAME }}-artifacts
-          skip-existing: false
+          # Tolerate re-runs of a tag whose artifacts were already published
+          skip-existing: true
 
       - name: Release to GitHub
         uses: ansys/actions/release-github@9dc4e3161033d2c2485fbf9687d40cfb7a661fb2 # v10.3.6
         with:
           library-name: ${{ env.PACKAGE_NAME }}
+          token: ${{ secrets.GITHUB_TOKEN }}
