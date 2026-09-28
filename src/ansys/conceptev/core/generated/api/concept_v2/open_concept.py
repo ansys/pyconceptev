@@ -77,11 +77,12 @@ def sync_detailed(
 
      Open a .cev concept file and load it into the file-system database.
 
-    Reads the concept ID from inside the file so the filename can be any
-    human-readable name rather than the UUID.  Registers the path so all
-    subsequent operations resolve the correct location without requiring
-    another open call.  Multiple files in different directories can be
-    registered independently.
+    The returned ``id`` is a handle minted by the server and keyed on the
+    file location, not something read out of the archive.  Opening the same
+    path again during one server run returns the same handle, while a copy
+    of the file at another path gets its own -- so duplicating a ``.cev`` in
+    the file explorer yields two independent concepts rather than two
+    references to one.  Handles do not survive a server restart.
 
     Args:
         path_to_file (str):
@@ -114,11 +115,12 @@ def sync(
 
      Open a .cev concept file and load it into the file-system database.
 
-    Reads the concept ID from inside the file so the filename can be any
-    human-readable name rather than the UUID.  Registers the path so all
-    subsequent operations resolve the correct location without requiring
-    another open call.  Multiple files in different directories can be
-    registered independently.
+    The returned ``id`` is a handle minted by the server and keyed on the
+    file location, not something read out of the archive.  Opening the same
+    path again during one server run returns the same handle, while a copy
+    of the file at another path gets its own -- so duplicating a ``.cev`` in
+    the file explorer yields two independent concepts rather than two
+    references to one.  Handles do not survive a server restart.
 
     Args:
         path_to_file (str):
@@ -146,11 +148,12 @@ async def asyncio_detailed(
 
      Open a .cev concept file and load it into the file-system database.
 
-    Reads the concept ID from inside the file so the filename can be any
-    human-readable name rather than the UUID.  Registers the path so all
-    subsequent operations resolve the correct location without requiring
-    another open call.  Multiple files in different directories can be
-    registered independently.
+    The returned ``id`` is a handle minted by the server and keyed on the
+    file location, not something read out of the archive.  Opening the same
+    path again during one server run returns the same handle, while a copy
+    of the file at another path gets its own -- so duplicating a ``.cev`` in
+    the file explorer yields two independent concepts rather than two
+    references to one.  Handles do not survive a server restart.
 
     Args:
         path_to_file (str):
@@ -181,11 +184,12 @@ async def asyncio(
 
      Open a .cev concept file and load it into the file-system database.
 
-    Reads the concept ID from inside the file so the filename can be any
-    human-readable name rather than the UUID.  Registers the path so all
-    subsequent operations resolve the correct location without requiring
-    another open call.  Multiple files in different directories can be
-    registered independently.
+    The returned ``id`` is a handle minted by the server and keyed on the
+    file location, not something read out of the archive.  Opening the same
+    path again during one server run returns the same handle, while a copy
+    of the file at another path gets its own -- so duplicating a ``.cev`` in
+    the file explorer yields two independent concepts rather than two
+    references to one.  Handles do not survive a server restart.
 
     Args:
         path_to_file (str):
