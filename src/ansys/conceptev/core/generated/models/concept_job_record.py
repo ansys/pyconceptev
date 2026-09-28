@@ -28,9 +28,10 @@ class ConceptJobRecord:
     file_ids: list[str] | Unset = UNSET
     error: None | str | Unset = UNSET
     backend_job_id: None | str | Unset = UNSET
-    progress: float | None | Unset = UNSET
-    min_time_left: float | None | Unset = UNSET
-    max_time_left: float | None | Unset = UNSET
+    progress: float | Unset = 0.0
+    min_time_left: float | Unset = 0.0
+    max_time_left: float | Unset = 0.0
+    time_taken: float | Unset = 0.0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -62,23 +63,13 @@ class ConceptJobRecord:
         else:
             backend_job_id = self.backend_job_id
 
-        progress: float | None | Unset
-        if isinstance(self.progress, Unset):
-            progress = UNSET
-        else:
-            progress = self.progress
+        progress = self.progress
 
-        min_time_left: float | None | Unset
-        if isinstance(self.min_time_left, Unset):
-            min_time_left = UNSET
-        else:
-            min_time_left = self.min_time_left
+        min_time_left = self.min_time_left
 
-        max_time_left: float | None | Unset
-        if isinstance(self.max_time_left, Unset):
-            max_time_left = UNSET
-        else:
-            max_time_left = self.max_time_left
+        max_time_left = self.max_time_left
+
+        time_taken = self.time_taken
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -106,6 +97,8 @@ class ConceptJobRecord:
             field_dict["min_time_left"] = min_time_left
         if max_time_left is not UNSET:
             field_dict["max_time_left"] = max_time_left
+        if time_taken is not UNSET:
+            field_dict["time_taken"] = time_taken
 
         return field_dict
 
@@ -144,32 +137,13 @@ class ConceptJobRecord:
 
         backend_job_id = _parse_backend_job_id(d.pop("backend_job_id", UNSET))
 
-        def _parse_progress(data: object) -> float | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(float | None | Unset, data)
+        progress = d.pop("progress", UNSET)
 
-        progress = _parse_progress(d.pop("progress", UNSET))
+        min_time_left = d.pop("min_time_left", UNSET)
 
-        def _parse_min_time_left(data: object) -> float | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(float | None | Unset, data)
+        max_time_left = d.pop("max_time_left", UNSET)
 
-        min_time_left = _parse_min_time_left(d.pop("min_time_left", UNSET))
-
-        def _parse_max_time_left(data: object) -> float | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(float | None | Unset, data)
-
-        max_time_left = _parse_max_time_left(d.pop("max_time_left", UNSET))
+        time_taken = d.pop("time_taken", UNSET)
 
         concept_job_record = cls(
             id=id,
@@ -183,6 +157,7 @@ class ConceptJobRecord:
             progress=progress,
             min_time_left=min_time_left,
             max_time_left=max_time_left,
+            time_taken=time_taken,
         )
 
         concept_job_record.additional_properties = d
