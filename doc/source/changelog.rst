@@ -9,6 +9,35 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
+`0.12.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.12.0>`_ - September 28, 2026
+==========================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Added
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Added codegen
+          - `#344 <https://github.com/ansys/pyconceptev/pull/344>`_
+
+        * - Feature/updating to latest api schema
+          - `#396 <https://github.com/ansys/pyconceptev/pull/396>`_
+
+
+  .. tab-item:: Documentation
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Chore: update CHANGELOG for v0.10.3
+          - `#367 <https://github.com/ansys/pyconceptev/pull/367>`_
+
+
 `0.10.3 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.3>`_ - July 16, 2026
 =====================================================================================
 
