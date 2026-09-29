@@ -1,0 +1,1269 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Release notes &#8212; pyconceptev</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/css/ansys_sphinx_theme.css?v=d2ac875c" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://www.nerdfonts.com/assets/css/webfont.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=93f552be" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+ 
+<link href="_static/css/breadcrumbs.css" rel="stylesheet" />
+
+    <script src="_static/documentation_options.js?v=60b83881"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/table.js?v=b64f5182"></script>
+    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'changelog';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://conceptev.docs.pyansys.com/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.9';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Contribute" href="contributing.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <link rel="canonical" href="https://conceptev.docs.pyansys.com/version/stable/changelog.html" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container"><!-- Debugging: html_theme_options =  -->
+
+  <!-- If there is no MeiliSearch enabled, use the PyData search -->
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+   
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/pyansys_logo_transparent_black.png" class="logo__image only-light" alt="pyconceptev - Home"/>
+    <script>document.write(`<img src="_static/pyansys_logo_transparent_white.png" class="logo__image only-dark" alt="pyconceptev - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api_ref.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contribute
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
+    Release notes
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/pyconceptev" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+    <div id="announcement_msg"></div>
+<script>
+  fetch("announcement.html")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(
+      (text) => (document.getElementById("announcement_msg").innerHTML = text),
+    )
+    .catch((error) => console.error(`Fetch problem: ${error.message}`));
+</script>  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api_ref.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contribute
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Release notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/pyconceptev" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+         
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="https://docs.pyansys.com/" class="nav-link">PyAnsys</a>
+    </li>
+     
+    <li class="breadcrumb-item">
+      <a
+        href="index.html"
+        class="nav-link"
+        aria-label="Home"
+      >
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+      
+    <li class="breadcrumb-item active" aria-current="page">Release notes</li>
+    
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="release-notes">
+<span id="ref-release-notes"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading">#</a></h1>
+<p>This document contains the release notes for the project.</p>
+<section id="may-06-2025">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.9.4">0.9.4</a> - May 06, 2025<a class="headerlink" href="#may-06-2025" title="Link to this heading">#</a></h2>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+Fixed</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>matplotlib as an optional</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/228">#228</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Dependencies</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>CHORE: Bump jupyterlab from 4.3.5 to 4.3.6</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/205">#205</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump pytest-cov from 5.0.0 to 6.1.1</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/216">#216</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+Maintenance</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>docs: Update <code class="docutils literal notranslate"><span class="pre">CONTRIBUTORS.md</span></code> with the latest contributors</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/215">#215</a></p></td>
+</tr>
+<tr class="row-even"><td><p>chore: update CHANGELOG for v0.9.3</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/219">#219</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="april-17-2025">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.9.3">0.9.3</a> - April 17, 2025<a class="headerlink" href="#april-17-2025" title="Link to this heading">#</a></h2>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+Added</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>Feature/better client connection</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/213">#213</a></p></td>
+</tr>
+<tr class="row-even"><td><p>update actions to v9 and change python release values</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/218">#218</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-4">
+Maintenance</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>chore: update CHANGELOG for v0.9.2</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/210">#210</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="march-24-2025">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.9.2">0.9.2</a> - March 24, 2025<a class="headerlink" href="#march-24-2025" title="Link to this heading">#</a></h2>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-5">
+Maintenance</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>chore: update CHANGELOG for v0.9.0</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/198">#198</a></p></td>
+</tr>
+<tr class="row-even"><td><p>208-make-optional-dependency</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/209">#209</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="march-10-2025">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.9.0">0.9.0</a> - March 10, 2025<a class="headerlink" href="#march-10-2025" title="Link to this heading">#</a></h2>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-6" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-6">
+Added</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>example script for reading from design instance ids</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/153">#153</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Feature/improved automated testing</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/168">#168</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Feature/get project name</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/169">#169</a></p></td>
+</tr>
+<tr class="row-even"><td><p>feature/get_project_or_create</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/183">#183</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>added function to get any job file for example input file</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/191">#191</a></p></td>
+</tr>
+<tr class="row-even"><td><p>start for adding support for py3.13</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/193">#193</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<input id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-7">
+Fixed</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>fix: AUTHORS file format</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/160">#160</a></p></td>
+</tr>
+<tr class="row-even"><td><p>updated account name specification</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/171">#171</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<input id="sd-tab-item-8" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-8">
+Dependencies</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>CHORE: Bump pre-commit from 3.8.0 to 4.0.1</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/144">#144</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump pytest from 8.3.3 to 8.3.4</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/161">#161</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHORE: Bump jupyterlab from 4.3.1 to 4.3.3</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/164">#164</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump pytest-asyncio from 0.24.0 to 0.25.0</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/165">#165</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHORE: Bump jupytext from 1.16.4 to 1.16.6</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/166">#166</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump jupyterlab from 4.3.3 to 4.3.4</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/167">#167</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHORE: Bump twine from 5.1.1 to 6.1.0</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/170">#170</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump pytest-asyncio from 0.25.0 to 0.25.2</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/172">#172</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHORE: Bump nbsphinx from 0.9.5 to 0.9.6</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/173">#173</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump tox from 4.23.2 to 4.24.1</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/174">#174</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHORE: Bump pytest-cov from 5.0.0 to 6.0.0</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/175">#175</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump pytest-asyncio from 0.25.2 to 0.25.3</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/179">#179</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHORE: Bump websockets from 14.1 to 15.0</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/181">#181</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump sphinx-gallery from 0.18.0 to 0.19.0</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/185">#185</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHORE: Bump pydantic-settings from 2.7.1 to 2.8.1</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/186">#186</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump matplotlib from 3.9.0 to 3.9.4</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/194">#194</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHORE: Bump websockets from 15.0 to 15.0.1</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/196">#196</a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHORE: Bump tox from 4.24.1 to 4.24.2</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/197">#197</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<input id="sd-tab-item-9" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-9">
+Maintenance</label><div class="sd-tab-content docutils">
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>chore: update CHANGELOG for v0.8</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/159">#159</a></p></td>
+</tr>
+<tr class="row-even"><td><p>chore: bump version version</p></td>
+<td><p><a class="reference external" href="https://github.com/ansys/pyconceptev/pull/182">#182</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="id44">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.8">0.8</a> - 2024-11-29<a class="headerlink" href="#id44" title="Link to this heading">#</a></h2>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>added custom exceptions <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/157">#157</a></p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>default value was called only once bug <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/154">#154</a></p></li>
+<li><p>added a product_id to create_new_concept so it doesn’t call ocm to often <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/155">#155</a></p></li>
+<li><p>added gateway timeout exception for get_results function <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/156">#156</a></p></li>
+</ul>
+</section>
+<section id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Bump pytest-cov from 5.0.0 to 6.0.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/143">#143</a></p></li>
+<li><p>CHORE: Bump websockets from 14.0 to 14.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/146">#146</a></p></li>
+<li><p>CHORE: Bump jupyterlab from 4.3.0 to 4.3.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/151">#151</a></p></li>
+<li><p>CHORE: Bump msal from 1.31.0 to 1.31.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/152">#152</a></p></li>
+<li><p>CHORE: Bump tomli from 2.1.0 to 2.2.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/158">#158</a></p></li>
+</ul>
+</section>
+<section id="maintenance">
+<h3>Maintenance<a class="headerlink" href="#maintenance" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.7.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/150">#150</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id56">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.7.0">0.7.0</a> - 2024-11-18<a class="headerlink" href="#id56" title="Link to this heading">#</a></h2>
+<section id="id57">
+<h3>Added<a class="headerlink" href="#id57" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>gets filtered version and example for motor loss map upload <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/149">#149</a></p></li>
+</ul>
+</section>
+<section id="id59">
+<h3>Fixed<a class="headerlink" href="#id59" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>added additional auth check on get results <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/148">#148</a></p></li>
+</ul>
+</section>
+<section id="id61">
+<h3>Maintenance<a class="headerlink" href="#id61" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.6 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/145">#145</a></p></li>
+<li><p>CHORE: Bump dev version into 0.7.dev0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/147">#147</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id65">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.6">0.6</a> - 2024-11-13<a class="headerlink" href="#id65" title="Link to this heading">#</a></h2>
+<section id="id66">
+<h3>Added<a class="headerlink" href="#id66" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>added a get_concept function <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/131">#131</a></p></li>
+<li><p>improve test that was calling out to external endpoint <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/136">#136</a></p></li>
+<li><p>feature/account_checking <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/142">#142</a></p></li>
+</ul>
+</section>
+<section id="id70">
+<h3>Dependencies<a class="headerlink" href="#id70" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Bump ansys-sphinx-theme from 1.0.9 to 1.0.11 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/124">#124</a></p></li>
+<li><p>CHORE: Bump tomli from 2.0.1 to 2.0.2 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/129">#129</a></p></li>
+<li><p>CHORE: Bump websockets from 13.0.1 to 14.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/135">#135</a></p></li>
+<li><p>CHORE: Bump jupyterlab from 4.2.5 to 4.3.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/137">#137</a></p></li>
+<li><p>CHORE: Bump sphinx-autobuild from 2024.9.17 to 2024.10.3 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/139">#139</a></p></li>
+<li><p>CHORE: Bump tox from 4.19.0 to 4.23.2 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/140">#140</a></p></li>
+</ul>
+</section>
+<section id="id77">
+<h3>Maintenance<a class="headerlink" href="#id77" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.5.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/123">#123</a></p></li>
+<li><p>CHORE: Bump ansys/actions from 7 to 8 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/128">#128</a></p></li>
+<li><p>CI: Remove index jobs <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/133">#133</a></p></li>
+<li><p>update to remove security issues <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/141">#141</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id83">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.5">0.5</a> - 2024-09-20<a class="headerlink" href="#id83" title="Link to this heading">#</a></h2>
+<section id="id84">
+<h3>Added<a class="headerlink" href="#id84" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>added a timeout option <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/118">#118</a></p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.4.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/106">#106</a></p></li>
+<li><p>CHORE: Bump development version to 0.5.dev0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/107">#107</a></p></li>
+<li><p>BUILD: Update dependencies range <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/109">#109</a></p></li>
+<li><p>chore: update CHANGELOG for v0.4.2 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/115">#115</a></p></li>
+</ul>
+</section>
+<section id="id90">
+<h3>Dependencies<a class="headerlink" href="#id90" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Bump pre-commit from 3.7.1 to 3.8.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/92">#92</a></p></li>
+<li><p>CHORE: Bump jupytext from 1.16.3 to 1.16.4 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/95">#95</a></p></li>
+<li><p>CHORE: Bump sphinx-design from 0.6.0 to 0.6.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/96">#96</a></p></li>
+<li><p>CHORE: Bump plotly from 5.24.0 to 5.24.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/116">#116</a></p></li>
+<li><p>CHORE: Bump ansys-sphinx-theme from 0.16.6 to 1.0.8 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/117">#117</a></p></li>
+<li><p>CHORE: Bump ansys-sphinx-theme from 1.0.8 to 1.0.9 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/119">#119</a></p></li>
+<li><p>CHORE: Bump tox from 4.18.1 to 4.19.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/120">#120</a></p></li>
+<li><p>CHORE: Bump sphinx-autobuild from 2024.9.3 to 2024.9.17 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/121">#121</a></p></li>
+</ul>
+</section>
+<section id="id99">
+<h3>Maintenance<a class="headerlink" href="#id99" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Bump ansys/actions from 6 to 7 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/97">#97</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id102">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.4.2">0.4.2</a> - 2024-09-13<a class="headerlink" href="#id102" title="Link to this heading">#</a></h2>
+<section id="id103">
+<h3>Changed<a class="headerlink" href="#id103" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Testing, do not merge <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/114">#114</a></p></li>
+</ul>
+</section>
+<section id="id105">
+<h3>Fixed<a class="headerlink" href="#id105" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>added a product id getter <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/111">#111</a></p></li>
+</ul>
+</section>
+<section id="miscellaneous">
+<h3>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Revert changelog changes after release failure <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/112">#112</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id109">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.4.1">0.4.1</a> - 2024-09-12<a class="headerlink" href="#id109" title="Link to this heading">#</a></h2>
+<section id="id110">
+<h3>Changed<a class="headerlink" href="#id110" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.4.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/106">#106</a></p></li>
+<li><p>CHORE: Bump development version to 0.5.dev0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/107">#107</a></p></li>
+<li><p>BUILD: Update dependencies range <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/109">#109</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id115">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.4">0.4</a> - 2024-09-04<a class="headerlink" href="#id115" title="Link to this heading">#</a></h2>
+<section id="id116">
+<h3>Added<a class="headerlink" href="#id116" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Added progress monitor and tests <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/105">#105</a></p></li>
+</ul>
+</section>
+<section id="id118">
+<h3>Changed<a class="headerlink" href="#id118" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.3.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/102">#102</a></p></li>
+<li><p>CHORE: Bump dev version into 0.4.dev0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/103">#103</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id122">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.3.0">0.3.0</a> - 2024-08-22<a class="headerlink" href="#id122" title="Link to this heading">#</a></h2>
+<section id="id123">
+<h3>Changed<a class="headerlink" href="#id123" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.2.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/93">#93</a></p></li>
+<li><p>CHORE: Bump dev version to 0.3.dev0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/94">#94</a></p></li>
+<li><p>CHORE: Revert “chore: update CHANGELOG for v0.3.0 (#99)” <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/100">#100</a></p></li>
+</ul>
+</section>
+<section id="id127">
+<h3>Miscellaneous<a class="headerlink" href="#id127" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Refactor concept creation process <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/98">#98</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id130">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.2.0">0.2.0</a> - 2024-07-30<a class="headerlink" href="#id130" title="Link to this heading">#</a></h2>
+<section id="id131">
+<h3>Changed<a class="headerlink" href="#id131" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.1.5 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/89">#89</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id134">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.1.5">0.1.5</a> - 2024-07-29<a class="headerlink" href="#id134" title="Link to this heading">#</a></h2>
+<section id="id135">
+<h3>Added<a class="headerlink" href="#id135" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>ansys id login <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/78">#78</a></p></li>
+</ul>
+</section>
+<section id="id137">
+<h3>Changed<a class="headerlink" href="#id137" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.1.4 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/69">#69</a></p></li>
+</ul>
+</section>
+<section id="id139">
+<h3>Fixed<a class="headerlink" href="#id139" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>slowed down pinging the results server <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/80">#80</a></p></li>
+<li><p>Fix/documentation links <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/88">#88</a></p></li>
+</ul>
+</section>
+<section id="id142">
+<h3>Dependencies<a class="headerlink" href="#id142" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Bump ansys-sphinx-theme from 0.16.5 to 0.16.6 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/70">#70</a></p></li>
+<li><p>CHORE: Bump twine from 5.1.0 to 5.1.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/76">#76</a></p></li>
+<li><p>CHORE: Bump importlib-metadata from 7.1.0 to 8.2.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/81">#81</a></p></li>
+<li><p>CHORE: Bump jupyterlab from 4.2.2 to 4.2.4 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/82">#82</a></p></li>
+<li><p>CHORE: Bump sphinx-autodoc-typehints from 2.1.1 to 2.2.3 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/83">#83</a></p></li>
+<li><p>CHORE: Bump tox from 4.15.1 to 4.16.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/84">#84</a></p></li>
+<li><p>CHORE: Bump sphinx from 7.3.7 to 7.4.7 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/85">#85</a></p></li>
+<li><p>CHORE: Bump plotly from 5.22.0 to 5.23.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/86">#86</a></p></li>
+<li><p>CHORE: Bump jupytext from 1.16.2 to 1.16.3 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/87">#87</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id153">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.1.4">0.1.4</a> - 2024-06-13<a class="headerlink" href="#id153" title="Link to this heading">#</a></h2>
+<section id="id154">
+<h3>Changed<a class="headerlink" href="#id154" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.1.3 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/67">#67</a></p></li>
+<li><p>DOCS: Update URLs to match new CNAME <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/68">#68</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id158">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.1.3">0.1.3</a> - 2024-06-12<a class="headerlink" href="#id158" title="Link to this heading">#</a></h2>
+<section id="id159">
+<h3>Changed<a class="headerlink" href="#id159" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>chore: update CHANGELOG for v0.1.2 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/53">#53</a></p></li>
+<li><p>CI: Use Trusted Publisher to release package <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/59">#59</a></p></li>
+<li><p>DOCS: Use ansys org instead of internal <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/61">#61</a></p></li>
+<li><p>DOC: Fix typo in pyproject.toml <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/62">#62</a></p></li>
+<li><p>CHORE: Use new repository name <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/63">#63</a></p></li>
+<li><p>CI: Refact release job <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/66">#66</a></p></li>
+</ul>
+</section>
+<section id="id166">
+<h3>Dependencies<a class="headerlink" href="#id166" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Bump pytest-cov from 4.1.0 to 5.0.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/38">#38</a></p></li>
+<li><p>CHORE: Bump sphinx-autodoc-typehints from 2.1.0 to 2.1.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/56">#56</a></p></li>
+<li><p>CHORE: Bump pytest from 7.4.4 to 8.2.2 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/57">#57</a></p></li>
+<li><p>CHORE: Bump tox from 4.15.0 to 4.15.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/58">#58</a></p></li>
+<li><p>CHORE: Bump jupyterlab from 4.2.1 to 4.2.2 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/60">#60</a></p></li>
+</ul>
+</section>
+<section id="id172">
+<h3>Miscellaneous<a class="headerlink" href="#id172" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>DOCS: Minor doc edits based on doc rendering <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/55">#55</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id175">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.1.2">0.1.2</a> - 2024-06-04<a class="headerlink" href="#id175" title="Link to this heading">#</a></h2>
+<section id="id176">
+<h3>Changed<a class="headerlink" href="#id176" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Bump development version to 0.2.dev0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/44">#44</a></p></li>
+<li><p>chore: update CHANGELOG for v0.1.1 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/48">#48</a></p></li>
+<li><p>DOCS: Fix non clickable cards <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/49">#49</a></p></li>
+</ul>
+</section>
+<section id="id180">
+<h3>Miscellaneous<a class="headerlink" href="#id180" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>DOCS: Update URLs in README.rst <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/50">#50</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id183">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.1.1">0.1.1</a> - 2024-06-03<a class="headerlink" href="#id183" title="Link to this heading">#</a></h2>
+<section id="id184">
+<h3>Changed<a class="headerlink" href="#id184" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: update CHANGELOG for v0.1.0 <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/46">#46</a></p></li>
+<li><p>CI: Fix release jobs <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/47">#47</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id188">
+<h2><a class="reference external" href="https://github.com/ansys/pyconceptev/releases/tag/v0.1.0">0.1.0</a> - 2024-06-03<a class="headerlink" href="#id188" title="Link to this heading">#</a></h2>
+<section id="id189">
+<h3>Changed<a class="headerlink" href="#id189" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Update following OSS review <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/36">#36</a></p></li>
+<li><p>First-pass of overall doc review <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/39">#39</a></p></li>
+<li><p>DOCS: Rework example documentation <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/43">#43</a></p></li>
+<li><p>CHORE: Clean up ci_cd.yml and pyproject.toml <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/45">#45</a></p></li>
+</ul>
+</section>
+<section id="id194">
+<h3>Miscellaneous<a class="headerlink" href="#id194" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CHORE: Second pass of oss code review <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/37">#37</a></p></li>
+<li><p>Doc edits based on skimming rendered doc <a class="reference external" href="https://github.com/ansys/pyconceptev/pull/41">#41</a></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#may-06-2025">0.9.4 - May 06, 2025</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#april-17-2025">0.9.3 - April 17, 2025</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#march-24-2025">0.9.2 - March 24, 2025</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#march-10-2025">0.9.0 - March 10, 2025</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">0.8 - 2024-11-29</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#maintenance">Maintenance</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id56">0.7.0 - 2024-11-18</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id57">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id59">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id61">Maintenance</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id65">0.6 - 2024-11-13</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id66">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id70">Dependencies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id77">Maintenance</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id83">0.5 - 2024-09-20</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id84">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id90">Dependencies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id99">Maintenance</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id102">0.4.2 - 2024-09-13</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id103">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id105">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id109">0.4.1 - 2024-09-12</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id110">Changed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id115">0.4 - 2024-09-04</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id116">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id118">Changed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id122">0.3.0 - 2024-08-22</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id123">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id127">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id130">0.2.0 - 2024-07-30</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id131">Changed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id134">0.1.5 - 2024-07-29</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id135">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id137">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id139">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id142">Dependencies</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id153">0.1.4 - 2024-06-13</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id154">Changed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id158">0.1.3 - 2024-06-12</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id159">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id166">Dependencies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id172">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id175">0.1.2 - 2024-06-04</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id176">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id180">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id183">0.1.1 - 2024-06-03</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id184">Changed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id188">0.1.0 - 2024-06-03</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id189">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id194">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item"> 
+<div class="tocsection editthispage">
+  <a href="https://github.com/ansys/pyconceptev/edit/main/doc/source/changelog.rst">
+    <i class="fa-solid fa-pencil"></i>
+       Edit
+    on GitHub  
+  </a>
+</div>
+
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/changelog.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright (c) 2023-2025 ANSYS, Inc. and/or its affiliates..
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the
+  <a href="https://sphinxdocs.ansys.com/version/stable/index.html"
+    >Ansys Sphinx Theme</a
+  >
+  1.0.11. <br />Last updated on
+  <span id="date"></span>
+</p>
+<script>
+  var options = { day: "numeric", month: "long", year: "numeric" };
+  var lastModifiedDate = new Date(document.lastModified);
+  var date = lastModifiedDate.toLocaleDateString("en-US", options);
+  document.getElementById("date").innerHTML = date;
+</script></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
