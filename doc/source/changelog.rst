@@ -9,7 +9,7 @@ This document contains the release notes for the project.
 
 .. towncrier release notes start
 
-`0.12.0 <https://github.com/ansys/pyconceptev/releases/tag/v0.12.0>`_ - September 28, 2026
+`0.12.1 <https://github.com/ansys/pyconceptev/releases/tag/v0.12.1>`_ - September 28, 2026
 ==========================================================================================
 
 .. tab-set::
@@ -65,6 +65,9 @@ This document contains the release notes for the project.
 
         * - Chore: Update missing or outdated files
           - `#388 <https://github.com/ansys/pyconceptev/pull/388>`_
+
+        * - Ci: fix permission for doc deploy jobs
+          - `#404 <https://github.com/ansys/pyconceptev/pull/404>`_
 
 
 `0.10.3 <https://github.com/ansys/pyconceptev/releases/tag/v0.10.3>`_ - July 16, 2026
