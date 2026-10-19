@@ -93,7 +93,7 @@ sphinx-autodoc-typehints = ">=2.1.1,<4.0.0"
 sphinx-copybutton = "^0.5.1"
 sphinx-design = "^0.6.0"
 pypandoc-binary = "^1.13"
-sphinx-gallery = ">=0.18,<0.22"
+sphinx-gallery = ">=0.18,<0.23"
 matplotlib = "^3.10.8"
 fonttools = ">=4.62.0"
 pandas = {extras = ["excel"], version = "^2.2.3"}
@@ -122,7 +122,7 @@ twine = ">=5,<8"
 optional = true
 
 [tool.poetry.group.linux-encryption.dependencies]
-pygobject = {version = "<3.58.1", platform = "linux"}
+pygobject = {version = "<3.58.2", platform = "linux"}
 
 [tool.pytest.ini_options]
 markers = [
