@@ -108,6 +108,8 @@ jobs:
           CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
+          optional-dependencies-name: ""
+          group-dependencies-name: "tests"
           pytest-extra-args: "tests/unit --cov=ansys --cov-report=term --cov-report=html:.cov/html"
           pytest-postargs: "-vv"
 
@@ -138,6 +140,8 @@ jobs:
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
+          optional-dependencies-name: ""
+          group-dependencies-name: "tests"
           pytest-extra-args: "tests/integration -m 'not e2e'"
   doc-build:
     name: Build documentation
