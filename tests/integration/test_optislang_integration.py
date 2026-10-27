@@ -211,7 +211,11 @@ def test_msal_app(msal_app):
     """Test that the MSAL PublicClientApplication is created."""
     assert isinstance(msal_app, auth.PublicClientApplication)
     assert msal_app.client_id == auth.client_id
-    assert msal_app.authority.authorization_endpoint == auth.authority + "/oauth2/v2.0/authorize"
+    # MSAL lower-cases the B2C policy segment when it normalizes the authority.
+    assert (
+        msal_app.authority.authorization_endpoint.lower()
+        == (auth.authority + "/oauth2/v2.0/authorize").lower()
+    )
 
 
 def test_interactive_sign_in_request_accepted():

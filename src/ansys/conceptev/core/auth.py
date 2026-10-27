@@ -106,7 +106,9 @@ def _acquire_token_by_pat(app: PublicClientApplication, pat: SecretStr) -> dict:
     previous_level = httpx_logger.level
     httpx_logger.setLevel(logging.WARNING)
     try:
-        with httpx.Client() as client:
+        # Default httpx timeout (5s) is too tight for some CI runners' network path
+        # to the identity provider.
+        with httpx.Client(timeout=30) as client:
             response = client.send(request, follow_redirects=False)
     finally:
         httpx_logger.setLevel(previous_level)
