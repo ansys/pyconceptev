@@ -203,8 +203,8 @@ Authenticate without an interactive sign-in (PAT)
 
 By default, ``get_http_client``/``get_conceptev_client`` sign in interactively
 (a browser window) or via a cached token. For automation that can't complete
-an interactive sign-in — CI pipelines, scheduled scripts, accounts protected by
-SSO/MFA — use an Ansys **Personal Access Token (PAT)** instead. PyConceptEV
+an interactive sign-in—CI pipelines, scheduled scripts, accounts protected by
+SSO/MFA—use an Ansys **Personal Access Token (PAT)** instead. PyConceptEV
 exchanges the PAT for a normal access token automatically (it is not used
 directly as a bearer token); see the `PAT authentication guide
 <https://developer.synopsys.com/docs/ansys-id-sso/pat-authentication-guide>`_
@@ -217,7 +217,7 @@ for background on how Ansys ID SSO handles this.
 3. Open your profile icon and select **Personal access token**.
 4. Select **Create Token**, give it a name and expiration date, and set
    **Scope** to **Full Access**.
-5. Copy the generated token — it's shown only once.
+5. Copy the generated token—it's shown only once.
 
 **Configure PyConceptEV to use it**
 
