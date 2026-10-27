@@ -198,6 +198,49 @@ and the settings management uses it.
 Most things can be left as default but the ``account_name`` should be changed
 to match your company account name.
 
+Authenticate without an interactive sign-in (PAT)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, ``get_http_client``/``get_conceptev_client`` sign in interactively
+(a browser window) or via a cached token. For automation that can't complete
+an interactive sign-in — CI pipelines, scheduled scripts, accounts protected by
+SSO/MFA — use an Ansys **Personal Access Token (PAT)** instead. PyConceptEV
+exchanges the PAT for a normal access token automatically (it is not used
+directly as a bearer token); see the `PAT authentication guide
+<https://developer.synopsys.com/docs/ansys-id-sso/pat-authentication-guide>`_
+for background on how Ansys ID SSO handles this.
+
+**Generate a PAT**
+
+1. Go to `<https://id.ansys.com/>`_ and sign in with your Ansys ID.
+2. Select the appropriate account if you belong to more than one.
+3. Open your profile icon and select **Personal access token**.
+4. Select **Create Token**, give it a name and expiration date, and set
+   **Scope** to **Full Access**.
+5. Copy the generated token — it's shown only once.
+
+**Configure PyConceptEV to use it**
+
+Set the ``ANSYS_UAT_PAT`` environment variable, or add ``ansys_uat_pat`` to
+your ``config.toml``:
+
+.. code-block:: toml
+
+   ansys_uat_pat = "your_pat_value"
+
+When set, it's tried before any interactive prompt. It's declared as a
+Pydantic ``SecretStr`` setting, so it's masked (``**********``) if settings
+are ever printed or logged, and never appears in tracebacks.
+
+**Treat a PAT like a password**
+
+- Never paste it directly into a terminal command (it ends up in your shell
+  history); use a prompt that doesn't echo it, or a secrets manager.
+- Never commit it to source control or share it with others.
+- Give it the shortest expiration that's practical, and delete unused tokens.
+- Rotate/revoke it immediately at `<https://id.ansys.com/>`_ if it's ever
+  exposed.
+
 Configure SSL certificate for company networks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

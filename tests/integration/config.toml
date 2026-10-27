@@ -4,6 +4,5 @@ CONCEPTEV_URL = "https://test-conceptev.awsansys3np.onscale.com/api"
 client_id = "fe4fb269-0e36-4f4a-8e1a-311fa3341876"
 authority = "https://a365uat.synopsys.com/a365uat.onmicrosoft.com/B2C_1A_ansysid_SIGNUP_SIGNIN"
 scope = "https://a365uat.synopsys.com/AnsysID/Authentication"
-conceptev_username = "conceptev_testing@ansys.com"
 account_name = "ConceptEv Test Account"
 job_timeout = 3600

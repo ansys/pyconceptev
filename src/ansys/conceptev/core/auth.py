@@ -23,10 +23,12 @@
 """Authentication for AnsysID."""
 
 import logging
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 from msal import PublicClientApplication
 from msal_extensions import FilePersistence, build_encrypted_persistence, token_cache
+from pydantic import SecretStr
 
 from ansys.conceptev.core.exceptions import TokenError
 from ansys.conceptev.core.settings import settings
@@ -35,8 +37,39 @@ logger = logging.getLogger(__name__)
 scope = settings.scope
 client_id = settings.client_id
 authority = settings.authority
-USERNAME = settings.conceptev_username
-PASSWORD = settings.conceptev_password
+PAT_TOKEN = settings.ansys_uat_pat
+# MSAL's default loopback redirect URI for public-client desktop apps (what
+# acquire_token_interactive uses when none is configured on PublicClientApplication).
+PAT_REDIRECT_URI = "http://localhost"
+
+
+def _acquire_token_by_pat(app: PublicClientApplication, pat: SecretStr) -> dict:
+    """Exchange a PAT for a token, per Ansys's documented PAT authentication flow.
+
+    See: https://developer.synopsys.com/docs/ansys-id-sso/pat-authentication-guide
+    The PAT is passed as an ``id_token_hint`` to the authorize endpoint to obtain
+    an authorization code (not usable as a bearer token itself), which MSAL then
+    exchanges — and caches — for a normal access token.
+    """
+    auth_url = (
+        f"{authority}/oauth2/v2.0/authorize"
+        f"?client_id={client_id}&nonce=defaultNonce&redirect_uri={PAT_REDIRECT_URI}"
+        f"&scope=openid&response_type=code&id_token_hint={pat.get_secret_value()}"
+    )
+    response = httpx.get(auth_url, follow_redirects=False)
+    location = response.headers.get("location")
+    if not location:
+        raise TokenError(
+            "PAT exchange failed: no redirect received from AnsysID. "
+            "Check that ANSYS_UAT_PAT is valid and not expired."
+        )
+    params = parse_qs(urlparse(location).query)
+    if "code" not in params:
+        error_description = params.get("error_description", ["Unknown error"])[0]
+        raise TokenError(f"PAT exchange failed: {error_description}")
+    return app.acquire_token_by_authorization_code(
+        code=params["code"][0], scopes=[scope], redirect_uri=PAT_REDIRECT_URI
+    )
 
 
 def create_msal_app(cache_filepath="token_cache.bin") -> PublicClientApplication:
@@ -58,8 +91,14 @@ def build_persistence(location, fallback_to_plaintext=True):
     return FilePersistence(location)
 
 
-def get_ansyId_token(app, force=False) -> str:
-    """Get token from AnsysID."""
+def get_ansyId_token(app, force=False, allow_interactive=True) -> str:
+    """Get token from AnsysID.
+
+    Tries silent (cached), then the configured Ansys UAT PAT exchange, then
+    interactive sign-in, in that order. Set ``allow_interactive=False`` to
+    prevent the interactive fallback, e.g. in automated/CI contexts where no
+    human is available to complete it.
+    """
     result = None
     accounts = app.get_accounts()
     if accounts and not force:
@@ -68,17 +107,17 @@ def get_ansyId_token(app, force=False) -> str:
         # Now let's try to find a token in cache for this account
         logger.info("Trying to acquire token silently")
         result = app.acquire_token_silent(scopes=[scope], account=chosen)
-    if not result and USERNAME and PASSWORD:
-        logger.info("Trying to acquire token with username and password")
-        result = app.acquire_token_by_username_password(
-            username=USERNAME, password=PASSWORD, scopes=[scope]
-        )
-    if not result:
+    if not result and PAT_TOKEN:
+        logger.info("Trying to exchange the configured Ansys UAT PAT for a token")
+        result = _acquire_token_by_pat(app, PAT_TOKEN)
+    if not result and allow_interactive:
         logger.info("Trying to acquire token interactively")
         result = app.acquire_token_interactive(scopes=[scope])
 
-    if "access_token" in result:
+    if result and "access_token" in result:
         return result["access_token"]
+    if result is None:
+        raise Exception("Failed to get token: no non-interactive credentials were available.")
     error = result.get("error")
     error_description = result.get("error_description")
     correlation_id = result.get("error_description")

@@ -40,15 +40,33 @@ DATA_DIR = Path(__file__).parent
 
 @pytest.fixture
 def msal_app():
-    """Fixture to create a MSAL PublicClientApplication instance."""
-    return auth.create_msal_app()
+    """Fixture to create a MSAL PublicClientApplication instance.
+
+    This is a deliberate, dedicated regression check for the auth *configuration*
+    itself (client ID / authority), independent of whether test credentials are
+    available. It fails loudly (rather than skipping) if the authority can't be
+    reached/validated, e.g. because the UAT environment URL changed — that's a
+    real regression we want surfaced, not hidden behind a skip.
+    """
+    try:
+        return auth.create_msal_app()
+    except Exception as exc:
+        pytest.fail(
+            f"Could not validate the configured AnsysID authority "
+            f"({auth.authority!r}). If the UAT environment URL has changed, "
+            f"update tests/integration/config.toml. Original error: {exc}"
+        )
 
 
 @pytest.fixture
-def token(msal_app):
-    """Fixture to get a valid AnsysID token."""
-    token = auth.get_ansyId_token(msal_app)
-    return token
+def token(session_token):
+    """Fixture reusing the guarded, session-scoped AnsysID token (see conftest.py).
+
+    Reusing one guarded auth attempt per session avoids every test in this file
+    separately retrying sign-in (and potentially blocking on an interactive
+    prompt) when auth is unavailable.
+    """
+    return session_token
 
 
 @pytest.fixture
@@ -194,6 +212,52 @@ def test_msal_app(msal_app):
     assert isinstance(msal_app, auth.PublicClientApplication)
     assert msal_app.client_id == auth.client_id
     assert msal_app.authority.authorization_endpoint == auth.authority + "/oauth2/v2.0/authorize"
+
+
+def test_interactive_sign_in_request_accepted():
+    """Smoke-test the interactive sign-in setup without a human completing it.
+
+    Issues the same authorize request ``acquire_token_interactive`` would open a
+    browser to (client ID, redirect URI, and scope included), but doesn't follow
+    through with an actual sign-in. Requires no credentials, so it runs even
+    when ANSYS_UAT_PAT isn't configured, and flags provider-side drift (a
+    deleted/renamed client ID, an unregistered redirect URI, or a removed
+    scope) before anything tries a real sign-in.
+    """
+    params = {
+        "client_id": auth.client_id,
+        "response_type": "code",
+        "redirect_uri": auth.PAT_REDIRECT_URI,
+        "scope": f"openid {auth.scope}",
+        "response_mode": "query",
+        "nonce": "smoketest",
+    }
+    response = httpx.get(
+        f"{auth.authority}/oauth2/v2.0/authorize",
+        params=params,
+        follow_redirects=True,
+        timeout=15,
+    )
+    assert response.status_code == 200, (
+        f"AnsysID returned HTTP {response.status_code} for the configured authority/client_id/"
+        "scope/redirect_uri. Check whether the identity provider configuration changed."
+    )
+    # These codes mean the provider rejected the request outright (bad client/redirect/scope),
+    # as opposed to rendering the normal sign-in page — a strong signal of provider-side drift.
+    known_errors = (
+        "aadb2c90008",  # invalid client_id
+        "aadb2c90006",  # invalid/unregistered redirect_uri
+        "aadb2c90009",  # invalid scope
+        "aadsts700016",  # application not found in tenant
+        "invalid_client",
+        "invalid_scope",
+        "unauthorized_client",
+    )
+    body = response.text.lower()
+    found = [code for code in known_errors if code in body]
+    assert (
+        not found
+    ), f"AnsysID rejected the sign-in request ({found}); check authority/client_id/scope setup."
 
 
 def test_auth_app(token):

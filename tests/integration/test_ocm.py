@@ -27,7 +27,6 @@ import uuid
 import httpx
 import pytest
 
-from ansys.conceptev.core.auth import create_msal_app, get_ansyId_token
 import ansys.conceptev.core.ocm as ocm
 from ansys.conceptev.core.settings import settings
 
@@ -43,10 +42,9 @@ def is_uuid(s: str):
 
 
 @pytest.fixture()
-def token():
-    msal = create_msal_app()
-    token = get_ansyId_token(msal)
-    return token
+def token(session_token):
+    """Fixture reusing the guarded, session-scoped AnsysID token (see conftest.py)."""
+    return session_token
 
 
 def test_product_id(token):

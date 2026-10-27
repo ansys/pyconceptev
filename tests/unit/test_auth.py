@@ -27,6 +27,7 @@ from msal_extensions import (
     KeychainPersistence,
     LibsecretPersistence,
 )
+from pydantic import SecretStr
 import pytest
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
@@ -49,8 +50,8 @@ class MockApp:
     def acquire_token_interactive(self, scopes):
         return {"access_token": "mock_token"}
 
-    def acquire_token_by_username_password(self, username, password, scopes):
-        return {"access_token": "mock_token_password"}
+    def acquire_token_by_authorization_code(self, code, scopes, redirect_uri):
+        return {"access_token": f"mock_pat_token_for_{code}"}
 
 
 @pytest.fixture
@@ -81,8 +82,7 @@ def test_create_build_persistance() -> None:
 
 def test_create_msal_app_try_token(mockPublcClientCreation, mocker) -> None:
     """Test Creating MSAL App."""
-    mocker.patch("ansys.conceptev.core.auth.USERNAME", None)
-    mocker.patch("ansys.conceptev.core.auth.PASSWORD", None)
+    mocker.patch("ansys.conceptev.core.auth.PAT_TOKEN", None)
     app = auth.create_msal_app()
     assert isinstance(app, MockApp)
     token = auth.get_ansyId_token(app)
@@ -91,22 +91,51 @@ def test_create_msal_app_try_token(mockPublcClientCreation, mocker) -> None:
 
 def test_create_msal_app_try_token_cache(mockPublcClientCreation, mockCache, mocker) -> None:
     """Test Creating MSAL App with cache"""
-    mocker.patch("ansys.conceptev.core.auth.USERNAME", None)
-    mocker.patch("ansys.conceptev.core.auth.PASSWORD", None)
+    mocker.patch("ansys.conceptev.core.auth.PAT_TOKEN", None)
     app = auth.create_msal_app()
     assert isinstance(app, MockApp)
     token = auth.get_ansyId_token(app)
     assert token == "mock_cached_token"
 
 
-def test_create_msal_app_password(mockPublcClientCreation, mocker) -> None:
-    """Test Creating MSAL App."""
-    mocker.patch("ansys.conceptev.core.auth.USERNAME", "something")
-    mocker.patch("ansys.conceptev.core.auth.PASSWORD", "something")
+def test_get_ansyId_token_exchanges_pat_for_access_token(
+    mockPublcClientCreation, mocker, httpx_mock: HTTPXMock
+) -> None:
+    """A configured PAT is exchanged for an access token (not used as a bearer token itself)."""
+    mocker.patch("ansys.conceptev.core.auth.PAT_TOKEN", SecretStr("fake-test-pat"))
+    httpx_mock.add_response(
+        status_code=302,
+        headers={"location": "https://example.com/redirect?code=fake-auth-code"},
+    )
     app = auth.create_msal_app()
-    assert isinstance(app, MockApp)
     token = auth.get_ansyId_token(app)
-    assert token == "mock_token_password"
+    assert token == "mock_pat_token_for_fake-auth-code"
+
+
+def test_get_ansyId_token_pat_exchange_without_redirect_raises(
+    mockPublcClientCreation, mocker, httpx_mock: HTTPXMock
+) -> None:
+    """A missing redirect (e.g. an invalid/expired PAT) should fail loudly, not silently
+    fall through to interactive."""
+    mocker.patch("ansys.conceptev.core.auth.PAT_TOKEN", SecretStr("fake-test-pat"))
+    httpx_mock.add_response(status_code=200)
+    app = auth.create_msal_app()
+
+    with pytest.raises(auth.TokenError, match="PAT exchange failed"):
+        auth.get_ansyId_token(app, allow_interactive=False)
+
+
+def test_get_ansyId_token_without_interactive_fallback_raises(mockPublcClientCreation, mocker):
+    """When no non-interactive credentials are available, don't fall back to an
+    interactive browser sign-in (e.g. so CI doesn't hang)."""
+    mocker.patch("ansys.conceptev.core.auth.PAT_TOKEN", None)
+    mock_interactive = mocker.patch.object(MockApp, "acquire_token_interactive")
+    app = auth.create_msal_app()
+
+    with pytest.raises(Exception, match="no non-interactive credentials"):
+        auth.get_ansyId_token(app, allow_interactive=False)
+
+    mock_interactive.assert_not_called()
 
 
 def test_auth_initialization_creates_msal_app(mocker):

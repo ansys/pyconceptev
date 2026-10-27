@@ -63,9 +63,16 @@ def pytest_configure(config) -> None:
 
 @pytest.fixture(scope="session")
 def session_token():
-    """Acquire a long-lived AnsysID token once per test session."""
-    msal = auth.create_msal_app()
-    return auth.get_ansyId_token(msal)
+    """Acquire a token once per test session, without blocking on human interaction.
+
+    ``get_ansyId_token`` uses the pre-issued ``ANSYS_UAT_PAT`` (unaffected by
+    SSO/MFA on the test account). Skips the whole session (rather than hanging
+    on an interactive sign-in) if it isn't configured.
+    """
+    if not auth.PAT_TOKEN:
+        pytest.skip("ANSYS_UAT_PAT is not configured — skipping integration tests.")
+    msal_app = auth.create_msal_app()
+    return auth.get_ansyId_token(msal_app, allow_interactive=False)
 
 
 @pytest.fixture(scope="session")
