@@ -23,6 +23,7 @@
 """Authentication for AnsysID."""
 
 import logging
+import re
 from urllib.parse import parse_qs, urlparse
 
 import httpx
@@ -38,30 +39,83 @@ scope = settings.scope
 client_id = settings.client_id
 authority = settings.authority
 PAT_TOKEN = settings.ansys_uat_pat
-# MSAL's default loopback redirect URI for public-client desktop apps (what
-# acquire_token_interactive uses when none is configured on PublicClientApplication).
-PAT_REDIRECT_URI = "http://localhost"
+# Verified-working redirect URI for this app registration (see Ansys's get_token.py
+# reference script) - used for both the PAT authorize request and its token exchange.
+PAT_REDIRECT_URI = "https://login.microsoftonline.com/common/oauth2/nativeclient"
+
+
+def _split_authority_policy(full_authority: str) -> tuple[str, str | None]:
+    """Split a B2C authority URL into its (tenant base, policy) parts.
+
+    MSAL's authority has the policy embedded in the path
+    (``https://host/tenant/POLICY``), but the plain OAuth2 authorize endpoint
+    expects the policy as a ``p=`` query parameter against the tenant-only path
+    (``https://host/tenant/oauth2/v2.0/authorize?p=POLICY``).
+    """
+    parsed = urlparse(full_authority)
+    parts = parsed.path.strip("/").split("/")
+    if len(parts) < 2:
+        return full_authority, None
+    policy = parts[-1]
+    base_path = "/".join(parts[:-1])
+    return f"{parsed.scheme}://{parsed.netloc}/{base_path}", policy
+
+
+_AUTHORIZE_BASE, _AUTHORIZE_POLICY = _split_authority_policy(authority)
+
+
+def _extract_error_detail(body: str) -> str | None:
+    """Pull a human-readable detail out of a B2C HTML error page, if present."""
+    match = re.search(r'"Detail"\s*:\s*"([^"]+)"', body)
+    return match.group(1) if match else None
+
+
+def _build_pat_authorize_request(pat_value: str, *, prompt_none: bool = False) -> httpx.Request:
+    """Build the PAT authorize request, mirroring Ansys's verified ``get_token.py``.
+
+    The policy is sent as a ``p=`` query parameter (not embedded in the path),
+    and the full resource scope is requested up front, same as that script.
+    """
+    params = {
+        "client_id": client_id,
+        "nonce": "defaultNonce",
+        "redirect_uri": PAT_REDIRECT_URI,
+        "scope": f"openid offline_access {scope}",
+        "response_type": "code",
+        "id_token_hint": pat_value,
+    }
+    if _AUTHORIZE_POLICY:
+        params["p"] = _AUTHORIZE_POLICY
+    if prompt_none:
+        params["prompt"] = "none"
+    return httpx.Request("GET", f"{_AUTHORIZE_BASE}/oauth2/v2.0/authorize", params=params)
 
 
 def _acquire_token_by_pat(app: PublicClientApplication, pat: SecretStr) -> dict:
     """Exchange a PAT for a token, per Ansys's documented PAT authentication flow.
 
     See: https://developer.synopsys.com/docs/ansys-id-sso/pat-authentication-guide
-    The PAT is passed as an ``id_token_hint`` to the authorize endpoint to obtain
-    an authorization code (not usable as a bearer token itself), which MSAL then
-    exchanges — and caches — for a normal access token.
+    The PAT is passed as an ``id_token_hint`` to the B2C authorize endpoint to
+    obtain an authorization code (not usable as a bearer token itself), which
+    MSAL then exchanges — and caches — for a normal access token.
     """
-    auth_url = (
-        f"{authority}/oauth2/v2.0/authorize"
-        f"?client_id={client_id}&nonce=defaultNonce&redirect_uri={PAT_REDIRECT_URI}"
-        f"&scope=openid&response_type=code&id_token_hint={pat.get_secret_value()}"
-    )
-    response = httpx.get(auth_url, follow_redirects=False)
+    request = _build_pat_authorize_request(pat.get_secret_value())
+    # httpx logs the full request URL at INFO level, which would otherwise leak the PAT
+    # (embedded in the query string) to logs/log-capturing test runners.
+    httpx_logger = logging.getLogger("httpx")
+    previous_level = httpx_logger.level
+    httpx_logger.setLevel(logging.WARNING)
+    try:
+        with httpx.Client() as client:
+            response = client.send(request, follow_redirects=False)
+    finally:
+        httpx_logger.setLevel(previous_level)
     location = response.headers.get("location")
     if not location:
+        detail = _extract_error_detail(response.text) or "no additional detail available"
         raise TokenError(
-            "PAT exchange failed: no redirect received from AnsysID. "
-            "Check that ANSYS_UAT_PAT is valid and not expired."
+            f"PAT exchange failed: AnsysID returned HTTP {response.status_code} without a "
+            f"redirect. Detail: {detail}"
         )
     params = parse_qs(urlparse(location).query)
     if "code" not in params:

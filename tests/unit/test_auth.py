@@ -112,17 +112,83 @@ def test_get_ansyId_token_exchanges_pat_for_access_token(
     assert token == "mock_pat_token_for_fake-auth-code"
 
 
+def test_get_ansyId_token_force_true_skips_cache_and_uses_pat(
+    mockPublcClientCreation, mockCache, mocker, httpx_mock: HTTPXMock
+) -> None:
+    """``force=True`` (used on the 401 retry in ``AnsysIDAuth.auth_flow``) must skip
+    the cached/silent token and re-exchange the PAT for a fresh one, rather than
+    reusing a token that was possibly just rejected."""
+    mocker.patch("ansys.conceptev.core.auth.PAT_TOKEN", SecretStr("fake-test-pat"))
+    mock_silent = mocker.patch.object(MockApp, "acquire_token_silent")
+    httpx_mock.add_response(
+        status_code=302,
+        headers={"location": "https://example.com/redirect?code=fake-auth-code"},
+    )
+    app = auth.create_msal_app()
+
+    token = auth.get_ansyId_token(app, force=True)
+
+    assert token == "mock_pat_token_for_fake-auth-code"
+    mock_silent.assert_not_called()
+
+
 def test_get_ansyId_token_pat_exchange_without_redirect_raises(
     mockPublcClientCreation, mocker, httpx_mock: HTTPXMock
 ) -> None:
     """A missing redirect (e.g. an invalid/expired PAT) should fail loudly, not silently
-    fall through to interactive."""
+    fall through to interactive, and should surface the provider's error detail."""
     mocker.patch("ansys.conceptev.core.auth.PAT_TOKEN", SecretStr("fake-test-pat"))
-    httpx_mock.add_response(status_code=200)
+    httpx_mock.add_response(status_code=200, text='{"Detail":"PAT is expired"}')
     app = auth.create_msal_app()
 
-    with pytest.raises(auth.TokenError, match="PAT exchange failed"):
+    with pytest.raises(auth.TokenError, match="PAT exchange failed.*PAT is expired"):
         auth.get_ansyId_token(app, allow_interactive=False)
+
+
+def test_split_authority_policy_extracts_policy() -> None:
+    """MSAL's authority (policy embedded in the path) should split into a bare
+    tenant base and the policy name."""
+    base, policy = auth._split_authority_policy("https://host/tenant/POLICY")
+    assert base == "https://host/tenant"
+    assert policy == "POLICY"
+
+
+def test_split_authority_policy_without_policy_segment() -> None:
+    """A tenant-only authority (no policy segment) has nothing to split out."""
+    base, policy = auth._split_authority_policy("https://host/tenant")
+    assert base == "https://host/tenant"
+    assert policy is None
+
+
+def test_build_pat_authorize_request_includes_policy_and_full_scope() -> None:
+    """The authorize request should send the policy as ``p=`` and the full resource
+    scope up front, matching Ansys's verified ``get_token.py`` reference script."""
+    request = auth._build_pat_authorize_request("my-pat-value")
+    params = dict(request.url.params)
+    assert params["p"] == auth._AUTHORIZE_POLICY
+    assert params["scope"] == f"openid offline_access {auth.scope}"
+    assert params["id_token_hint"] == "my-pat-value"
+    assert params["redirect_uri"] == auth.PAT_REDIRECT_URI
+    assert params["response_type"] == "code"
+    assert "prompt" not in params
+    assert str(request.url).startswith(f"{auth._AUTHORIZE_BASE}/oauth2/v2.0/authorize")
+
+
+def test_build_pat_authorize_request_prompt_none() -> None:
+    """``prompt=none`` should only be included when explicitly requested."""
+    request = auth._build_pat_authorize_request("my-pat-value", prompt_none=True)
+    assert dict(request.url.params)["prompt"] == "none"
+
+
+def test_extract_error_detail_found() -> None:
+    """A B2C HTML error page embeds a JSON-ish \"Detail\" field to surface."""
+    body = '<html>...{"Title":"Error","Detail":"The id_token_hint is expired."}...</html>'
+    assert auth._extract_error_detail(body) == "The id_token_hint is expired."
+
+
+def test_extract_error_detail_missing() -> None:
+    """When there's no recognizable detail, return None rather than guessing."""
+    assert auth._extract_error_detail("<html>some unrelated page</html>") is None
 
 
 def test_get_ansyId_token_without_interactive_fallback_raises(mockPublcClientCreation, mocker):
