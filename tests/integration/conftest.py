@@ -46,7 +46,7 @@ os.environ.setdefault("PYCONCEPTEV_SETTINGS", str(INTEGRATION_CONFIG))
 
 import pytest  # noqa: E402
 
-from ansys.conceptev.core import app, auth  # noqa: E402
+from ansys.conceptev.core import app, auth, exceptions  # noqa: E402
 
 DATA_DIR = Path(__file__).parent
 
@@ -54,6 +54,36 @@ DATA_DIR = Path(__file__).parent
 def pytest_configure(config) -> None:
     """Re-affirm the env var in case settings was imported before our module-level set."""
     os.environ.setdefault("PYCONCEPTEV_SETTINGS", str(INTEGRATION_CONFIG))
+
+
+# ---------------------------------------------------------------------------
+# KNOWN ISSUE (2026-10-27): the ConceptEV API rejects the ANSYS_UAT_PAT identity
+# with a 401 "Key Not Found" — the ConceptEV API hasn't migrated to the new UAT
+# environment/identity setup yet, so it doesn't recognize tokens issued through the
+# new PAT-based auth flow. This is an environment-migration gap on the ConceptEV
+# side, not a pyconceptev bug (confirmed: the same token works fine against the OCM API).
+#
+# TO RE-ENABLE: once the ConceptEV API has migrated to the new UAT environment,
+# delete `_KNOWN_PROVISIONING_ISSUE_DETAIL`/`_skip_if_known_provisioning_issue` below
+# and their call sites — the tests will then run and assert normally again.
+# ---------------------------------------------------------------------------
+_KNOWN_PROVISIONING_ISSUE_DETAIL = "Key Not Found"
+
+
+def _skip_if_known_provisioning_issue(exc: Exception) -> None:
+    """Skip (not fail) on the known ConceptEV API / UAT migration gap.
+
+    Matches only the exact known error detail, so unrelated regressions still fail.
+    """
+    if _KNOWN_PROVISIONING_ISSUE_DETAIL in str(exc):
+        pytest.skip(
+            "Known issue: the ConceptEV API hasn't migrated to the new UAT environment "
+            f"yet, so it rejects the ANSYS_UAT_PAT identity with a 401 "
+            f"'{_KNOWN_PROVISIONING_ISSUE_DETAIL}'. See the comment above "
+            "_skip_if_known_provisioning_issue in tests/integration/conftest.py for how "
+            "to re-enable."
+        )
+    raise exc
 
 
 # ---------------------------------------------------------------------------
@@ -107,11 +137,14 @@ def _creation_concept(session_token, session_account_id, session_hpc_id):
             session_hpc_id,
             "Integration Tests – creation",
         )
-        concept = app.create_new_concept(
-            client,
-            project["projectId"],
-            title="Component creation test concept",
-        )
+        try:
+            concept = app.create_new_concept(
+                client,
+                project["projectId"],
+                title="Component creation test concept",
+            )
+        except exceptions.ResponseError as exc:
+            _skip_if_known_provisioning_issue(exc)
     yield concept
     try:
         app.delete_project(project["projectId"], session_token)
@@ -153,11 +186,14 @@ def populated_concept(session_token, session_account_id, session_hpc_id):
             session_hpc_id,
             "Integration Tests – job",
         )
-        concept = app.create_new_concept(
-            client,
-            project["projectId"],
-            title="Job test concept",
-        )
+        try:
+            concept = app.create_new_concept(
+                client,
+                project["projectId"],
+                title="Job test concept",
+            )
+        except exceptions.ResponseError as exc:
+            _skip_if_known_provisioning_issue(exc)
 
     design_instance_id = concept["design_instance_id"]
 
