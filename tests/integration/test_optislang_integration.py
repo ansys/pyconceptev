@@ -25,7 +25,7 @@ from pathlib import Path
 import pprint
 import re
 
-from conftest import _skip_if_known_provisioning_issue
+from _known_issues import _skip_if_known_provisioning_issue
 import httpx
 import jwt
 
@@ -312,8 +312,7 @@ def test_authorised(client):
         pytest.skip(
             "Known issue: the ConceptEV API hasn't migrated to the new UAT environment "
             "yet, so it rejects the ANSYS_UAT_PAT identity with a 401 'Key Not Found'. "
-            "See tests/integration/conftest.py's _skip_if_known_provisioning_issue for how "
-            "to re-enable."
+            "See tests/integration/_known_issues.py for how to re-enable."
         )
     assert response.status_code == 200
 

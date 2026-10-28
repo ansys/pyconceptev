@@ -44,6 +44,7 @@ INTEGRATION_CONFIG = Path(__file__).resolve().parent / "config.toml"
 # at module-import time via os.environ.get("PYCONCEPTEV_SETTINGS").
 os.environ.setdefault("PYCONCEPTEV_SETTINGS", str(INTEGRATION_CONFIG))
 
+from _known_issues import _skip_if_known_provisioning_issue  # noqa: E402
 import pytest  # noqa: E402
 
 from ansys.conceptev.core import app, auth, exceptions  # noqa: E402
@@ -54,36 +55,6 @@ DATA_DIR = Path(__file__).parent
 def pytest_configure(config) -> None:
     """Re-affirm the env var in case settings was imported before our module-level set."""
     os.environ.setdefault("PYCONCEPTEV_SETTINGS", str(INTEGRATION_CONFIG))
-
-
-# ---------------------------------------------------------------------------
-# KNOWN ISSUE (2026-10-27): the ConceptEV API rejects the ANSYS_UAT_PAT identity
-# with a 401 "Key Not Found" — the ConceptEV API hasn't migrated to the new UAT
-# environment/identity setup yet, so it doesn't recognize tokens issued through the
-# new PAT-based auth flow. This is an environment-migration gap on the ConceptEV
-# side, not a pyconceptev bug (confirmed: the same token works fine against the OCM API).
-#
-# TO RE-ENABLE: once the ConceptEV API has migrated to the new UAT environment,
-# delete `_KNOWN_PROVISIONING_ISSUE_DETAIL`/`_skip_if_known_provisioning_issue` below
-# and their call sites — the tests will then run and assert normally again.
-# ---------------------------------------------------------------------------
-_KNOWN_PROVISIONING_ISSUE_DETAIL = "Key Not Found"
-
-
-def _skip_if_known_provisioning_issue(exc: Exception) -> None:
-    """Skip (not fail) on the known ConceptEV API / UAT migration gap.
-
-    Matches only the exact known error detail, so unrelated regressions still fail.
-    """
-    if _KNOWN_PROVISIONING_ISSUE_DETAIL in str(exc):
-        pytest.skip(
-            "Known issue: the ConceptEV API hasn't migrated to the new UAT environment "
-            f"yet, so it rejects the ANSYS_UAT_PAT identity with a 401 "
-            f"'{_KNOWN_PROVISIONING_ISSUE_DETAIL}'. See the comment above "
-            "_skip_if_known_provisioning_issue in tests/integration/conftest.py for how "
-            "to re-enable."
-        )
-    raise exc
 
 
 # ---------------------------------------------------------------------------
