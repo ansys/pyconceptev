@@ -25,6 +25,7 @@ from pathlib import Path
 import pprint
 import re
 
+from conftest import _skip_if_known_provisioning_issue
 import httpx
 import jwt
 
@@ -177,11 +178,14 @@ def project_id(created_project):
 
 @pytest.fixture
 def created_concept(client, project_id):
-    concept_data = app.create_new_concept(
-        client,
-        project_id,
-        title="ConceptEV Integration Test",
-    )
+    try:
+        concept_data = app.create_new_concept(
+            client,
+            project_id,
+            title="ConceptEV Integration Test",
+        )
+    except exceptions.ResponseError as exc:
+        _skip_if_known_provisioning_issue(exc)
     return concept_data
 
 

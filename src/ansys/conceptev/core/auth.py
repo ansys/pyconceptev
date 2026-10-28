@@ -140,10 +140,14 @@ def build_persistence(location, fallback_to_plaintext=True):
     """Create Persistent Cache."""
     try:
         return build_encrypted_persistence(location)
-    except Exception:
+    except Exception as exc:
         if not fallback_to_plaintext:
             raise
-        logger.exception("Encryption unavailable. Opting in to plain text.")
+        # Expected on CI runners without an OS keyring (e.g. Linux without libsecret/gi) —
+        # log a short reason, not the full traceback, to avoid drowning out real failures.
+        logger.debug(
+            "OS-level token cache encryption unavailable (%s); using a plaintext cache.", exc
+        )
     return FilePersistence(location)
 
 
