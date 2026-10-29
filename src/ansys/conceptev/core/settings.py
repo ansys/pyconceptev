@@ -31,7 +31,7 @@ try:
 except ModuleNotFoundError:
     import tomli as tomllib
 
-from pydantic import AfterValidator, EmailStr, HttpUrl, WebsocketUrl
+from pydantic import AfterValidator, HttpUrl, SecretStr, WebsocketUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 RESOURCE_DIRECTORY = Path(__file__).parents[0].joinpath("resources")
@@ -64,8 +64,9 @@ class Settings(BaseSettings):
     scope: HttpUrlString
     job_timeout: int
     ssl_cert_file: str | None = None
-    conceptev_username: EmailStr | None = None  # Only works in testing environment
-    conceptev_password: str | None = None  # Only works in testing environment
+    # Pre-issued, long-lived Personal Access Token exchanged for a non-interactive access token
+    # for CI test automation — unaffected by SSO/MFA on the account. A secret: never logged/repr'd.
+    ansys_uat_pat: SecretStr | None = None
     account_name: str | None
     local_config_path: Path | None = DEFAULT_CONFIG_PATH
     local_server_mode: Literal["gui", "headless"] = "gui"
@@ -78,6 +79,9 @@ class Settings(BaseSettings):
             "./config.toml",
         ],
         secrets_dir=[RESOURCE_DIRECTORY, "."],
+        # Tolerate stale/unknown keys in hand-edited config.toml files (e.g. leftover
+        # conceptev_username/conceptev_password from before PAT-based auth).
+        extra="ignore",
     )
 
 

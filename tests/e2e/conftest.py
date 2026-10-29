@@ -130,20 +130,18 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 def e2e_settings():
     """Return the pyconceptev settings loaded from tests/e2e/config.toml.
 
-    Also exports CONCEPTEV_PASSWORD to the process environment so optiSLang's
+    Also exports ANSYS_UAT_PAT to the process environment so optiSLang's
     bundled Python subprocess can pick it up regardless of its working directory
     (pydantic-settings secret-file lookup is CWD-relative).
     """
-    if _loaded_settings.conceptev_password and not os.environ.get("CONCEPTEV_PASSWORD"):
-        os.environ["CONCEPTEV_PASSWORD"] = _loaded_settings.conceptev_password
+    if _loaded_settings.ansys_uat_pat and not os.environ.get("ANSYS_UAT_PAT"):
+        os.environ["ANSYS_UAT_PAT"] = _loaded_settings.ansys_uat_pat.get_secret_value()
 
-    password_set = bool(_loaded_settings.conceptev_password or os.environ.get("CONCEPTEV_PASSWORD"))
     print(
         f"\n[e2e-settings] config={E2E_CONFIG}\n"
         f"  CONCEPTEV_URL={_loaded_settings.conceptev_url}\n"
         f"  ACCOUNT_NAME={_loaded_settings.account_name}\n"
-        f"  USERNAME={_loaded_settings.conceptev_username}\n"
-        f"  PASSWORD set: {password_set}"
+        f"  ANSYS_UAT_PAT set: {bool(_loaded_settings.ansys_uat_pat)}"
     )
     return _loaded_settings
 
@@ -155,9 +153,16 @@ def e2e_settings():
 
 @pytest.fixture(scope="session")
 def session_token():
-    """Acquire an AnsysID token once per test session."""
-    msal = auth.create_msal_app()
-    return auth.get_ansyId_token(msal)
+    """Acquire a token once per test session, without blocking on human interaction.
+
+    ``get_ansyId_token`` uses the pre-issued ``ANSYS_UAT_PAT`` (unaffected by
+    SSO/MFA on the test account). Skips the whole session (rather than hanging
+    on an interactive sign-in) if it isn't configured.
+    """
+    if not auth.PAT_TOKEN:
+        pytest.skip("ANSYS_UAT_PAT is not configured — skipping e2e tests.")
+    msal_app = auth.create_msal_app()
+    return auth.get_ansyId_token(msal_app, allow_interactive=False)
 
 
 @pytest.fixture(scope="session")
