@@ -235,7 +235,7 @@ def test_interactive_sign_in_request_accepted():
     params = {
         "client_id": auth.client_id,
         "response_type": "code",
-        "redirect_uri": auth.PAT_REDIRECT_URI,
+        "redirect_uri": "http://localhost:8400",
         "scope": f"openid {auth.scope}",
         "response_mode": "query",
         "nonce": "smoketest",
