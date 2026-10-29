@@ -115,6 +115,10 @@ def _creation_concept(session_token, session_account_id, session_hpc_id):
                 title="Component creation test concept",
             )
         except exceptions.ResponseError as exc:
+            try:
+                app.delete_project(project["projectId"], session_token)
+            except Exception as e:
+                print(f"Warning: failed to clean up project {project['projectId']}: {e}")
             _skip_if_known_provisioning_issue(exc)
     yield concept
     try:
