@@ -47,3 +47,10 @@ def test_local_server_settings_can_be_overridden(monkeypatch):
     settings = Settings()
     assert settings.local_server_mode == "headless"
     assert settings.local_server_timeout == 10
+
+
+def test_ansys_uat_pat_from_env(monkeypatch):
+    monkeypatch.setenv("ANSYS_UAT_PAT", "fake-test-pat")
+    settings = Settings()
+    assert settings.ansys_uat_pat.get_secret_value() == "fake-test-pat"
+    assert "fake-test-pat" not in repr(settings.ansys_uat_pat)

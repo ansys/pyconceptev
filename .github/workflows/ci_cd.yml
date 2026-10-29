@@ -105,7 +105,6 @@ jobs:
     steps:
       - uses: ansys/actions/tests-pytest@9dc4e3161033d2c2485fbf9687d40cfb7a661fb2 # v10.3.6
         env:
-          CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           pytest-extra-args: "tests/unit --cov=ansys --cov-report=term --cov-report=html:.cov/html"
@@ -134,7 +133,7 @@ jobs:
       - uses: ansys/actions/tests-pytest@9dc4e3161033d2c2485fbf9687d40cfb7a661fb2 # v10.3.6
         env:
           PYCONCEPTEV_SETTINGS: "tests/integration/config.toml"
-          CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
+          ANSYS_UAT_PAT: ${{ secrets.ANSYS_UAT_PAT }}
           POETRY_VIRTUALENVS_CREATE: ${{ vars.POETRY_VIRTUALENVS_CREATE }}
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
@@ -162,7 +161,6 @@ jobs:
           optional-dependencies-name: ""
           group-dependencies-name: "doc"
         env:
-          CONCEPTEV_PASSWORD: ${{ secrets.CONCEPTEV_PASSWORD }}
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
   package:

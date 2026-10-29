@@ -124,7 +124,20 @@ OCM_URL = settings.ocm_url
 BASE_URL = settings.conceptev_url
 ACCOUNT_NAME = settings.account_name
 LOCAL_CONFIG_PATH = settings.local_config_path
-app = auth.create_msal_app()
+_default_msal_app: "auth.PublicClientApplication | None" = None
+
+
+def _get_default_msal_app() -> "auth.PublicClientApplication":
+    """Lazily create the module-default MSAL app.
+
+    Deferred so importing this module doesn't require network access to the
+    AnsysID authority (e.g. so test collection still works when the configured
+    authority is unreachable or misconfigured).
+    """
+    global _default_msal_app
+    if _default_msal_app is None:
+        _default_msal_app = auth.create_msal_app()
+    return _default_msal_app
 
 
 def get_http_client(
@@ -422,10 +435,10 @@ def wait_for_job_completed(
     A timeout from the websocket path is re-raised immediately — the budget is spent.
     """
     job_id = job_info.get("job_id", "?")
-    _msal = msal_app or app
 
     # --- Websocket path (primary) ------------------------------------------
     try:
+        _msal = msal_app or _get_default_msal_app()
         token = auth.get_token(client)
         user_id = get_user_id(token)
         status = monitor_job_progress(job_id, user_id, token, _msal, timeout=timeout)

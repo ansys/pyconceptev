@@ -686,6 +686,19 @@ def test_get_status_falls_back_to_job_status_list_when_last_and_final_are_none(h
     assert result == "CREATED"
 
 
+def test_wait_for_job_completed_falls_back_when_msal_initialization_fails(client, mocker):
+    mocker.patch.object(
+        app, "_get_default_msal_app", side_effect=RuntimeError("authority unavailable")
+    )
+    mocker.patch.object(app.auth, "get_token", return_value="token")
+    mock_get_status = mocker.patch.object(app, "get_status", return_value=STATUS_COMPLETE)
+
+    result = app.wait_for_job_completed({"job_id": "123"}, client)
+
+    assert result == STATUS_COMPLETE
+    mock_get_status.assert_called_once_with({"job_id": "123"}, "token")
+
+
 @pytest.mark.parametrize(
     "result,expected",
     [(STATUS_COMPLETE, True), (STATUS_FINISHED, True), (STATUS_ERROR, False), (None, False)],

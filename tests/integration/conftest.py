@@ -44,9 +44,10 @@ INTEGRATION_CONFIG = Path(__file__).resolve().parent / "config.toml"
 # at module-import time via os.environ.get("PYCONCEPTEV_SETTINGS").
 os.environ.setdefault("PYCONCEPTEV_SETTINGS", str(INTEGRATION_CONFIG))
 
+from _known_issues import _skip_if_known_provisioning_issue  # noqa: E402
 import pytest  # noqa: E402
 
-from ansys.conceptev.core import app, auth  # noqa: E402
+from ansys.conceptev.core import app, auth, exceptions  # noqa: E402
 
 DATA_DIR = Path(__file__).parent
 
@@ -63,9 +64,16 @@ def pytest_configure(config) -> None:
 
 @pytest.fixture(scope="session")
 def session_token():
-    """Acquire a long-lived AnsysID token once per test session."""
-    msal = auth.create_msal_app()
-    return auth.get_ansyId_token(msal)
+    """Acquire a token once per test session, without blocking on human interaction.
+
+    ``get_ansyId_token`` uses the pre-issued ``ANSYS_UAT_PAT`` (unaffected by
+    SSO/MFA on the test account). Skips the whole session (rather than hanging
+    on an interactive sign-in) if it isn't configured.
+    """
+    if not auth.PAT_TOKEN:
+        pytest.skip("ANSYS_UAT_PAT is not configured — skipping integration tests.")
+    msal_app = auth.create_msal_app()
+    return auth.get_ansyId_token(msal_app, allow_interactive=False)
 
 
 @pytest.fixture(scope="session")
@@ -100,11 +108,18 @@ def _creation_concept(session_token, session_account_id, session_hpc_id):
             session_hpc_id,
             "Integration Tests – creation",
         )
-        concept = app.create_new_concept(
-            client,
-            project["projectId"],
-            title="Component creation test concept",
-        )
+        try:
+            concept = app.create_new_concept(
+                client,
+                project["projectId"],
+                title="Component creation test concept",
+            )
+        except exceptions.ResponseError as exc:
+            try:
+                app.delete_project(project["projectId"], session_token)
+            except Exception as e:
+                print(f"Warning: failed to clean up project {project['projectId']}: {e}")
+            _skip_if_known_provisioning_issue(exc)
     yield concept
     try:
         app.delete_project(project["projectId"], session_token)
@@ -146,11 +161,14 @@ def populated_concept(session_token, session_account_id, session_hpc_id):
             session_hpc_id,
             "Integration Tests – job",
         )
-        concept = app.create_new_concept(
-            client,
-            project["projectId"],
-            title="Job test concept",
-        )
+        try:
+            concept = app.create_new_concept(
+                client,
+                project["projectId"],
+                title="Job test concept",
+            )
+        except exceptions.ResponseError as exc:
+            _skip_if_known_provisioning_issue(exc)
 
     design_instance_id = concept["design_instance_id"]
 
