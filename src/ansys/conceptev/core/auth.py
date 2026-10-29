@@ -120,7 +120,9 @@ def _acquire_token_by_pat(app: PublicClientApplication, pat: SecretStr) -> dict:
     request = _build_pat_authorize_request(pat.get_secret_value())
     # Default httpx timeout (5s) is too tight for some CI runners' network path
     # to the identity provider.
-    with httpx.Client(timeout=30) as client:
+    from ansys.conceptev.core.progress import generate_ssl_context
+
+    with httpx.Client(timeout=30, verify=generate_ssl_context()) as client:
         response = client.send(request, follow_redirects=False)
     location = response.headers.get("location")
     if not location:
