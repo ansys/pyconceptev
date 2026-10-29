@@ -35,6 +35,24 @@ from ansys.conceptev.core.exceptions import TokenError
 from ansys.conceptev.core.settings import settings
 
 logger = logging.getLogger(__name__)
+
+
+class _PatRedactionFilter(logging.Filter):
+    """Redact PATs from HTTPX request URL log messages."""
+
+    _pattern = re.compile(r"([?&]id_token_hint=)[^&\s\"']*", re.IGNORECASE)
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        message = record.getMessage()
+        redacted_message = self._pattern.sub(r"\1[REDACTED]", message)
+        if redacted_message != message:
+            record.msg = redacted_message
+            record.args = ()
+        return True
+
+
+logging.getLogger("httpx").addFilter(_PatRedactionFilter())
+
 scope = settings.scope
 client_id = settings.client_id
 authority = settings.authority
@@ -100,18 +118,10 @@ def _acquire_token_by_pat(app: PublicClientApplication, pat: SecretStr) -> dict:
     MSAL then exchanges — and caches — for a normal access token.
     """
     request = _build_pat_authorize_request(pat.get_secret_value())
-    # httpx logs the full request URL at INFO level, which would otherwise leak the PAT
-    # (embedded in the query string) to logs/log-capturing test runners.
-    httpx_logger = logging.getLogger("httpx")
-    previous_level = httpx_logger.level
-    httpx_logger.setLevel(logging.WARNING)
-    try:
-        # Default httpx timeout (5s) is too tight for some CI runners' network path
-        # to the identity provider.
-        with httpx.Client(timeout=30) as client:
-            response = client.send(request, follow_redirects=False)
-    finally:
-        httpx_logger.setLevel(previous_level)
+    # Default httpx timeout (5s) is too tight for some CI runners' network path
+    # to the identity provider.
+    with httpx.Client(timeout=30) as client:
+        response = client.send(request, follow_redirects=False)
     location = response.headers.get("location")
     if not location:
         detail = _extract_error_detail(response.text) or "no additional detail available"

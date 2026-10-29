@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import logging
+
 import httpx
 from msal_extensions import (
     FilePersistence,
@@ -110,6 +112,24 @@ def test_get_ansyId_token_exchanges_pat_for_access_token(
     app = auth.create_msal_app()
     token = auth.get_ansyId_token(app)
     assert token == "mock_pat_token_for_fake-auth-code"
+
+
+def test_pat_exchange_redacts_pat_from_httpx_logs(
+    mockPublcClientCreation, mocker, httpx_mock: HTTPXMock, caplog
+) -> None:
+    mocker.patch("ansys.conceptev.core.auth.PAT_TOKEN", SecretStr("fake-test-pat"))
+    httpx_mock.add_response(
+        status_code=302,
+        headers={"location": "https://example.com/redirect?code=fake-auth-code"},
+    )
+    app = auth.create_msal_app()
+
+    with caplog.at_level(logging.INFO, logger="httpx"):
+        auth.get_ansyId_token(app)
+
+    assert "HTTP Request" in caplog.text
+    assert "id_token_hint=[REDACTED]" in caplog.text
+    assert "fake-test-pat" not in caplog.text
 
 
 def test_get_ansyId_token_force_true_skips_cache_and_uses_pat(
