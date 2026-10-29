@@ -435,10 +435,10 @@ def wait_for_job_completed(
     A timeout from the websocket path is re-raised immediately — the budget is spent.
     """
     job_id = job_info.get("job_id", "?")
-    _msal = msal_app or _get_default_msal_app()
 
     # --- Websocket path (primary) ------------------------------------------
     try:
+        _msal = msal_app or _get_default_msal_app()
         token = auth.get_token(client)
         user_id = get_user_id(token)
         status = monitor_job_progress(job_id, user_id, token, _msal, timeout=timeout)
