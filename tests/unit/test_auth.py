@@ -116,9 +116,7 @@ def test_get_ansyId_token_exchanges_pat_for_access_token(
 
 def test_pat_exchange_uses_configured_ssl_context(mockPublcClientCreation, mocker):
     ssl_context = object()
-    mocker.patch(
-        "ansys.conceptev.core.progress.generate_ssl_context", return_value=ssl_context
-    )
+    mocker.patch("ansys.conceptev.core.progress.generate_ssl_context", return_value=ssl_context)
     mock_client = mocker.patch("ansys.conceptev.core.auth.httpx.Client")
     mock_client.return_value.__enter__.return_value.send.return_value.headers = {
         "location": "https://example.com/redirect?code=fake-auth-code"
